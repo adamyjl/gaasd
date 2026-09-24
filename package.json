@@ -1,0 +1,27 @@
+{
+  "name": "gaasd-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "GAASD static promotional website",
+  "scripts": {
+    "dev": "node scripts/serve.mjs --dir site --port 4173",
+    "format": "prettier --write site/*.{html,css,js,svg} backend/ui/*.{html,css,js} scripts/*.mjs tests/*.mjs *.json *.mjs",
+    "format:check": "prettier --check site/*.{html,css,js,svg} backend/ui/*.{html,css,js} scripts/*.mjs tests/*.mjs *.json *.mjs",
+    "lint": "eslint site/*.js backend/ui/*.js scripts/*.mjs tests/*.mjs *.mjs",
+    "typecheck": "tsc --project jsconfig.json",
+    "test": "playwright test",
+    "test:analytics": "playwright test -c playwright.analytics.config.mjs",
+    "dev:analytics": "node scripts/analytics-dev.mjs",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/serve.mjs --dir dist --port 4173"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.2",
+    "eslint": "^9.39.5",
+    "prettier": "^3.9.6",
+    "typescript": "^7.0.2"
+  }
+}

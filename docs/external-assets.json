@@ -1,0 +1,138 @@
+{
+  "snapshot_date": "2026-09-24",
+  "full_backup_id": "20260924T102025",
+  "files": {
+    "backend/geo-data/ip2region_v4.xdb": {
+      "bytes": 11122036,
+      "sha256": "8e31bbdccb5bf21028af10592d4312ec975da0bffa108c0c5d862a12190f9ad3"
+    },
+    "backend/geo-data/ip2region_v6.xdb": {
+      "bytes": 37277813,
+      "sha256": "939f6b46bd2b8bec3cf7c5ceb8ba782266ae9b1f35b5ba7916700dec0b7506ed"
+    },
+    "site/images/ai-assist.webp": {
+      "bytes": 28620,
+      "sha256": "0d94415a13e3bbdd54124fdc3c4c2d6a56533534e6df2dafaf2d1fa3e35246d2"
+    },
+    "site/images/en/ai-assist-20260922.webp": {
+      "bytes": 134912,
+      "sha256": "94661c05fee66d924e9f73f1f803223e705c104a88363437ba4c0d37c1d7158b"
+    },
+    "site/images/en/nnide-20260922.webp": {
+      "bytes": 125850,
+      "sha256": "13526e0da61eec4288a2e6da32ce5ba841560a46ddc2ac5b68cd27bd02c829dd"
+    },
+    "site/images/en/overview-20260922.webp": {
+      "bytes": 178072,
+      "sha256": "8cfcde26267cac86263c2766996fcd8ddd5901b013aa69ca48996f1cfd3accfc"
+    },
+    "site/images/en/platform-20260922.webp": {
+      "bytes": 135382,
+      "sha256": "bb88e0254cbc536cca0300cc9427dc61607144ae9f789862f3eaa60eb94d02b0"
+    },
+    "site/images/en/vla-20260922.webp": {
+      "bytes": 185294,
+      "sha256": "f6fd326e7c68d1eceb88f411fbe29e5ab0850292b5c86981762060b95e31a10e"
+    },
+    "site/images/nnide.webp": {
+      "bytes": 30048,
+      "sha256": "79d3d7b5d773e6dd66126b4f5daa24d7ba2d34aa84d1699d0da2032014e83cb8"
+    },
+    "site/images/overview.webp": {
+      "bytes": 86152,
+      "sha256": "8882c60de741ec3ece32389480f2e69f3315778050525faf74ac6b3d1e4d2801"
+    },
+    "site/images/platform.webp": {
+      "bytes": 34056,
+      "sha256": "c6d45b9773d32d8e76093c7aea6570c42a78e0f5284de24acc5f7a76c3b9ca2d"
+    },
+    "site/images/public-security-beian.png": {
+      "bytes": 11143,
+      "sha256": "6189a29f86e1756d1970f4446b9f836642c283c373d312dbddeb42411f1608e6"
+    },
+    "site/images/vla.webp": {
+      "bytes": 59918,
+      "sha256": "6f951d24169eeff47b83ed313e2d2be89a8a65eae90d1f2fa45a3bc0a9db59bb"
+    },
+    "site/media/ai-assist.mp4": {
+      "bytes": 31163494,
+      "sha256": "2350403b5785d10c6249ae4303106d386df85480765e98e925c212f0f3747ed0"
+    },
+    "site/media/nnide.mp4": {
+      "bytes": 98575695,
+      "sha256": "f3b06eef7db7ce1a4e5cad77369b92bcf548fcf8296fffe1cdb9fc0fd51c9365"
+    },
+    "site/media/overview.mp4": {
+      "bytes": 25104028,
+      "sha256": "7b64db3b60a0fbf4a19e1e666f5b90fefddd973db3032c80e47d185cf6b08a1a"
+    },
+    "site/media/platform.mp4": {
+      "bytes": 19558928,
+      "sha256": "cbc1d26d6fb1d711f1d040b9bfa16119dd05cf19f93854e0bb1c4fe3d101fa3a"
+    },
+    "site/media/present2/cn/ai-assist.mp4": {
+      "bytes": 20249440,
+      "sha256": "39414f03ae3842cf118f7f6eb45dc6014b45cac7231f4c752acf627b2939dd30"
+    },
+    "site/media/present2/cn/nnide-20260916.mp4": {
+      "bytes": 24370209,
+      "sha256": "2cc128ad663357220c1fc4848bd692ea17619e93caf6c0ee71385104a3cfb3c8"
+    },
+    "site/media/present2/cn/nnide.mp4": {
+      "bytes": 24902011,
+      "sha256": "bd3874c4af017da5b0a3c3c6bc8a908023513e7e57ea9c41e203fdcb7882b622"
+    },
+    "site/media/present2/cn/platform-20260915.mp4": {
+      "bytes": 31752743,
+      "sha256": "e1afe82f68bedf973f376f153b00a3c1dbcb50c165b85c30c62858101d5625bf"
+    },
+    "site/media/present2/cn/platform.mp4": {
+      "bytes": 31707898,
+      "sha256": "10c54e506e12b5cb8db03d94d2a150fc46e7e660b033ecc97df79eb069fdf30e"
+    },
+    "site/media/present2/cn/vla-20260916.mp4": {
+      "bytes": 110980732,
+      "sha256": "0058c2adb086ab698bfeda331a082a41f260a63043fed8ed3165d14c16df50ae"
+    },
+    "site/media/present2/cn/vla.mp4": {
+      "bytes": 110939103,
+      "sha256": "89629292957a7b072ff545797e2df945fac4e42de1603f85a4a0c9137b4b3f9d"
+    },
+    "site/media/present2/en/ai-assist.mp4": {
+      "bytes": 20923206,
+      "sha256": "9c368d2b5784c2d680903d749a1c7a99ac064a88cb71862f734619ea5635d1c9"
+    },
+    "site/media/present2/en/nnide-20260916.mp4": {
+      "bytes": 27554132,
+      "sha256": "2f5be5550e42d34d17d7502dfaba623ceeab1f2f49009366b3d01d64508dbff9"
+    },
+    "site/media/present2/en/nnide.mp4": {
+      "bytes": 27980863,
+      "sha256": "3350402b74cf3656bbaefc896e269f1c2f640b80105a99ae13ed2eec817580cb"
+    },
+    "site/media/present2/en/overview-en-ja-20260914.mp4": {
+      "bytes": 37155463,
+      "sha256": "a228568afc631272e8d0b0ec283cf8331bb73f219cfc3bd5c01308c0a9f70b59"
+    },
+    "site/media/present2/en/platform-20260915.mp4": {
+      "bytes": 32457831,
+      "sha256": "7d7d5e97fc15e376da1fcd833e789d854d8f223e38e67623d4b317033494bbe6"
+    },
+    "site/media/present2/en/platform.mp4": {
+      "bytes": 32421081,
+      "sha256": "3e63c4adf715b5ece59c5378f28d2f153850c55cab93f911cdd3ad30693b637b"
+    },
+    "site/media/present2/en/vla-20260916.mp4": {
+      "bytes": 112171950,
+      "sha256": "86c0c4d0a580a8e35991461cb93ca5f4e8238abd3d4d8671c59ce895ebd6b29d"
+    },
+    "site/media/present2/en/vla.mp4": {
+      "bytes": 112130321,
+      "sha256": "e0bda632980966c6fdb89948b5ca8ca5135b740f943af282167cc91f970f297e"
+    },
+    "site/media/vla.mp4": {
+      "bytes": 123228373,
+      "sha256": "3d764be847615f9636e4a43edc7dcbc593658c5bb29fda2c1b66b6e64634c325"
+    }
+  }
+}

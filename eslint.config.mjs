@@ -1,0 +1,42 @@
+import js from "@eslint/js";
+
+export default [
+  js.configs.recommended,
+  {
+    files: ["**/*.js", "**/*.mjs"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        document: "readonly",
+        window: "readonly",
+        location: "readonly",
+        history: "readonly",
+        HTMLElement: "readonly",
+        HTMLDialogElement: "readonly",
+        HTMLVideoElement: "readonly",
+        HTMLButtonElement: "readonly",
+        SVGElement: "readonly",
+        IntersectionObserver: "readonly",
+        requestAnimationFrame: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        console: "readonly",
+        URL: "readonly",
+        process: "readonly",
+        Buffer: "readonly",
+        fetch: "readonly",
+        navigator: "readonly",
+        crypto: "readonly",
+        performance: "readonly",
+        Blob: "readonly",
+        CustomEvent: "readonly",
+        FormData: "readonly",
+        URLSearchParams: "readonly",
+        AbortController: "readonly",
+      },
+    },
+    rules: { "no-unused-vars": ["error", { argsIgnorePattern: "^_" }] },
+  },
+  { ignores: ["dist/**", "work/**", ".tools/**", "node_modules/**"] },
+];

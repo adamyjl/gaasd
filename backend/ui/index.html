@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <title>访问与视频统计 · GAASD</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/statistics/assets/dashboard.css" />
+    <script type="module" src="/statistics/assets/dashboard.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="wordmark" href="/">GAASD <span>STATISTICS</span></a>
+      <div class="top-actions">
+        <a class="admin-link" href="/status">服务器状态</a>
+        <span class="private-badge">管理员访问</span
+        ><a href="/">查看宣传页 ↗</a>
+      </div>
+    </header>
+    <main class="dashboard">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">AUDIENCE / ENGAGEMENT</p>
+          <h1>访问与视频统计</h1>
+          <p class="subtitle">了解访客来自哪里，以及哪些开发演示被观看。</p>
+        </div>
+        <p class="updated" id="updated" aria-live="polite">正在获取数据…</p>
+      </div>
+      <form id="filters" class="filter-panel">
+        <div class="quick-ranges" role="group" aria-label="快捷日期范围">
+          <button type="button" data-days="1">今天</button
+          ><button type="button" data-days="7" aria-pressed="true">
+            近 7 天</button
+          ><button type="button" data-days="30">近 30 天</button>
+        </div>
+        <div class="date-fields">
+          <label
+            >开始日期<input id="from" name="from" type="date" required /></label
+          ><span class="date-separator" aria-hidden="true">—</span
+          ><label
+            >结束日期<input id="to" name="to" type="date" required
+          /></label>
+        </div>
+        <label class="search-field"
+          >搜索访客<input
+            name="q"
+            type="search"
+            placeholder="IP、地区或浏览器"
+            maxlength="120"
+        /></label>
+        <label
+          >关联视频<select name="video">
+            <option value="">全部视频</option>
+            <option value="overview">GAASD 总览</option>
+            <option value="platform">平台与功能软件</option>
+            <option value="ai-assist">AI 辅助开发</option>
+            <option value="nnide">神经网络开发</option>
+            <option value="vla">VLM / VLA 开发</option>
+          </select></label
+        >
+        <label
+          >数据来源<select name="source">
+            <option value="all">全部来源</option>
+            <option value="client">页面事件</option>
+            <option value="nginx">历史日志</option>
+          </select></label
+        >
+        <div class="filter-bottom">
+          <label class="check-label"
+            ><input
+              name="bots"
+              type="checkbox"
+              value="1"
+            />包含识别出的自动流量</label
+          >
+          <div class="filter-actions">
+            <button class="apply-button" type="submit">应用筛选</button
+            ><button id="refresh" type="button">刷新</button
+            ><a
+              id="export"
+              class="button-link"
+              href="/statistics/api/export.csv"
+              >导出 CSV ↓</a
+            >
+          </div>
+        </div>
+      </form>
+      <p class="message" id="message" role="status" hidden></p>
+      <section class="metrics" aria-label="关键数据">
+        <article>
+          <p>访问次数 <span>PV</span></p>
+          <strong id="metric-pv">—</strong><small>页面访问记录</small>
+        </article>
+        <article>
+          <p>访问会话</p>
+          <strong id="metric-sessions">—</strong
+          ><small>按 30 分钟间隔区分</small>
+        </article>
+        <article>
+          <p>独立 IP</p>
+          <strong id="metric-ips">—</strong><small>不等同于独立人数</small>
+        </article>
+        <article>
+          <p>视频播放</p>
+          <strong id="metric-plays">—</strong><small>实际开始播放的次数</small>
+        </article>
+        <article>
+          <p>累计观看时长</p>
+          <strong id="metric-watch">—</strong><small>前台实际播放时间</small>
+        </article>
+      </section>
+      <div class="insights-grid">
+        <section class="panel trend-panel">
+          <div class="panel-heading">
+            <h2>访问趋势</h2>
+            <span>北京时间 · 每日 PV</span>
+          </div>
+          <div
+            id="trend"
+            class="trend"
+            role="img"
+            aria-label="正在加载每日访问趋势"
+          ></div>
+          <div class="trend-labels">
+            <span id="trend-start"></span><span id="trend-end"></span>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>访客地区</h2>
+            <span>按访问次数</span>
+          </div>
+          <div id="regions" class="rank-list"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>浏览器分布</h2>
+            <span>按访问次数</span>
+          </div>
+          <div id="browsers" class="rank-list"></div>
+        </section>
+      </div>
+      <section class="panel video-panel">
+        <div class="panel-heading">
+          <h2>五个演示的观看表现</h2>
+          <span>资源请求不计入播放次数</span>
+        </div>
+        <div class="table-wrap">
+          <table class="video-table">
+            <thead>
+              <tr>
+                <th>演示视频</th>
+                <th>播放次数</th>
+                <th>观看 IP</th>
+                <th>累计时长</th>
+                <th>完整播放</th>
+                <th>历史资源请求</th>
+              </tr>
+            </thead>
+            <tbody id="video-rows"></tbody>
+          </table>
+        </div>
+        <p class="table-note">
+          完整播放：播放覆盖达到 90% 且播放至结尾。拖动进度不会增加观看时长。
+        </p>
+      </section>
+      <section class="panel visits-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>访问明细</h2>
+            <p id="visit-count" class="count-label"></p>
+          </div>
+          <span>展开一条记录，查看浏览器与观看明细</span>
+        </div>
+        <div class="table-wrap">
+          <table class="visit-table">
+            <thead>
+              <tr>
+                <th>访问时间 / 来源</th>
+                <th>IP / 大致地区</th>
+                <th>浏览器 / 设备</th>
+                <th>观看的视频</th>
+                <th>观看时长</th>
+                <th>详情</th>
+              </tr>
+            </thead>
+            <tbody id="visit-rows"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <button id="previous-page" type="button">← 上一页</button
+          ><span id="page-info">第 1 页</span
+          ><button id="next-page" type="button">下一页 →</button>
+        </div>
+      </section>
+      <footer class="notes">
+        <p>
+          页面会话使用标签页临时标识；历史会话按 IP
+          与浏览器推断。关联视频筛选会选出相关访问记录。
+        </p>
+        <p id="historical-note"></p>
+        <p>
+          IP
+          归属地为离线数据库估算，不能确定精确住址；共享网络可能对应多名访客。页面事件可能受浏览器隐私设置、脚本拦截或离线影响。
+        </p>
+        <p>
+          数据保存在腾讯云服务器 · 统计明细仅管理员可见 · CSV 最多导出当前筛选的
+          10,000 条记录
+        </p>
+        <p class="attribution">
+          地区数据：<a
+            href="https://github.com/lionsoul2014/ip2region"
+            target="_blank"
+            rel="noreferrer"
+            >ip2region</a
+          >
+          · 浏览器识别：ua-parser
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

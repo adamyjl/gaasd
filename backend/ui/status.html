@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <title>服务器状态 · GAASD</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/status/assets/dashboard.css" />
+    <link rel="stylesheet" href="/status/assets/status.css" />
+    <script type="module" src="/status/assets/status.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="wordmark" href="/">GAASD <span>SERVER STATUS</span></a>
+      <nav class="top-actions" aria-label="管理页面">
+        <span class="private-badge">管理员访问</span>
+        <a href="/statistics">访问统计 ↗</a>
+        <a href="/">宣传页 ↗</a>
+      </nav>
+    </header>
+    <main class="dashboard status-dashboard">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">INFRASTRUCTURE / LIVE</p>
+          <h1>服务器状态</h1>
+          <p class="subtitle" id="host-summary">正在连接腾讯云服务器…</p>
+        </div>
+        <div class="live-state">
+          <span class="state-pill" id="live-state">连接中</span>
+          <p class="updated" id="status-updated">等待首份采样</p>
+        </div>
+      </div>
+      <div class="status-toolbar">
+        <p>服务器每 5 秒采样 · 时间均为北京时间</p>
+        <div class="status-controls">
+          <label
+            >刷新间隔
+            <select id="interval">
+              <option value="5">5 秒</option>
+              <option value="10">10 秒</option>
+              <option value="30">30 秒</option>
+            </select></label
+          >
+          <button id="pause" type="button" aria-pressed="false">
+            暂停刷新
+          </button>
+          <button id="refresh-status" type="button">立即刷新 ↻</button>
+        </div>
+      </div>
+      <p id="status-error" class="status-notice" role="status" hidden></p>
+      <section
+        class="status-metrics"
+        aria-label="服务器概况"
+        id="summary-metrics"
+      ></section>
+      <div id="alerts" class="status-notice" role="status" hidden></div>
+      <div class="status-grid">
+        <section class="panel cpu-panel">
+          <div class="panel-heading">
+            <h2>每核心 CPU</h2>
+            <span id="cpu-detail">采样中</span>
+          </div>
+          <div id="cpu-cores" class="core-grid"></div>
+          <div id="cpu-load" class="detail-grid"></div>
+          <p class="table-note">
+            每个逻辑核心 0–100%；负载为待运行或不可中断任务的平均数。I/O
+            等待、虚拟机资源等待单列显示。
+          </p>
+        </section>
+        <section class="panel memory-panel">
+          <div class="panel-heading">
+            <h2>内存与 Swap</h2>
+            <span>可用空间与缓存</span>
+          </div>
+          <div id="memory-detail"></div>
+        </section>
+      </div>
+      <section class="panel history-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>资源趋势</h2>
+            <p class="count-label" id="history-note">首次采样后开始积累</p>
+          </div>
+          <div class="history-controls" role="group" aria-label="趋势时间范围">
+            <button type="button" data-hours="1" aria-pressed="true">
+              1 小时</button
+            ><button type="button" data-hours="6" aria-pressed="false">
+              6 小时</button
+            ><button type="button" data-hours="24" aria-pressed="false">
+              24 小时
+            </button>
+          </div>
+        </div>
+        <div class="chart-grid" id="history-charts"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>磁盘与挂载</h2>
+          <span>空间 · inode · I/O</span>
+        </div>
+        <div id="filesystems" class="filesystem-grid"></div>
+        <div class="table-wrap">
+          <table>
+            <caption>
+              块设备实时 I/O
+            </caption>
+            <thead>
+              <tr>
+                <th>设备</th>
+                <th>读取</th>
+                <th>写入</th>
+                <th>读 / 写 IOPS</th>
+                <th>繁忙度</th>
+              </tr>
+            </thead>
+            <tbody id="disk-io"></tbody>
+          </table>
+        </div>
+        <p class="table-note">
+          本机磁盘、内存文件系统与远程挂载分别标注。磁盘“可用”不包含系统保留空间；远程挂载不计入本机容量。
+        </p>
+      </section>
+      <div class="status-grid">
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>网络接口</h2>
+            <span>实时速率 / 开机累计</span>
+          </div>
+          <div id="network" class="network-list"></div>
+          <p class="table-note">
+            累计流量来自系统网卡计数；与腾讯云账单口径可能不同。各接口独立展示，回环流量不计入顶部合计。
+          </p>
+        </section>
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>服务与维护</h2>
+            <span id="service-updated">每分钟检查</span>
+          </div>
+          <div id="services" class="service-list"></div>
+          <div id="maintenance" class="detail-grid"></div>
+        </section>
+      </div>
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <h2>资源占用进程</h2>
+            <p class="count-label" id="process-count"></p>
+          </div>
+          <label
+            >排序
+            <select id="process-sort">
+              <option value="cpu">CPU 占用</option>
+              <option value="memory">内存占用</option>
+            </select></label
+          >
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>PID</th>
+                <th>进程</th>
+                <th>状态</th>
+                <th>CPU</th>
+                <th>常驻内存</th>
+              </tr>
+            </thead>
+            <tbody id="processes"></tbody>
+          </table>
+        </div>
+        <p class="table-note">
+          展示 CPU、内存各前 8 名的合集；CPU 按整机总算力归一化为
+          0–100%。仅显示进程名称，不读取命令参数或环境变量。
+        </p>
+      </section>
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>系统详情</h2>
+          <span>连接 · 压力 · 运行信息</span>
+        </div>
+        <div class="detail-grid system-details" id="system-details"></div>
+        <div id="pressure" class="pressure-grid"></div>
+        <p class="table-note">
+          资源压力表示任务因 CPU、内存或 I/O
+          不足而停顿的时间占比。虚拟机未提供的温度、频率等指标显示“未提供”。
+        </p>
+      </section>
+      <footer class="notes">
+        <p>
+          采集服务与数据保存在腾讯云，本机关机不影响采集。最近 24
+          小时趋势持续保留，每分钟聚合，重启后继续积累。
+        </p>
+        <p>
+          这是只读状态页；登录账号、密码与访问统计页相同。服务器或网络不可达时，本页会提示连接异常，无法替代外部可用性监控。
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>
