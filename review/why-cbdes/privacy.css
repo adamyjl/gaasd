@@ -1,0 +1,29 @@
+.privacy-page {
+  max-width: 840px;
+  padding-block: 48px 80px;
+}
+.privacy-back {
+  display: inline-block;
+  margin-bottom: 48px;
+  padding-block: 10px;
+}
+.privacy-page h1 {
+  font-size: clamp(24px, 5vw, 36px);
+  line-height: 1.4;
+  margin-bottom: 28px;
+}
+.privacy-page p:not(.eyebrow) {
+  margin-block: 20px;
+  color: var(--color-text-muted);
+  line-height: 1.9;
+}
+.privacy-page button {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: 0;
+  padding: 12px 20px;
+  min-height: 44px;
+}
+.privacy-page .privacy-small {
+  font-size: 13px;
+}

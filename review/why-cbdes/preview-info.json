@@ -1,0 +1,34 @@
+{
+  "version": "beda931",
+  "revision": "beda931",
+  "dirty": false,
+  "base": "/gaasd/review/why-cbdes/",
+  "assets": [
+    "https://gaasd.com/media/present2/en/overview-en-ja-20260914.mp4",
+    "https://gaasd.com/images/en/overview-20260922.webp",
+    "https://gaasd.com/media/present2/en/platform-20260915.mp4",
+    "https://gaasd.com/images/en/platform-20260922.webp",
+    "https://gaasd.com/media/present2/en/ai-assist.mp4",
+    "https://gaasd.com/images/en/ai-assist-20260922.webp",
+    "https://gaasd.com/media/present2/en/nnide-20260916.mp4",
+    "https://gaasd.com/images/en/nnide-20260922.webp",
+    "https://gaasd.com/media/present2/en/vla-20260916.mp4",
+    "https://gaasd.com/images/en/vla-20260922.webp",
+    "https://gaasd.com/media/overview.mp4",
+    "https://gaasd.com/images/overview.webp",
+    "https://gaasd.com/media/present2/cn/platform-20260915.mp4",
+    "https://gaasd.com/images/platform.webp",
+    "https://gaasd.com/media/present2/cn/ai-assist.mp4",
+    "https://gaasd.com/images/ai-assist.webp",
+    "https://gaasd.com/media/present2/cn/nnide-20260916.mp4",
+    "https://gaasd.com/images/nnide.webp",
+    "https://gaasd.com/media/present2/cn/vla-20260916.mp4",
+    "https://gaasd.com/images/vla.webp",
+    "https://gaasd.com/images/public-security-beian.png"
+  ],
+  "analytics": false,
+  "missingResources": [
+    "images/why-cbdes-source.jpg",
+    "docs/GAASD-Develop.pdf"
+  ]
+}
