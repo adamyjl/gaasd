@@ -14,7 +14,9 @@
     "test:analytics": "playwright test -c playwright.analytics.config.mjs",
     "dev:analytics": "node scripts/analytics-dev.mjs",
     "build": "node scripts/build.mjs",
-    "preview": "node scripts/serve.mjs --dir dist --port 4173"
+    "preview": "node scripts/serve.mjs --dir dist --port 4173",
+    "build:preview": "node scripts/build-preview.mjs",
+    "test:preview": "playwright test -c playwright.preview.config.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

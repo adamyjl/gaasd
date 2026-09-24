@@ -1,0 +1,63 @@
+/* Included by build:preview only; production HTML never loads this file. */
+.review-top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.review-top .site-header {
+  position: static;
+}
+html[data-preview="true"] {
+  scroll-padding-top: 160px;
+}
+html[data-preview="true"] .why-cbdes {
+  scroll-margin-top: 0;
+}
+.review-banner {
+  padding: 10px var(--gutter);
+  background: #19200f;
+  border-bottom: 1px solid #465134;
+  color: var(--color-text-muted);
+  font:
+    12px/1.5 Arial,
+    "Microsoft YaHei",
+    sans-serif;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 20px;
+}
+.review-banner p {
+  margin: 0;
+}
+.review-banner strong {
+  color: var(--color-accent);
+  font-weight: 500;
+}
+.review-banner nav {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.review-banner a {
+  padding: 7px 10px;
+}
+.review-banner a[aria-current="page"] {
+  color: var(--color-accent);
+  border: 1px solid #465134;
+}
+@media (max-width: 767px) {
+  html[data-preview="true"] {
+    scroll-padding-top: 205px;
+  }
+  .review-banner {
+    padding: 10px 20px;
+  }
+}
+@media (min-width: 768px) and (max-width: 1150px) {
+  /* One extra navigation item must not squeeze the brand or video action. */
+  .desktop-nav {
+    gap: 14px;
+  }
+}

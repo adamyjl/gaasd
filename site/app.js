@@ -19,7 +19,8 @@ const [{ renderVideoCards }, { initMediaPlayer }, { getVideos }] =
 
 const language =
   document.documentElement.dataset.videoLanguage === "cn" ? "cn" : "en";
-const videos = getVideos(language, language === "cn" ? "/" : "");
+const mediaBase = document.documentElement.dataset.mediaBase;
+const videos = getVideos(language, mediaBase || (language === "cn" ? "/" : ""));
 renderVideoCards(videos, language);
 initNavigation();
 initAnalytics();

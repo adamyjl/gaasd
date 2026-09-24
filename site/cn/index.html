@@ -22,6 +22,8 @@
     <link rel="preload" href="/images/overview.webp" as="image" />
     <script type="module" src="/app.js?v=english-20260922"></script>
     <title>GAASD · 图形化开发系统</title>
+    <link rel="stylesheet" href="/why-cbdes.css?v=review-1" />
+    <script type="module" src="/why-cbdes.js?v=review-1"></script>
   </head>
   <body>
     <a class="skip-link" href="#overview">跳到主要内容</a>
@@ -36,8 +38,8 @@
         >
         <nav class="desktop-nav" aria-label="主导航">
           <a href="#overview" aria-current="location">概览</a
-          ><a href="#tracks">开发方向</a><a href="#capabilities">核心能力</a
-          ><a href="#about">关于</a>
+          ><a href="#why-cbdes">为何 CBDES</a><a href="#tracks">开发方向</a
+          ><a href="#capabilities">核心能力</a><a href="#about">关于</a>
         </nav>
         <button class="overview-link" type="button" data-video-id="overview">
           观看总览 <span aria-hidden="true">↗</span>
@@ -119,6 +121,209 @@
         </div>
       </section>
       <section
+        class="why-cbdes"
+        id="why-cbdes"
+        aria-labelledby="why-title"
+        lang="zh-CN"
+      >
+        <div class="why-shell">
+          <div class="why-intro">
+            <div>
+              <p class="why-kicker">WHY CBDES <span>/ 01</span></p>
+              <h2 id="why-title">
+                <span>为什么需要新的</span><span>自动驾驶开发方式？</span>
+              </h2>
+            </div>
+            <p class="why-lead">
+              从算法设计、软件集成到部署与上车验证，研发需要贯通多个环节。如何让成熟能力得到复用，让每一轮验证推动下一轮开发？
+            </p>
+          </div>
+
+          <div class="why-challenges" aria-label="研发挑战">
+            <article class="why-challenge">
+              <div class="why-card-meta">
+                <span>01</span><span>VALIDATION</span>
+              </div>
+              <h3>安全验证复杂</h3>
+              <p>场景多、链路长，算法改动需要贯穿仿真与实车的持续验证。</p>
+              <div class="why-need">需要贯通开发与验证</div>
+            </article>
+            <article class="why-challenge">
+              <div class="why-card-meta">
+                <span>02</span><span>DEVELOPMENT COST</span>
+              </div>
+              <h3>开发成本高</h3>
+              <p>接口与平台差异带来重复开发，成熟算法难以直接复用。</p>
+              <div class="why-need">需要沉淀可复用的能力</div>
+            </article>
+            <article class="why-challenge">
+              <div class="why-card-meta">
+                <span>03</span><span>ITERATION</span>
+              </div>
+              <h3>迭代效率低</h3>
+              <p>建模、代码、部署与反馈相互割裂，修改难以快速形成闭环。</p>
+              <div class="why-need">需要连接每一轮迭代</div>
+            </article>
+          </div>
+
+          <div class="why-solution">
+            <div class="why-equation-row">
+              <div>
+                <p class="why-small-label">我们的方案</p>
+                <h3>计算基础平台及开发系统</h3>
+              </div>
+              <p class="why-equation" aria-label="CBDES equals CBB plus GAASD">
+                <strong>CBDES</strong><span>=</span><b>CBB</b><span>+</span
+                ><b>GAASD</b>
+              </p>
+            </div>
+            <div class="why-platforms">
+              <article class="why-platform">
+                <div class="why-platform-top">
+                  <span class="why-product">CBB</span>
+                  <h4>功能软件基础平台</h4>
+                </div>
+                <p>
+                  沉淀可复用的功能软件，通过分层解耦与标准接口，适配不同应用、系统软件和硬件平台。
+                </p>
+                <div class="why-capabilities">
+                  <span>分层解耦</span><span>模块复用</span
+                  ><span>跨平台适配</span>
+                </div>
+              </article>
+              <article class="why-platform">
+                <div class="why-platform-top">
+                  <span class="why-product">GAASD</span>
+                  <h4>图形化开发系统</h4>
+                </div>
+                <p>
+                  以图形化建模与 AI
+                  辅助开发连接应用重构、代码生成、编译部署和仿真验证。
+                </p>
+                <div class="why-capabilities">
+                  <span>图形化建模</span><span>AI 辅助开发</span
+                  ><span>生成与验证</span>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="why-workflow">
+            <div class="why-flow-heading">
+              <h3>持续迭代的开发闭环</h3>
+              <span>选择步骤，查看工作与产出</span>
+            </div>
+            <div class="why-flow-track">
+              <div class="why-stages" role="group" aria-label="开发流程步骤">
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="0"
+                  aria-pressed="true"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">01</span
+                  ><span class="why-step-name">应用建模</span
+                  ><span class="why-step-caption">组合与重构</span>
+                </button>
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="1"
+                  aria-pressed="false"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">02</span
+                  ><span class="why-step-name">部署下载</span
+                  ><span class="why-step-caption">生成与部署</span>
+                </button>
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="2"
+                  aria-pressed="false"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">03</span
+                  ><span class="why-step-name">上车验证</span
+                  ><span class="why-step-caption">测试与评估</span>
+                </button>
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="3"
+                  aria-pressed="false"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">04</span
+                  ><span class="why-step-name">优化迭代</span
+                  ><span class="why-step-caption">反馈与改进</span>
+                </button>
+              </div>
+              <div class="why-return">
+                <button type="button" class="why-restart">
+                  <span aria-hidden="true">↶</span>
+                  <span>验证反馈回到应用建模，开始下一轮迭代</span>
+                </button>
+              </div>
+            </div>
+            <div
+              class="why-step-detail"
+              id="why-step-detail"
+              role="region"
+              aria-live="polite"
+              aria-atomic="true"
+              aria-label="当前步骤说明"
+            >
+              <div class="why-detail-title">
+                <span class="why-detail-number">01 / 04</span>
+                <h4 class="why-detail-name">应用建模</h4>
+              </div>
+              <div class="why-detail-copy">
+                <p class="why-detail-body">
+                  围绕应用需求选择与组合功能模块，定义接口、参数和数据流，构建可继续迭代的应用图模型。
+                </p>
+                <div class="why-output">
+                  <span>本步产出</span
+                  ><strong class="why-detail-output"
+                    >应用图模型 · 接口与参数配置</strong
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="why-section-end">
+            <div class="why-source-links">
+              <button
+                type="button"
+                class="why-source-toggle"
+                hidden
+                aria-expanded="false"
+                aria-controls="why-source-panel"
+              >
+                <span>研发背景原页</span
+                ><span class="why-source-symbol" aria-hidden="true"
+                  >＋</span
+                ></button
+              ><a class="why-pdf-link" hidden target="_blank" rel="noopener"
+                >平台介绍 PDF（英文） ↗</a
+              >
+            </div>
+            <a class="why-cta" href="#tracks"
+              ><span>探索四个开发方向</span><span aria-hidden="true">↗</span></a
+            >
+          </div>
+          <div class="why-source-panel" id="why-source-panel" hidden>
+            <p>参考原页：自动驾驶算法的研发现状与开发闭环</p>
+            <img
+              alt="中文参考页：研发挑战、CBDES 与应用建模到优化迭代的流程"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </section>
+      <section
         class="container tracks-section"
         id="tracks"
         aria-labelledby="tracks-title"
@@ -189,6 +394,7 @@
       </div>
       <nav aria-label="移动端主导航">
         <a href="#overview">概览 <span aria-hidden="true">↗</span></a
+        ><a href="#why-cbdes">为何 CBDES</a
         ><a href="#tracks">开发方向 <span aria-hidden="true">↗</span></a
         ><a href="#capabilities">核心能力 <span aria-hidden="true">↗</span></a
         ><a href="#about">关于 <span aria-hidden="true">↗</span></a>

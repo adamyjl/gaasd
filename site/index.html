@@ -22,6 +22,8 @@
     <link rel="preload" href="images/en/overview-20260922.webp" as="image" />
     <script type="module" src="app.js?v=english-20260922"></script>
     <title>GAASD · Visual Software Development</title>
+    <link rel="stylesheet" href="why-cbdes.css?v=review-1" />
+    <script type="module" src="why-cbdes.js?v=review-1"></script>
   </head>
   <body>
     <a class="skip-link" href="#overview">Skip to main content</a>
@@ -36,8 +38,8 @@
         >
         <nav class="desktop-nav" aria-label="Primary navigation">
           <a href="#overview" aria-current="location">Overview</a
-          ><a href="#tracks">Tracks</a><a href="#capabilities">Capabilities</a
-          ><a href="#about">About</a>
+          ><a href="#why-cbdes">Why CBDES</a><a href="#tracks">Tracks</a
+          ><a href="#capabilities">Capabilities</a><a href="#about">About</a>
         </nav>
         <button class="overview-link" type="button" data-video-id="overview">
           Watch overview <span aria-hidden="true">↗</span>
@@ -152,6 +154,239 @@
         </div>
       </section>
       <section
+        class="why-cbdes"
+        id="why-cbdes"
+        aria-labelledby="why-title"
+        lang="en"
+      >
+        <div class="why-shell">
+          <div class="why-intro">
+            <div>
+              <p class="why-kicker">WHY CBDES <span>/ 01</span></p>
+              <h2 id="why-title">
+                Why Rethink Development for Autonomous Driving?
+              </h2>
+            </div>
+            <p class="why-lead">
+              Autonomous driving development spans algorithm design, software
+              integration, deployment and vehicle validation. How can proven
+              capabilities be reused—and each round of validation inform the
+              next?
+            </p>
+          </div>
+
+          <div class="why-challenges" aria-label="Development challenges">
+            <article class="why-challenge">
+              <div class="why-card-meta">
+                <span>01</span><span>VALIDATION</span>
+              </div>
+              <h3>Complex Safety Validation</h3>
+              <p>
+                Diverse scenarios and long integration chains require continuous
+                validation in simulation and on vehicles.
+              </p>
+              <div class="why-need">Connect development and validation</div>
+            </article>
+            <article class="why-challenge">
+              <div class="why-card-meta">
+                <span>02</span><span>DEVELOPMENT COST</span>
+              </div>
+              <h3>High Development Costs</h3>
+              <p>
+                Different interfaces and platforms lead to repeated engineering,
+                making proven algorithms difficult to reuse.
+              </p>
+              <div class="why-need">Build on reusable capabilities</div>
+            </article>
+            <article class="why-challenge">
+              <div class="why-card-meta">
+                <span>03</span><span>ITERATION</span>
+              </div>
+              <h3>Slow Iteration Cycles</h3>
+              <p>
+                Modeling, code, deployment and feedback remain disconnected,
+                slowing the path from change to validation.
+              </p>
+              <div class="why-need">Connect each development cycle</div>
+            </article>
+          </div>
+
+          <div class="why-solution">
+            <div class="why-equation-row">
+              <div>
+                <p class="why-small-label">OUR APPROACH</p>
+                <h3>Computing Base Brain &amp; Development System</h3>
+              </div>
+              <p class="why-equation" aria-label="CBDES equals CBB plus GAASD">
+                <strong>CBDES</strong><span>=</span><b>CBB</b><span>+</span
+                ><b>GAASD</b>
+              </p>
+            </div>
+            <div class="why-platforms">
+              <article class="why-platform">
+                <div class="why-platform-top">
+                  <span class="why-product">CBB</span>
+                  <h4>Functional Software Platform</h4>
+                </div>
+                <p>
+                  Build a foundation of reusable functional software. Decoupled
+                  layers and standard interfaces support adaptation across
+                  applications, system software and hardware.
+                </p>
+                <div class="why-capabilities">
+                  <span>Decoupled layers</span><span>Reusable modules</span
+                  ><span>Cross-platform adaptation</span>
+                </div>
+              </article>
+              <article class="why-platform">
+                <div class="why-platform-top">
+                  <span class="why-product">GAASD</span>
+                  <h4>Visual Development System</h4>
+                </div>
+                <p>
+                  Connect application refactoring, code generation, build and
+                  deployment, and simulation validation through visual modeling
+                  and AI-assisted development.
+                </p>
+                <div class="why-capabilities">
+                  <span>Visual modeling</span
+                  ><span>AI-assisted development</span
+                  ><span>Generation &amp; validation</span>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="why-workflow">
+            <div class="why-flow-heading">
+              <h3>A Continuous Development Loop</h3>
+              <span>Select a stage to explore its work and outputs</span>
+            </div>
+            <div class="why-flow-track">
+              <div
+                class="why-stages"
+                role="group"
+                aria-label="Development stages"
+              >
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="0"
+                  aria-pressed="true"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">01</span
+                  ><span class="why-step-name">Model</span
+                  ><span class="why-step-caption">Compose applications</span>
+                </button>
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="1"
+                  aria-pressed="false"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">02</span
+                  ><span class="why-step-name">Deploy</span
+                  ><span class="why-step-caption">Build &amp; deploy</span>
+                </button>
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="2"
+                  aria-pressed="false"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">03</span
+                  ><span class="why-step-name">Validate</span
+                  ><span class="why-step-caption">Test on vehicles</span>
+                </button>
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="3"
+                  aria-pressed="false"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">04</span
+                  ><span class="why-step-name">Refine</span
+                  ><span class="why-step-caption">Apply feedback</span>
+                </button>
+              </div>
+              <div class="why-return">
+                <button type="button" class="why-restart">
+                  <span aria-hidden="true">↶</span>
+                  <span
+                    >Feed validation results back into application
+                    modeling</span
+                  >
+                </button>
+              </div>
+            </div>
+            <div
+              class="why-step-detail"
+              id="why-step-detail"
+              role="region"
+              aria-live="polite"
+              aria-atomic="true"
+              aria-label="Selected stage details"
+            >
+              <div class="why-detail-title">
+                <span class="why-detail-number">01 / 04</span>
+                <h4 class="why-detail-name">Application Modeling</h4>
+              </div>
+              <div class="why-detail-copy">
+                <p class="why-detail-body">
+                  Select and compose functional modules around application
+                  requirements. Define interfaces, parameters and data flows to
+                  create an application graph that can evolve.
+                </p>
+                <div class="why-output">
+                  <span>Outputs</span
+                  ><strong class="why-detail-output"
+                    >Application graph · Interface and parameter
+                    configuration</strong
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="why-section-end">
+            <div class="why-source-links">
+              <button
+                type="button"
+                class="why-source-toggle"
+                hidden
+                aria-expanded="false"
+                aria-controls="why-source-panel"
+              >
+                <span>Background slide</span
+                ><span class="why-source-symbol" aria-hidden="true"
+                  >＋</span
+                ></button
+              ><a class="why-pdf-link" hidden target="_blank" rel="noopener"
+                >Platform overview PDF ↗</a
+              >
+            </div>
+            <a class="why-cta" href="#tracks"
+              ><span>Explore Four Development Tracks</span
+              ><span aria-hidden="true">↗</span></a
+            >
+          </div>
+          <div class="why-source-panel" id="why-source-panel" hidden>
+            <p>
+              Source slide (Chinese): development challenges and the iterative
+              workflow
+            </p>
+            <img
+              alt="Chinese source slide showing development challenges, CBDES, and the modeling-to-refinement loop"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </section>
+      <section
         class="container tracks-section"
         id="tracks"
         aria-labelledby="tracks-title"
@@ -224,6 +459,7 @@
       </div>
       <nav aria-label="Mobile primary navigation">
         <a href="#overview">Overview <span aria-hidden="true">↗</span></a
+        ><a href="#why-cbdes">Why CBDES</a
         ><a href="#tracks">Tracks <span aria-hidden="true">↗</span></a
         ><a href="#capabilities"
           >Capabilities <span aria-hidden="true">↗</span></a
