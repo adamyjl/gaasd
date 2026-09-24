@@ -35,6 +35,8 @@ for (const language of ["en", "cn"]) {
       );
     expect(order).toEqual(["overview", "metrics-band", "why-cbdes", "tracks"]);
     await expect(page.locator("h1 span")).toHaveCount(3);
+    // Exercise lazy-loaded covers below the new section before checking decoding.
+    await page.locator(".track-card").last().scrollIntoViewIfNeeded();
     await expect
       .poll(() =>
         page
