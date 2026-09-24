@@ -3,6 +3,7 @@ node_modules/
 .tools/
 work/
 dist/
+preview-dist/
 playwright-report/
 test-results/
 __pycache__/
