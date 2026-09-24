@@ -84,7 +84,7 @@ for (const filename of await sourceFiles(path.join(root, "site"))) {
   }
   const destination = path.join(output, relative);
   await mkdir(path.dirname(destination), { recursive: true });
-  await writeFile(destination, text);
+  await writeFile(destination, text.replace(/[ \t]+$/gm, ""));
 }
 const assets = [
   ...new Set([
