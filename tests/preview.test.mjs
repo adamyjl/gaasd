@@ -165,6 +165,8 @@ for (const language of ["en", "cn"]) {
       Object.defineProperty(navigator, "webdriver", { get: () => false }),
     );
     await page.goto(language === "cn" ? "cn/" : "./");
+    // Dynamic imports finish wiring the player after the document load event.
+    await expect(page.locator(".track-card")).toHaveCount(4);
     await page.locator(".overview-video").click();
     const ids =
       info.project.name === "1440"
