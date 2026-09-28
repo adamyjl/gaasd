@@ -20,6 +20,8 @@
 
 `site/index.html`、`site/cn/index.html` 独立维护静态文案，共享 `why-cbdes.css`、`why-cbdes.js`。主样式未改变。`.gitattributes` 固定文本 LF，修复 Windows 新 worktree 因 Git 自动转换 CRLF 导致的原有格式检查误差。
 
+2026-09-28 按评审提供的译文更新 Why CBDES 英文文案及动态步骤详情，统一使用 verification、Application Modeling 等术语。方案区的 GAASD 两个英文全称分别展示为 Graphic ADAS/AD Software Developer 和 Graphic AI-Assisted Software Developer；原首页其他区域的品牌文案不在此次修改范围。中文同步调整区块标签和“应用模型”表述。长英文标题按可用宽度换行，仍保留桌面横向四步与手机纵向闭环。
+
 ## 资源与统计
 
 预览引用 `https://gaasd.com/` 已公开的 10 段视频、10 张封面和备案图标。21 个地址均以 HEAD 核查，视频另核查 HTTP 206；浏览器检查实际图片解码与视频播放。它们仍由正式站点分发，站点访问日志可能记录资源请求，但预览不发送业务访问或播放事件。
