@@ -1,5 +1,5 @@
 {
-  "snapshot_date": "2026-09-24",
+  "snapshot_date": "2026-09-28",
   "full_backup_id": "20260924T102025",
   "files": {
     "backend/geo-data/ip2region_v4.xdb": {
@@ -133,6 +133,23 @@
     "site/media/vla.mp4": {
       "bytes": 123228373,
       "sha256": "3d764be847615f9636e4a43edc7dcbc593658c5bb29fda2c1b66b6e64634c325"
+    },
+    "site/media/present2/en/ai-assist-20260928.mp4": {
+      "bytes": 17957329,
+      "sha256": "a1388c772f487e4ef98dc410dcb74474c754fb55b13487a574b9e1208f7b5de0"
+    },
+    "site/media/present2/en/vla-20260928.mp4": {
+      "bytes": 115640475,
+      "sha256": "5e93bf98cf3c4a2ee11e6198edb487f262535f26cfa0f352b6123efb2ec8c061"
+    },
+    "site/media/present2/cn/ai-assist-20260928.mp4": {
+      "bytes": 17673913,
+      "sha256": "292b644d5f4f1e3015383c88fbe8f3e7259726a8cb2fc7ff2713c48df40066ed"
+    },
+    "site/media/present2/cn/vla-20260928.mp4": {
+      "bytes": 113836984,
+      "sha256": "c884db8f7030ab72f2063812dd0e172687c9964967eb94036bc2f73fda3f5eab"
     }
-  }
+  },
+  "media_update": "docs/production-20260928.md"
 }

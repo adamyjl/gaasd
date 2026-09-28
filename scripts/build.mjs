@@ -61,7 +61,9 @@ async function files(directory) {
   return results;
 }
 const manifest = {};
-for (const filename of await files(dist)) {
+// Describe only current source files, not stale output left by a renamed module.
+for (const source of await files(site)) {
+  const filename = path.join(dist, path.relative(site, source));
   const bytes = await readFile(filename);
   manifest[path.relative(dist, filename).split(path.sep).join("/")] = {
     bytes: bytes.length,

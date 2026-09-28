@@ -2,13 +2,13 @@
 
 GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计、服务器状态后台。本地源码为 `D:\Code\GAASD-Web`，线上运行于腾讯云轻量应用服务器 `49.232.60.144`。网站、视频、统计和采集均在服务器运行，本机关机不影响线上服务。
 
-本文按 **2026-09-24 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，状态指标详见 [STATUS.md](STATUS.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
+本文按 **2026-09-28 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，状态指标详见 [STATUS.md](STATUS.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
 
 代码备份仓库：[adamyjl/gaasd](https://github.com/adamyjl/gaasd)。**GitHub 仅保存源码、测试、构建/部署脚本、依赖清单和说明文件**，不上传视频、图片、PDF、地区数据库、访问数据、生产凭据或完整备份包。下文的目录结构描述完整本地项目；克隆仓库后须先恢复外部资源才能完整预览、构建和部署。具体步骤及资源校验清单见 [GitHub 代码备份说明](docs/github-backup.md)。
 
 ## 1. 入口与当前版本
 
-“为什么需要 CBDES”评审中的新增前端与独立 Pages 预览见 [设计评审说明](docs/why-cbdes-review.md)。本功能分支不代表正式网站已上线，生产版本记录仍以以下表格为准。
+当前双语 CBDES 页面及方向 02/04 新视频已按用户授权发布至正式域名，详见 [2026-09-28 发布记录](docs/production-20260928.md)。独立 Pages 预览及维护方式见 [设计评审说明](docs/why-cbdes-review.md)。源码仍在功能分支；正式发布不自动合并 main。
 
 | 地址                                | 内容                                                           | 权限       |
 | ----------------------------------- | -------------------------------------------------------------- | ---------- |
@@ -25,7 +25,7 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn` 以 301 跳�
 | 项目         | 当前值                                               |
 | ------------ | ---------------------------------------------------- |
 | SSH          | `ssh ubuntu@49.232.60.144`，使用已有 SSH 密钥        |
-| 前端版本     | `/var/www/gaasd-test/releases/20260923T002235`       |
+| 前端版本     | `/var/www/gaasd-test/releases/20260928T204607`       |
 | 前端活动链接 | `/var/www/gaasd-test/public`                         |
 | 后端版本     | `/opt/gaasd-analytics/releases/20260914T201120`      |
 | 后端活动链接 | `/opt/gaasd-analytics/current`                       |
@@ -35,7 +35,7 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn` 以 301 跳�
 | ICP 页脚     | `京ICP备2026057773号`，链接至工信部备案查询网站      |
 | 公安备案页脚 | `京公网安备11010802050298号`，链接至公安备案查询页面 |
 
-前后端版本可以不同：最近一次优化英文首屏的三行主标题、产品名称颜色层级及功能短语换行；延续英文文案和五张英文封面，四个模块标题与视频片头英文名称一致。十段中英文视频、中文站正文及后端保持原样。实际版本以 `readlink -f` 为准；`/healthz` 中的旧 `release` 字符串不是部署版本号。源码通过 Git 和 GitHub 备份；线上发布继续使用时间戳版本目录和 SHA-256 清单管理，推送 GitHub 不会自动部署。
+前后端版本可以不同：本次上线双语 Why CBDES、当前首屏及缩写说明、桌面 2×2 / 手机 1×4 开发方向、中英文切换，以及方向 02/04 四个新视频。总览、方向 01/03、封面、备案信息及后端保持原样。实际版本以 `readlink -f` 为准；`/healthz` 中的旧 `release` 字符串不是部署版本号。源码通过 Git 和 GitHub 备份；线上发布继续使用时间戳版本目录和 SHA-256 清单管理，推送 GitHub 不会自动部署。
 
 公安备案链接为 `https://beian.mps.gov.cn/#/query/webSearch?code=11010802050298`，使用新窗口打开及 `noopener noreferrer`。备案图标保存在 `site/images/public-security-beian.png`，来源为备案平台自身使用的 `https://beian.mps.gov.cn/img/logo01.dd7ff50e.png`，网页从本站加载图片。电脑端备案号并排、手机端分行；发布和校验记录保存在 `work/public-security-20260915/`。
 
@@ -120,9 +120,9 @@ GAASD-Web/
 
 `site/index.html` 与 `site/cn/index.html` 分别维护两种语言的正文，共享 CSS 和 JavaScript。公共结构调整须同步两份入口；构建不会从英文页生成中文页。英文专用字体、字号和长标题换行通过 `html:lang(en)` 选择器处理，保留既有内容顺序和断点。
 
-当前评审分支的英文首屏使用一个 H1 和三个独立陈述：`Layered Software Decoupling.`、`Cross-Domain Reuse & Refactoring.`、`AI-Augmented Visual Development.`。中文对应“分层解耦拆解 / 跨域共用重构 / 图形化AI赋能”。英文大小写和句末标点直接写入 HTML；宽屏文字/视频列比例为 54:46，视频保持 16:9，标题使用 `clamp(32px, 2.95vw, 42px)`、行高 1.16。1200px 起按最长一句的实际宽度逐行两端对齐，字体、字号、字重和字距相同。平板保持左对齐；手机保留 `clamp(22px, calc(8vw - 3.2px), 44px)` 的可读字号，长句自然换行、左对齐，不强制挤成三行。完整修改对照见 [PDF 评审建议落实说明](docs/pdf-feedback-20260928.md)。
+当前正式版的英文首屏使用一个 H1 和三个独立陈述：`Layered Software Decoupling.`、`Cross-Domain Reuse & Refactoring.`、`AI-Augmented Visual Development.`。中文对应“分层解耦拆解 / 跨域共用重构 / 图形化AI赋能”。英文大小写和句末标点直接写入 HTML；宽屏文字/视频列比例为 54:46，视频保持 16:9，标题使用 `clamp(32px, 2.95vw, 42px)`、行高 1.16。1200px 起按最长一句的实际宽度逐行两端对齐，字体、字号、字重和字距相同。平板保持左对齐；手机保留 `clamp(22px, calc(8vw - 3.2px), 44px)` 的可读字号，长句自然换行、左对齐，不强制挤成三行。完整修改对照见 [PDF 评审建议落实说明](docs/pdf-feedback-20260928.md)。
 
-产品名称、斜杠、定位分别着色，中英文功能短语使用两组可换行列表。每个短语保持完整，通过列表的负向前导间距和父级裁去装饰性行首分隔点，文字本身不裁切。评审首页的 CBB 能力强调预制功能模块、跨域共用与应用重构。两种语言 CSS 和应用入口使用 `review-language-20260928`，Why CBDES 模块使用 `review-feedback-20260928` 缓存版本；正式站点仍使用其原发布版本。
+产品名称、斜杠、定位分别着色，中英文功能短语使用两组可换行列表。每个短语保持完整，通过列表的负向前导间距和父级裁去装饰性行首分隔点，文字本身不裁切。首页的 CBB 能力强调预制功能模块、跨域共用与应用重构。两种语言 CSS、应用入口和共享语言切换使用 `production-20260928`，Why CBDES 模块使用 `review-feedback-20260928` 缓存版本。
 
 首屏补充三个可直接阅读的缩写全称：顶部公式下方为 CBDES（Computing Base Brain & Development System）；两组产品标题下分别为 CBB（Computing Base Brain）和 GAASD（Graphic AI-Augmented Software Developer）。名称核对自 `GAASD-Develop.pdf` 第 1 页，GAASD 沿用已确认的 AI-Augmented 版本。全称使用 13px 次级灰色文字，手机端同样显示，不依赖悬停提示。更新记录、八种视口截图和检查结果位于 `work/acronyms-20260923/`；仅部署 `index.html` 和 `style.css`，回滚版本为 `/var/www/gaasd-test/releases/20260922T235627`。
 
@@ -134,13 +134,15 @@ GAASD-Web/
 | ---------------- | ----------------------------------------------- | ----------------------------------------- | ------------------ |
 | 总览             | `media/present2/en/overview-en-ja-20260914.mp4` | `media/overview.mp4`                      | 28.44 秒           |
 | 1 平台与功能软件 | `media/present2/en/platform-20260915.mp4`       | `media/present2/cn/platform-20260915.mp4` | 03:27              |
-| 2 AI 辅助开发    | `media/present2/en/ai-assist.mp4`               | `media/present2/cn/ai-assist.mp4`         | 03:14              |
+| 2 AI 辅助开发    | `media/present2/en/ai-assist-20260928.mp4`      | `media/present2/cn/ai-assist-20260928.mp4` | 03:59              |
 | 3 神经网络开发   | `media/present2/en/nnide-20260916.mp4`          | `media/present2/cn/nnide-20260916.mp4`    | 英 04:56；中 04:43 |
-| 4 VLM / VLA      | `media/present2/en/vla-20260916.mp4`            | `media/present2/cn/vla-20260916.mp4`      | 04:35              |
+| 4 VLM / VLA      | `media/present2/en/vla-20260928.mp4`            | `media/present2/cn/vla-20260928.mp4`      | 04:35              |
 
 主站总览为 1080p / 50 fps、英文配音及上英下日字幕，SHA-256：`a228568afc631272e8d0b0ec283cf8331bb73f219cfc3bd5c01308c0a9f70b59`。中文总览 SHA-256：`7b64db3b60a0fbf4a19e1e666f5b90fefddd973db3032c80e47d185cf6b08a1a`。
 
-模块 02 来自 `C:\Users\LG-NB\Downloads\present2`；模块 01 于 2026-09-15 更新为 Downloads 中的 `1. gaasd eng.mp4`（主站）和 `1. gaasd chn.mp4`（中文站）。模块 03、04 于 2026-09-16 更新为 `C:\Users\LG-NB\Downloads\gaasd0916` 中的四个新视频。仅做 H.264/AAC 校验及 fast-start 无损重封装，保留视频画面和配音。部署和恢复使用项目内媒体，不依赖 Downloads。旧的媒体地址保留兼容；替换主站总览时不要覆盖中文站仍在使用的 `media/overview.mp4`。
+模块 02 最初来自 `C:\Users\LG-NB\Downloads\present2`；模块 01 于 2026-09-15 更新为 Downloads 中的 `1. gaasd eng.mp4`（主站）和 `1. gaasd chn.mp4`（中文站）。模块 03、04 于 2026-09-16 更新为 `C:\Users\LG-NB\Downloads\gaasd0916` 中的四个新视频。仅做 H.264/AAC 校验及 fast-start 无损重封装，保留视频画面和配音。部署和恢复使用项目内媒体，不依赖 Downloads。旧的媒体地址保留兼容；替换主站总览时不要覆盖中文站仍在使用的 `media/overview.mp4`。
+
+2026-09-28：方向 02/04 更新为 Downloads 中的 `gaasd-ai-en/cn.mp4` 和 `gaasd-vla-en/cn.mp4`，分别为 239.30 秒及 274.77 秒。四个文件已是 fast-start，逐字节复制而不转码；新路径和 SHA-256 见 [发布记录](docs/production-20260928.md) 及外部资源清单。旧地址与其他媒体保留。
 
 模块 01 的版本为 1920×1080、30 fps、207.04 秒，使用 `platform` 统计 ID；其发布记录保存在 `work/platform-20260915/`。
 

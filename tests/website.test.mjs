@@ -10,9 +10,9 @@ const expectedTitles = [
 const sources = {
   overview: "media/present2/en/overview-en-ja-20260914.mp4",
   platform: "media/present2/en/platform-20260915.mp4",
-  "ai-assist": "media/present2/en/ai-assist.mp4",
+  "ai-assist": "media/present2/en/ai-assist-20260928.mp4",
   nnide: "media/present2/en/nnide-20260916.mp4",
-  vla: "media/present2/en/vla-20260916.mp4",
+  vla: "media/present2/en/vla-20260928.mp4",
 };
 const screenshots = path.resolve("work/screenshots");
 
@@ -203,7 +203,7 @@ test("all five videos play, seek, switch and release on close", async ({
   const items = [
     ["overview", 28],
     ["platform", 207],
-    ["ai-assist", 194],
+    ["ai-assist", 239],
     ["nnide", 296],
     ["vla", 275],
   ];

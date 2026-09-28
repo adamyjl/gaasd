@@ -80,9 +80,12 @@ for (const filename of await sourceFiles(path.join(root, "site"))) {
       text = text.replace("</header>", "</header></div>");
     } else text = text.replace("<body>", `<body>\n${banner}`);
     // connect-src blocks fetch/beacon/XHR, including any accidentally reintroduced analytics.
+    const languageScript = text.includes("language-switch.js")
+      ? ""
+      : `<script type="module" src="${base}language-switch.js"></script>`;
     text = text.replace(
       "</head>",
-      `<meta name="robots" content="noindex,nofollow" /><meta name="referrer" content="no-referrer" /><meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://gaasd.com; media-src https://gaasd.com; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" /><link rel="stylesheet" href="${base}review-preview.css" /><script type="module" src="${base}review-preview.js"></script></head>`,
+      `<meta name="robots" content="noindex,nofollow" /><meta name="referrer" content="no-referrer" /><meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://gaasd.com; media-src https://gaasd.com; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" /><link rel="stylesheet" href="${base}review-preview.css" />${languageScript}</head>`,
     );
   }
   const destination = path.join(output, relative);

@@ -2,8 +2,8 @@ import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 
 const media = {
-  en: [207.04, 193.98, 296.34, 274.81],
-  cn: [207.04, 193.98, 282.64, 274.81],
+  en: [207.04, 239.3, 296.34, 274.77],
+  cn: [207.04, 239.3, 282.64, 274.77],
 };
 const ids = ["platform", "ai-assist", "nnide", "vla"];
 const titles = {
@@ -36,7 +36,13 @@ for (const language of ["en", "cn"]) {
     );
     await expect(page.locator(".track-title")).toHaveText(titles[language]);
     if (language === "en") {
-      const text = (await page.locator("body").textContent())
+      const text = (
+        await page.locator("body").evaluate((body) => {
+          const content = body.cloneNode(true);
+          content.querySelector(".language-switch")?.remove();
+          return content.textContent;
+        })
+      )
         .replaceAll("京ICP备2026057773号", "")
         .replaceAll("京公网安备11010802050298号", "");
       expect(text).not.toMatch(/\p{Script=Han}/u);
@@ -77,9 +83,9 @@ for (const language of ["en", "cn"]) {
       const filename =
         id === "platform"
           ? "platform-20260915"
-          : id === "nnide" || id === "vla"
+          : id === "nnide"
             ? `${id}-20260916`
-            : id;
+            : `${id}-20260928`;
       const src = `/media/present2/${language}/${filename}.mp4`;
       await expect(video).toHaveAttribute(
         "src",

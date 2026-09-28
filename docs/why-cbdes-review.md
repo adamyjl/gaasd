@@ -1,12 +1,14 @@
 # Why CBDES 设计评审
 
+**2026-09-28 状态更新：** 用户已授权将当前双语版与方向 02/04 新视频发布到正式域名，见 [正式发布记录](production-20260928.md)。以下 Pages 构建与隔离规则继续适用于预览更新；本次服务器发布不合并 main。
+
 ## 评审入口与边界
 
 - 英文完整首页：<https://adamyjl.github.io/gaasd/review/why-cbdes/>
 - 中文完整首页：<https://adamyjl.github.io/gaasd/review/why-cbdes/cn/>
 - 功能分支：`feature/why-cbdes-review`，以 `main` 为目标的草稿 PR；评审期间不合并。
 - Pages 分支：`preview-pages`，根目录发布，没有 `CNAME`，不绑定生产域名。
-- 只发布静态前端，不发布后端和管理页面，不执行腾讯云部署脚本。
+- Pages 预览只发布静态前端，不发布后端和管理页面；后续预览更新不自动部署腾讯云。
 
 首次开始时 `origin/main` 为 `f485c00`，仓库没有 Pages、Actions 工作流或 webhook。实现使用独立 worktree，保留原项目及本地媒体。页面顶部短提交号对应功能分支的源码提交；发布分支的生成产物另有 Git 提交。
 
