@@ -1,4 +1,3 @@
-import { initNavigation } from "./navigation.js";
 import { initAnalytics } from "./analytics.js";
 
 // Share the entry version across modules whose translated copy can change.
@@ -14,8 +13,19 @@ const cardsModule = import(moduleUrl("./cards.js"));
 const playerModule = import(moduleUrl("./player.js"));
 /** @type {Promise<typeof import('./video-catalog.js')>} */
 const catalogModule = import(moduleUrl("./video-catalog.js"));
-const [{ renderVideoCards }, { initMediaPlayer }, { getVideos }] =
-  await Promise.all([cardsModule, playerModule, catalogModule]);
+/** @type {Promise<typeof import('./navigation.js')>} */
+const navigationModule = import(moduleUrl("./navigation.js"));
+const [
+  { renderVideoCards },
+  { initMediaPlayer },
+  { getVideos },
+  { initNavigation },
+] = await Promise.all([
+  cardsModule,
+  playerModule,
+  catalogModule,
+  navigationModule,
+]);
 
 const language =
   document.documentElement.dataset.videoLanguage === "cn" ? "cn" : "en";

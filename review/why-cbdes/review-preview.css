@@ -35,18 +35,6 @@ html[data-preview="true"] .why-cbdes {
   color: var(--color-accent);
   font-weight: 500;
 }
-.review-banner nav {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-.review-banner a {
-  padding: 7px 10px;
-}
-.review-banner a[aria-current="page"] {
-  color: var(--color-accent);
-  border: 1px solid #465134;
-}
 @media (max-width: 767px) {
   html[data-preview="true"] {
     scroll-padding-top: 205px;
