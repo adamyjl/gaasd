@@ -4,8 +4,8 @@ const descriptions = {
   cn: [
     [
       "应用建模",
-      "围绕应用需求选择与组合功能模块，定义接口、参数和数据流，构建可继续迭代的应用图模型。",
-      "应用图模型 · 接口与参数配置",
+      "围绕应用需求选择与组合功能模块，定义接口、参数和数据流，构建可继续迭代的应用模型。",
+      "应用模型 · 接口与参数配置",
     ],
     [
       "部署下载",
@@ -26,22 +26,22 @@ const descriptions = {
   en: [
     [
       "Application Modeling",
-      "Select and compose functional modules around application requirements. Define interfaces, parameters and data flows to create an application graph that can evolve.",
-      "Application graph · Interface and parameter configuration",
+      "Select and combine functional modules based on application requirements; define interfaces, parameters, and data flows; construct an application model ready for continuous iteration.",
+      "Application Model · Interface & Parameter Configuration",
     ],
     [
-      "Deployment",
+      "Deployment & Download",
       "Generate code and configuration from the application graph. Compile and adapt the application to the target platform, then deploy it to the controller.",
       "Application build · Deployment configuration",
     ],
     [
-      "Vehicle Validation",
-      "Use simulation results to inform vehicle testing. Capture runtime logs, performance metrics and issues to create traceable validation feedback.",
+      "On-board Verification",
+      "Use simulation results to inform vehicle testing. Capture runtime logs, performance metrics and issues to create traceable verification feedback.",
       "Test records · Performance metrics · Issue list",
     ],
     [
-      "Refinement",
-      "Feed validation findings back into models, modules and parameters. Make changes and run regression checks before the next development cycle.",
+      "Optimization & Iteration",
+      "Feed verification findings back into models, modules and parameters. Make changes and run regression checks before the next development cycle.",
       "Updated models and modules · Regression results",
     ],
   ],
