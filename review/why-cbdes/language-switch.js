@@ -1,4 +1,4 @@
-// This module is injected only into the independent review build.
+// Keep the corresponding visible section when switching between language pages.
 const sectionIds = ["overview", "why-cbdes", "tracks", "about"];
 for (const link of document.querySelectorAll("[data-review-language]")) {
   link.addEventListener("click", () => {
