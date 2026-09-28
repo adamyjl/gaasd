@@ -111,8 +111,7 @@ test("responsive layout, content, real images and screenshots", async ({
       expect(line.height).toBeCloseTo(layout.titles[0].height, 0);
   }
   expect(layout.metrics[0].width).toBeCloseTo(layout.metrics[1].width, 0);
-  const expectedColumns =
-    layout.width >= 1200 ? 4 : layout.width >= 768 ? 2 : 1;
+  const expectedColumns = layout.width >= 768 ? 2 : 1;
   expect(
     layout.cards.filter((box) => Math.abs(box.y - layout.cards[0].y) < 2),
   ).toHaveLength(expectedColumns);

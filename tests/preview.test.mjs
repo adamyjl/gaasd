@@ -63,6 +63,20 @@ for (const language of ["en", "cn"]) {
           ),
       )
       .toBe(true);
+    const cards = await page.locator(".track-card").evaluateAll((elements) =>
+      elements.map((element) => {
+        const { x, y } = element.getBoundingClientRect();
+        return { x: Math.round(x), y: Math.round(y) };
+      }),
+    );
+    const columns = Number(info.project.name) >= 768 ? 2 : 1;
+    expect(new Set(cards.map((card) => card.x)).size).toBe(columns);
+    expect(new Set(cards.map((card) => card.y)).size).toBe(4 / columns);
+    for (let index = 1; index < cards.length; index++) {
+      if (index % columns === 0)
+        expect(cards[index].y).toBeGreaterThan(cards[index - 1].y);
+      else expect(cards[index].y).toBe(cards[index - 1].y);
+    }
     await expect(page.locator(".why-source-toggle")).toBeHidden();
     await expect(page.locator(".why-pdf-link")).toBeHidden();
     await expect(page.locator(".why-source-panel img[src]")).toHaveCount(0);

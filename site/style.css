@@ -384,8 +384,8 @@ h1 span {
 }
 .track-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 28px;
 }
 .track-group {
   display: grid;
@@ -777,10 +777,6 @@ dialog::backdrop {
     max-width: 840px;
     justify-self: center;
   }
-  .track-grid {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
   .track-group {
     gap: 20px;
   }
@@ -915,10 +911,6 @@ dialog::backdrop {
   }
   .section-hint span {
     padding-left: 6px;
-  }
-  .track-grid {
-    grid-template-columns: 1fr;
-    gap: 28px;
   }
   .track-group {
     grid-template-columns: 1fr;
