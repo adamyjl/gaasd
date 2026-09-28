@@ -384,8 +384,35 @@ h1 span {
 }
 .track-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+}
+.track-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: auto 1fr;
+  gap: 16px;
+  min-width: 0;
+}
+.track-group-heading {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  padding: 4px 0 14px;
+  border-bottom: 1px solid var(--color-line);
+}
+.track-group-range {
+  font: 12px/1.5 var(--font-mono);
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+.track-group-heading h3 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 .track-card {
   display: flex;
@@ -751,7 +778,10 @@ dialog::backdrop {
     justify-self: center;
   }
   .track-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .track-group {
     gap: 20px;
   }
   .track-title {
@@ -888,6 +918,11 @@ dialog::backdrop {
   }
   .track-grid {
     grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .track-group {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
     gap: 12px;
   }
   .track-card {
@@ -1056,7 +1091,7 @@ html:lang(en) {
   --font-body: Arial, Helvetica, sans-serif;
 }
 html:lang(en) .hero h1 {
-  font-size: clamp(38px, 3.35vw, 49px);
+  font-size: clamp(32px, 2.95vw, 42px);
   line-height: 1.16;
   letter-spacing: -0.028em;
 }
@@ -1118,7 +1153,7 @@ html:lang(en) .hero .feature-row li::before {
 }
 @media (min-width: 1200px) {
   html:lang(en) .hero {
-    grid-template-columns: minmax(0, 47fr) minmax(0, 53fr);
+    grid-template-columns: minmax(0, 54fr) minmax(0, 46fr);
   }
 }
 @media (min-width: 1200px), (max-width: 767px) {
@@ -1158,9 +1193,13 @@ html:lang(en) .section-english {
 }
 @media (max-width: 767px) {
   html:lang(en) .hero h1 {
-    /* Keep all three sentences on one line at 320px and wider, accounting
-       for the two 20px mobile gutters without stretching the letterforms. */
+    /* Longer statements retain readable type and wrap within the mobile column. */
     font-size: clamp(22px, calc(8vw - 3.2px), 44px);
+  }
+  html:lang(en) .hero h1 span {
+    text-align: left;
+    text-align-last: left;
+    text-wrap: balance;
   }
   html:lang(en) .hero .systems {
     margin-top: 28px;

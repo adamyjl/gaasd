@@ -1,48 +1,48 @@
 import { whyResources } from "./why-resources.js";
 
 const descriptions = {
-  cn: [
-    [
-      "应用建模",
-      "围绕应用需求选择与组合功能模块，定义接口、参数和数据流，构建可继续迭代的应用模型。",
-      "应用模型 · 接口与参数配置",
-    ],
-    [
-      "部署下载",
-      "基于图模型生成代码与配置，完成编译和目标平台适配，将应用部署到目标控制器。",
-      "应用程序 · 部署配置",
-    ],
-    [
-      "上车验证",
-      "结合仿真结果开展实车测试，采集运行日志、性能指标与异常信息，形成可回溯的验证反馈。",
-      "测试记录 · 性能指标 · 问题清单",
-    ],
-    [
-      "优化迭代",
-      "将验证发现的问题回流到模型、模块与参数，完成修改与回归验证，再进入下一轮开发。",
-      "更新后的模型与模块 · 回归结果",
-    ],
-  ],
   en: [
     [
+      "Algorithm Design",
+      "Design the algorithm logic of individual functional modules graphically in GAASD. Define module interfaces, parameters, and behavior, using AI-assisted development to decouple algorithm design from code implementation.",
+      "Functional Algorithm Modules · Module Interfaces & Parameters",
+    ],
+    [
       "Application Modeling",
-      "Select and combine functional modules based on application requirements; define interfaces, parameters, and data flows; construct an application model ready for continuous iteration.",
-      "Application Model · Interface & Parameter Configuration",
+      "Select prefabricated functional modules from CBB to meet application requirements. Use GAASD to connect and reuse modules across domains, configure data flows and parameters, and refactor the application.",
+      "Application Model · Module Connections & Configuration",
     ],
     [
-      "Deployment & Download",
-      "Generate code and configuration from the application graph. Compile and adapt the application to the target platform, then deploy it to the controller.",
-      "Application build · Deployment configuration",
-    ],
-    [
-      "On-board Verification",
-      "Use simulation results to inform vehicle testing. Capture runtime logs, performance metrics and issues to create traceable verification feedback.",
-      "Test records · Performance metrics · Issue list",
+      "Deployment & Verification",
+      "Use GAASD to generate application code and configuration, compile and deploy to the target platform, and verify application behavior in simulation and on vehicles. Record performance metrics and issues.",
+      "Deployed Application · Verification Records · Issue List",
     ],
     [
       "Optimization & Iteration",
-      "Feed verification findings back into models, modules and parameters. Make changes and run regression checks before the next development cycle.",
-      "Updated models and modules · Regression results",
+      "Bring verification feedback into GAASD to improve module algorithms, composition, and parameters. Return to algorithm design and application modeling, then run regression checks for the next iteration.",
+      "Updated Algorithms & Application Models · Regression Results",
+    ],
+  ],
+  cn: [
+    [
+      "算法设计",
+      "在 GAASD 中以图形化方式设计单个功能模块的算法逻辑，定义模块接口、参数与行为，通过 AI 辅助开发将算法设计与代码实现解耦。",
+      "功能算法模块 · 模块接口与参数",
+    ],
+    [
+      "应用建模",
+      "面向应用需求，从 CBB 选择预制功能模块，在 GAASD 中通过图形化连接和跨域复用组合模块，配置数据流与参数，完成应用重构。",
+      "应用模型 · 模块连接与配置",
+    ],
+    [
+      "部署验证",
+      "利用 GAASD 生成应用代码与配置，完成编译和目标平台部署，通过仿真与实车测试验证应用行为，记录性能指标与问题。",
+      "部署程序 · 验证记录 · 问题清单",
+    ],
+    [
+      "优化迭代",
+      "将验证反馈带回 GAASD，改进模块算法、模块组合及参数配置；回到算法设计与应用建模，持续迭代并开展回归验证。",
+      "更新的算法与应用模型 · 回归结果",
     ],
   ],
 };
