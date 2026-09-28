@@ -19,11 +19,7 @@ for (const [entry, language, lines] of [
   [
     "index.html",
     "en",
-    [
-      "Decouple Software Layers",
-      "Reuse Proven Components",
-      "Refactor Visually With AI",
-    ],
+    ["Layered Decoupling", "Software Module Reuse", "AI-Driven Refactoring"],
   ],
   [
     "cn/index.html",
