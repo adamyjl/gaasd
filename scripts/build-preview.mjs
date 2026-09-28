@@ -68,7 +68,10 @@ for (const filename of await sourceFiles(path.join(root, "site"))) {
             (value.includes("?") ? "?" + value.split("?")[1] : "");
       return `${attribute}="${url}"`;
     });
-    const banner = `<aside class="review-banner" aria-label="Design review"><p><strong>${chinese ? "设计评审预览" : "Design Review Preview"}</strong> · <code>${version}</code> · ${chinese ? "未上线 · 不采集访问及播放事件" : "Not a production release · Analytics off"}</p><nav aria-label="Language"><a href="${base}" data-review-language="en" lang="en" ${chinese ? "" : 'aria-current="page"'}>EN</a><a href="${base}cn/" data-review-language="cn" lang="zh-CN" ${chinese ? 'aria-current="page"' : ""}>中文</a></nav></aside>`;
+    const languages = text.includes('class="language-switch"')
+      ? ""
+      : `<nav class="language-switch" aria-label="Language"><a href="${base}" data-review-language="en" lang="en" ${chinese ? "" : 'aria-current="page"'}>EN</a><a href="${base}cn/" data-review-language="cn" lang="zh-CN" ${chinese ? 'aria-current="page"' : ""}>中文</a></nav>`;
+    const banner = `<aside class="review-banner" aria-label="Design review"><p><strong>${chinese ? "设计评审预览" : "Design Review Preview"}</strong> · <code>${version}</code> · ${chinese ? "未上线 · 不采集访问及播放事件" : "Not a production release · Analytics off"}</p>${languages}</aside>`;
     if (text.includes('class="site-header"')) {
       text = text.replace(
         "<body>",

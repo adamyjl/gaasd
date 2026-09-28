@@ -18,9 +18,9 @@
     <meta property="og:locale" content="en_US" />
     <link rel="canonical" href="https://gaasd.com/" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="style.css?v=review-grid-20260928" />
+    <link rel="stylesheet" href="style.css?v=review-language-20260928" />
     <link rel="preload" href="images/en/overview-20260922.webp" as="image" />
-    <script type="module" src="app.js?v=review-feedback-20260928"></script>
+    <script type="module" src="app.js?v=review-language-20260928"></script>
     <title>GAASD · Visual Software Development</title>
     <link rel="stylesheet" href="why-cbdes.css?v=review-feedback-20260928" />
     <script
@@ -44,18 +44,26 @@
           ><a href="#why-cbdes">Why CBDES</a><a href="#tracks">Tracks</a
           ><a href="#capabilities">Capabilities</a><a href="#about">About</a>
         </nav>
-        <button class="overview-link" type="button" data-video-id="overview">
-          Watch overview <span aria-hidden="true">↗</span>
-        </button>
-        <button
-          class="menu-toggle"
-          type="button"
-          aria-label="Open navigation menu"
-          aria-controls="mobile-menu"
-          aria-expanded="false"
-        >
-          <span></span><span></span>
-        </button>
+        <div class="header-actions">
+          <nav class="language-switch" aria-label="Language">
+            <a href="/" data-review-language="en" lang="en" aria-current="page"
+              >EN</a
+            >
+            <a href="/cn/" data-review-language="cn" lang="zh-CN">中文</a>
+          </nav>
+          <button class="overview-link" type="button" data-video-id="overview">
+            Watch overview <span aria-hidden="true">↗</span>
+          </button>
+          <button
+            class="menu-toggle"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-controls="mobile-menu"
+            aria-expanded="false"
+          >
+            <span></span><span></span>
+          </button>
+        </div>
       </div>
     </header>
     <main>

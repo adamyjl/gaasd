@@ -45,6 +45,28 @@ for (const language of ["en", "cn"]) {
       ).toEqual(ids);
     }
     await expect(page.locator("html")).toHaveAttribute("data-preview", "true");
+    const languages = page.locator(".site-header .language-switch");
+    await expect(languages).toBeVisible();
+    await expect(page.locator("[data-review-language]")).toHaveCount(2);
+    await expect(languages.locator('[aria-current="page"]')).toHaveAttribute(
+      "data-review-language",
+      language,
+    );
+    const languageBox = await languages.boundingBox();
+    const nextAction = await page
+      .locator(
+        Number(info.project.name) >= 768 ? ".overview-link" : ".menu-toggle",
+      )
+      .boundingBox();
+    expect(languageBox.x + languageBox.width).toBeLessThanOrEqual(nextAction.x);
+    expect(
+      Math.abs(
+        languageBox.y +
+          languageBox.height / 2 -
+          nextAction.y -
+          nextAction.height / 2,
+      ),
+    ).toBeLessThan(1);
     const order = await page
       .locator("main > section")
       .evaluateAll((sections) =>

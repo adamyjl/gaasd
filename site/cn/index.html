@@ -18,9 +18,9 @@
     <meta property="og:locale" content="zh_CN" />
     <link rel="canonical" href="https://gaasd.com/cn/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/style.css?v=review-grid-20260928" />
+    <link rel="stylesheet" href="/style.css?v=review-language-20260928" />
     <link rel="preload" href="/images/overview.webp" as="image" />
-    <script type="module" src="/app.js?v=review-feedback-20260928"></script>
+    <script type="module" src="/app.js?v=review-language-20260928"></script>
     <title>GAASD · 图形化开发系统</title>
     <link rel="stylesheet" href="/why-cbdes.css?v=review-feedback-20260928" />
     <script
@@ -44,18 +44,30 @@
           ><a href="#why-cbdes">为何 CBDES</a><a href="#tracks">开发方向</a
           ><a href="#capabilities">核心能力</a><a href="#about">关于</a>
         </nav>
-        <button class="overview-link" type="button" data-video-id="overview">
-          观看总览 <span aria-hidden="true">↗</span>
-        </button>
-        <button
-          class="menu-toggle"
-          type="button"
-          aria-label="打开导航菜单"
-          aria-controls="mobile-menu"
-          aria-expanded="false"
-        >
-          <span></span><span></span>
-        </button>
+        <div class="header-actions">
+          <nav class="language-switch" aria-label="语言切换">
+            <a href="/" data-review-language="en" lang="en">EN</a>
+            <a
+              href="/cn/"
+              data-review-language="cn"
+              lang="zh-CN"
+              aria-current="page"
+              >中文</a
+            >
+          </nav>
+          <button class="overview-link" type="button" data-video-id="overview">
+            观看总览 <span aria-hidden="true">↗</span>
+          </button>
+          <button
+            class="menu-toggle"
+            type="button"
+            aria-label="打开导航菜单"
+            aria-controls="mobile-menu"
+            aria-expanded="false"
+          >
+            <span></span><span></span>
+          </button>
+        </div>
       </div>
     </header>
     <main>
