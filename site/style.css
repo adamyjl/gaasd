@@ -1135,21 +1135,24 @@ html:lang(en) .hero .system-copy {
 /* Each whole phrase wraps as one item. The negative leading gutter hides only
    the decorative dot at the start of every flex line, including wrapped lines.
    Text stays inside the copy area; no trailing separators are generated. */
-html:lang(en) .hero .feature-row {
+.hero .feature-row {
   display: flex;
   flex-wrap: wrap;
   list-style: none;
   padding: 0;
   margin: 0 0 0 -1.2em;
 }
-html:lang(en) .hero .feature-row li {
+.hero .feature-row li {
   display: flex;
   white-space: nowrap;
 }
-html:lang(en) .hero .feature-row li::before {
+.hero .feature-row li::before {
   content: "·" / "";
   flex: 0 0 1.2em;
   text-align: center;
+}
+html:lang(zh-CN) .hero .system-copy {
+  overflow: hidden;
 }
 @media (min-width: 1200px) {
   html:lang(en) .hero {
