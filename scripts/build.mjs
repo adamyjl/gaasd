@@ -19,19 +19,21 @@ for (const [entry, language, lines] of [
   [
     "index.html",
     "en",
-    ["Layered Decoupling", "AI-Driven Refactoring", "Software Module Reuse"],
+    [
+      "Layered Software Decoupling.",
+      "Cross-Domain Reuse & Refactoring.",
+      "AI-Augmented Visual Development.",
+    ],
   ],
-  [
-    "cn/index.html",
-    "zh-CN",
-    ["功能软件分层解耦", "优质模块沉淀复用", "智能赋能图形重构"],
-  ],
+  ["cn/index.html", "zh-CN", ["分层解耦拆解", "跨域共用重构", "图形化AI赋能"]],
 ]) {
   const html = await readFile(path.join(site, entry), "utf8");
   if (!html.includes(`lang="${language}"`))
     throw new Error(`Wrong page language: ${entry}`);
   for (const line of lines) {
-    const literal = line.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const literal = line
+      .replaceAll("&", "&amp;")
+      .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     if (!new RegExp(`<span>\\s*${literal}\\s*</span\\s*>`).test(html))
       throw new Error(`Missing headline in ${entry}: ${line}`);
   }

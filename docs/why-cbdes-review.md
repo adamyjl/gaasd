@@ -14,13 +14,13 @@
 
 参考附件 `GAASD-CBDES-Design-Preview.zip` 中的 DESIGN-PROPOSAL、两个首页新增片段、why-cbdes CSS/JS、局部预览及 why-copy 文案。仅提取新增板块与相关交互，没有整包覆盖项目，也没有提交附件、内嵌图片的演示 HTML 或 Base64 媒体。
 
-页面顺序为原首页概览与视频 → 815+ / 04 数据栏 → Why CBDES → 四个开发方向 → 原页脚。保留原三行标题、缩写全称、播放器和双语视频映射。
+页面顺序为原首页概览与视频 → 815+ / 04 数据栏 → Why CBDES → 四个开发方向 → 原页脚。保留三条首屏主张的结构、播放器和双语视频映射；文案按当前评审意见更新。
 
-新增区块包含三个挑战、CBDES = CBB + GAASD 分工，以及应用建模 → 部署下载 → 上车验证 → 优化迭代。四个原生按钮更新说明和产出，使用 `aria-pressed` 和 `aria-live`；反馈按钮回到第一步。桌面横向流程，手机纵向流程与左侧回流线。英文标题自然换行，不强制复用中文断行。
+新增区块包含三个挑战、CBDES = CBB + GAASD 分工，以及算法设计 → 应用建模 → 部署验证 → 优化迭代。四个原生按钮更新说明和产出，使用 `aria-pressed` 和 `aria-live`；反馈按钮回到第一步。桌面横向流程，手机纵向流程与左侧回流线。英文标题自然换行，不强制复用中文断行。
 
-`site/index.html`、`site/cn/index.html` 独立维护静态文案，共享 `why-cbdes.css`、`why-cbdes.js`。主样式未改变。`.gitattributes` 固定文本 LF，修复 Windows 新 worktree 因 Git 自动转换 CRLF 导致的原有格式检查误差。
+`site/index.html`、`site/cn/index.html` 独立维护静态文案，共享 `why-cbdes.css`、`why-cbdes.js`。共享主样式包含英文长标题适配和规则/数据驱动两类开发方向的响应式分组。`.gitattributes` 固定文本 LF，修复 Windows 新 worktree 因 Git 自动转换 CRLF 导致的原有格式检查误差。
 
-2026-09-28 按评审提供的译文更新 Why CBDES 英文文案及动态步骤详情，统一使用 verification、Application Modeling 等术语。方案区的 GAASD 两个英文全称分别展示为 Graphic ADAS/AD Software Developer 和 Graphic AI-Assisted Software Developer；原首页其他区域的品牌文案不在此次修改范围。中文同步调整区块标签和“应用模型”表述。长英文标题按可用宽度换行，仍保留桌面横向四步与手机纵向闭环。
+当前五项修改依据 `GAASD网页修改建议.pdf`，具体对照见 [PDF 评审建议落实说明](pdf-feedback-20260928.md)。首屏强调分层解耦拆解、跨域共用重构、图形化 AI 赋能；三个挑战分别标注对应方案。GAASD 全称统一为 Graphic AI-Augmented Software Developer。流程区明确区分模块级算法设计与复用模块形成应用，并让验证反馈返回算法设计和应用建模；开发方向按 01/02 规则驱动代码、03/04 数据驱动模型分组。
 
 ## 资源与统计
 

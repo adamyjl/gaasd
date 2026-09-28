@@ -3,9 +3,9 @@ import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
 const expectedTitles = [
-  "Layered Decoupling",
-  "AI-Driven Refactoring",
-  "Software Module Reuse",
+  "Layered Software Decoupling.",
+  "Cross-Domain Reuse & Refactoring.",
+  "AI-Augmented Visual Development.",
 ];
 const sources = {
   overview: "media/present2/en/overview-en-ja-20260914.mp4",

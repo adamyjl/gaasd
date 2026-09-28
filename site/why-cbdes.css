@@ -131,6 +131,15 @@
   padding-top: 12px;
   color: #cecfca;
 }
+.why-need-label {
+  display: block;
+  color: var(--why-accent);
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+.why-need strong {
+  font-weight: 500;
+}
 .why-solution {
   margin-top: 26px;
   border: 1px solid #39412a;
@@ -210,6 +219,10 @@
   line-height: 1.8;
   color: #b6bcad;
   max-width: 560px;
+}
+.why-platform .why-product-expansion {
+  font-size: 12px;
+  margin-bottom: 10px;
 }
 .why-capabilities {
   display: flex;

@@ -116,13 +116,13 @@ GAASD-Web/
 └─ work/                         临时发布包、测试数据、视频制作过程
 ```
 
-模块桌面四列、平板两列、手机单列；390px 为左右卡片，320px 为上图下文。播放器切换时暂停旧视频，记录当前会话中的进度；关闭时释放请求、恢复焦点。封面灰度来自 CSS，视频本身保留彩色画面。
+模块分为 01/02“规则驱动的代码”和 03/04“数据驱动的模型”。桌面两组并列、各双列，共四列；平板两组纵向、各双列；手机分组与卡片均纵向排列。390px 为左右卡片，320px 为上图下文。播放器切换时暂停旧视频，记录当前会话中的进度；关闭时释放请求、恢复焦点。封面灰度来自 CSS，视频本身保留彩色画面。
 
 `site/index.html` 与 `site/cn/index.html` 分别维护两种语言的正文，共享 CSS 和 JavaScript。公共结构调整须同步两份入口；构建不会从英文页生成中文页。英文专用字体、字号和长标题换行通过 `html:lang(en)` 选择器处理，保留既有内容顺序和断点。
 
-英文首屏使用一个 H1 和三个独立句子：`Layered Decoupling`、`AI-Driven Refactoring`、`Software Module Reuse`。大小写直接写入文案，无句末标点。桌面文字/视频列比例为 47:53、列间距 40px，视频保持 16:9；1440px 标题约 48px，宽屏上限 49px，行高 1.16。宽屏桌面（1200px 起）及手机（767px 以下）的 H1 使用 `width: max-content` 和 `max-width: 100%`，以最长句的实际字宽限定共同宽度；每个块级 span 单独使用 `text-align: justify`、`text-align-last: justify` 和 `text-justify: inter-word`。三行字号、字重、字距相同，不缩放字形。768～1199px 保持原有左对齐。手机端使用 `clamp(22px, calc(8vw - 3.2px), 44px)`，将两侧各 20px 留白纳入字号计算；320px 及以上保持每句一行、三行两端对齐。
+当前评审分支的英文首屏使用一个 H1 和三个独立陈述：`Layered Software Decoupling.`、`Cross-Domain Reuse & Refactoring.`、`AI-Augmented Visual Development.`。中文对应“分层解耦拆解 / 跨域共用重构 / 图形化AI赋能”。英文大小写和句末标点直接写入 HTML；宽屏文字/视频列比例为 54:46，视频保持 16:9，标题使用 `clamp(32px, 2.95vw, 42px)`、行高 1.16。1200px 起按最长一句的实际宽度逐行两端对齐，字体、字号、字重和字距相同。平板保持左对齐；手机保留 `clamp(22px, calc(8vw - 3.2px), 44px)` 的可读字号，长句自然换行、左对齐，不强制挤成三行。完整修改对照见 [PDF 评审建议落实说明](docs/pdf-feedback-20260928.md)。
 
-产品名称、斜杠、定位分别着色，功能短语使用两组可换行列表。每个短语保持完整，通过列表的负向前导间距和父级裁去装饰性行首分隔点，文字本身不裁切；不要把分隔点写进短语文本。新规则限定于英文 `.hero`，中文源码不变。主站 CSS 缓存版本为 `20260923-mobile-headline`。桌面标题对齐记录位于 `work/headline-align-20260923/`；后续手机两端对齐记录与截图位于 `work/mobile-headline-20260923/`，通过 320、360、375、390、414、430px 等 14 种视口检查及线上手机视频播放检查。当前回滚版本为 `/var/www/gaasd-test/releases/20260923T001628`。
+产品名称、斜杠、定位分别着色，英文功能短语使用两组可换行列表。每个短语保持完整，通过列表的负向前导间距和父级裁去装饰性行首分隔点，文字本身不裁切。评审首页的 CBB 能力强调预制功能模块、跨域共用与应用重构。两种语言 CSS、应用入口和 Why CBDES 模块均使用 `review-feedback-20260928` 缓存版本；正式站点仍使用其原发布版本。
 
 首屏补充三个可直接阅读的缩写全称：顶部公式下方为 CBDES（Computing Base Brain & Development System）；两组产品标题下分别为 CBB（Computing Base Brain）和 GAASD（Graphic AI-Augmented Software Developer）。名称核对自 `GAASD-Develop.pdf` 第 1 页，GAASD 沿用已确认的 AI-Augmented 版本。全称使用 13px 次级灰色文字，手机端同样显示，不依赖悬停提示。更新记录、八种视口截图和检查结果位于 `work/acronyms-20260923/`；仅部署 `index.html` 和 `style.css`，回滚版本为 `/var/www/gaasd-test/releases/20260922T235627`。
 

@@ -27,6 +27,23 @@ for (const language of ["en", "cn"]) {
     await page.goto(relative);
     await page.reload();
     await expect(page.locator(".track-card")).toHaveCount(4);
+    await expect(page.locator(".track-group-heading h3")).toHaveText(
+      language === "cn"
+        ? ["规则驱动的代码", "数据驱动的模型"]
+        : ["Rule-Driven Code", "Data-Driven Models"],
+    );
+    for (const [group, ids] of [
+      ["rule", ["platform", "ai-assist"]],
+      ["data", ["nnide", "vla"]],
+    ]) {
+      expect(
+        await page
+          .locator(`[data-track-group="${group}"] .track-card`)
+          .evaluateAll((cards) =>
+            cards.map((card) => card.getAttribute("data-video-id")),
+          ),
+      ).toEqual(ids);
+    }
     await expect(page.locator("html")).toHaveAttribute("data-preview", "true");
     const order = await page
       .locator("main > section")
@@ -60,8 +77,15 @@ for (const language of ["en", "cn"]) {
         `0${index + 1} / 04`,
       );
       await expect(page.locator(".why-detail-output")).not.toBeEmpty();
+      await expect(page.locator(".why-detail-name")).toHaveText(
+        await stage.locator(".why-step-name").innerText(),
+      );
+      await expect(page.locator(".why-detail-body")).toContainText("GAASD");
     }
     await page.locator(".why-restart").click();
+    await expect(page.locator(".why-detail-name")).toHaveText(
+      language === "cn" ? "算法设计" : "Algorithm Design",
+    );
     await expect(page.locator(".why-stage").first()).toHaveAttribute(
       "aria-pressed",
       "true",
@@ -75,7 +99,11 @@ for (const language of ["en", "cn"]) {
     await page.locator(".why-restart").click();
     const overflow = await page.evaluate(() => {
       const width = document.documentElement.clientWidth;
-      return [...document.querySelectorAll(".why-cbdes, .why-cbdes *")]
+      return [
+        ...document.querySelectorAll(
+          ".why-cbdes, .why-cbdes *, .track-group, .track-group-heading, .track-group-heading *",
+        ),
+      ]
         .filter((el) => {
           const rect = el.getBoundingClientRect();
           return (
@@ -116,11 +144,20 @@ for (const language of ["en", "cn"]) {
       path: `${folder}/${language}-${info.project.name}-full.png`,
       fullPage: true,
     });
+    await page.screenshot({
+      path: `${folder}/${language}-${info.project.name}-viewport.png`,
+    });
     const section = await page.locator("#why-cbdes").boundingBox();
     await page.screenshot({
       path: `${folder}/${language}-${info.project.name}-section.png`,
       fullPage: true,
       clip: section,
+    });
+    const tracks = await page.locator("#tracks").boundingBox();
+    await page.screenshot({
+      path: `${folder}/${language}-${info.project.name}-tracks.png`,
+      fullPage: true,
+      clip: tracks,
     });
     await page.locator(".why-cta").click();
     await expect(page).toHaveURL(/#tracks$/);
