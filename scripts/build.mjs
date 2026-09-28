@@ -19,7 +19,7 @@ for (const [entry, language, lines] of [
   [
     "index.html",
     "en",
-    ["Layered Decoupling", "Software Module Reuse", "AI-Driven Refactoring"],
+    ["Layered Decoupling", "AI-Driven Refactoring", "Software Module Reuse"],
   ],
   [
     "cn/index.html",

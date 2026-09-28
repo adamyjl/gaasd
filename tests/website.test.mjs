@@ -4,8 +4,8 @@ import path from "node:path";
 
 const expectedTitles = [
   "Layered Decoupling",
-  "Software Module Reuse",
   "AI-Driven Refactoring",
+  "Software Module Reuse",
 ];
 const sources = {
   overview: "media/present2/en/overview-en-ja-20260914.mp4",

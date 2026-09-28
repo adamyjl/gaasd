@@ -120,7 +120,7 @@ GAASD-Web/
 
 `site/index.html` 与 `site/cn/index.html` 分别维护两种语言的正文，共享 CSS 和 JavaScript。公共结构调整须同步两份入口；构建不会从英文页生成中文页。英文专用字体、字号和长标题换行通过 `html:lang(en)` 选择器处理，保留既有内容顺序和断点。
 
-英文首屏使用一个 H1 和三个独立句子：`Layered Decoupling`、`Software Module Reuse`、`AI-Driven Refactoring`。大小写直接写入文案，无句末标点。桌面文字/视频列比例为 47:53、列间距 40px，视频保持 16:9；1440px 标题约 48px，宽屏上限 49px，行高 1.16。宽屏桌面（1200px 起）及手机（767px 以下）的 H1 使用 `width: max-content` 和 `max-width: 100%`，以最长句的实际字宽限定共同宽度；每个块级 span 单独使用 `text-align: justify`、`text-align-last: justify` 和 `text-justify: inter-word`。三行字号、字重、字距相同，不缩放字形。768～1199px 保持原有左对齐。手机端使用 `clamp(22px, calc(8vw - 3.2px), 44px)`，将两侧各 20px 留白纳入字号计算；320px 及以上保持每句一行、三行两端对齐。
+英文首屏使用一个 H1 和三个独立句子：`Layered Decoupling`、`AI-Driven Refactoring`、`Software Module Reuse`。大小写直接写入文案，无句末标点。桌面文字/视频列比例为 47:53、列间距 40px，视频保持 16:9；1440px 标题约 48px，宽屏上限 49px，行高 1.16。宽屏桌面（1200px 起）及手机（767px 以下）的 H1 使用 `width: max-content` 和 `max-width: 100%`，以最长句的实际字宽限定共同宽度；每个块级 span 单独使用 `text-align: justify`、`text-align-last: justify` 和 `text-justify: inter-word`。三行字号、字重、字距相同，不缩放字形。768～1199px 保持原有左对齐。手机端使用 `clamp(22px, calc(8vw - 3.2px), 44px)`，将两侧各 20px 留白纳入字号计算；320px 及以上保持每句一行、三行两端对齐。
 
 产品名称、斜杠、定位分别着色，功能短语使用两组可换行列表。每个短语保持完整，通过列表的负向前导间距和父级裁去装饰性行首分隔点，文字本身不裁切；不要把分隔点写进短语文本。新规则限定于英文 `.hero`，中文源码不变。主站 CSS 缓存版本为 `20260923-mobile-headline`。桌面标题对齐记录位于 `work/headline-align-20260923/`；后续手机两端对齐记录与截图位于 `work/mobile-headline-20260923/`，通过 320、360、375、390、414、430px 等 14 种视口检查及线上手机视频播放检查。当前回滚版本为 `/var/www/gaasd-test/releases/20260923T001628`。
 
