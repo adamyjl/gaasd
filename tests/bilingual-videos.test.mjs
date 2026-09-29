@@ -2,8 +2,8 @@ import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 
 const media = {
-  en: [207.04, 239.3, 296.34, 274.77],
-  cn: [207.04, 239.3, 282.64, 274.77],
+  en: [124.57, 239.3, 296.34, 274.77],
+  cn: [124.57, 239.3, 282.64, 274.77],
 };
 const ids = ["platform", "ai-assist", "nnide", "vla"];
 const titles = {
@@ -82,7 +82,7 @@ for (const language of ["en", "cn"]) {
       );
       const filename =
         id === "platform"
-          ? "platform-20260915"
+          ? "platform-20260929"
           : id === "nnide"
             ? `${id}-20260916`
             : `${id}-20260928`;

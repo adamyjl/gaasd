@@ -1,5 +1,5 @@
 {
-  "snapshot_date": "2026-09-28",
+  "snapshot_date": "2026-09-29",
   "full_backup_id": "20260924T102025",
   "files": {
     "backend/geo-data/ip2region_v4.xdb": {
@@ -149,7 +149,15 @@
     "site/media/present2/cn/vla-20260928.mp4": {
       "bytes": 113836984,
       "sha256": "c884db8f7030ab72f2063812dd0e172687c9964967eb94036bc2f73fda3f5eab"
+    },
+    "site/media/present2/en/platform-20260929.mp4": {
+      "bytes": 24968218,
+      "sha256": "8818204a4d2cf7e5cb39751199f55bdf866f4cb307956642531862465abb4992"
+    },
+    "site/media/present2/cn/platform-20260929.mp4": {
+      "bytes": 24285906,
+      "sha256": "4e3de3656835fa0ba5df318f1ec2df64a30c860148b36e6bc4f2b55f13b8cb31"
     }
   },
-  "media_update": "docs/production-20260928.md"
+  "media_update": "docs/platform-20260929.md"
 }
