@@ -2,7 +2,7 @@
 
 GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计、服务器状态后台。当前发布源码位于 `D:\Code\GAASD-Web-Review`（`feature/why-cbdes-review`），原 `D:\Code\GAASD-Web` 的 main 检出保留，线上运行于腾讯云轻量应用服务器 `49.232.60.144`。网站、视频、统计和采集均在服务器运行，本机关机不影响线上服务。
 
-本文按 **2026-09-29 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，状态指标详见 [STATUS.md](STATUS.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
+本文按 **2026-10-01 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，双服务器状态与 GPU 指标详见 [STATUS.md](STATUS.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
 
 代码备份仓库：[adamyjl/gaasd](https://github.com/adamyjl/gaasd)。**GitHub 仅保存源码、测试、构建/部署脚本、依赖清单和说明文件**，不上传视频、图片、PDF、地区数据库、访问数据、生产凭据或完整备份包。下文的目录结构描述完整本地项目；克隆仓库后须先恢复外部资源才能完整预览、构建和部署。具体步骤及资源校验清单见 [GitHub 代码备份说明](docs/github-backup.md)。
 
@@ -17,7 +17,7 @@ GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计
 | `https://gaasd.com/privacy.html`    | 英文数据用途说明、当前浏览器统计开关                           | 公开       |
 | `https://gaasd.com/cn/privacy.html` | 中文数据用途说明、共用当前浏览器统计偏好                       | 公开       |
 | `https://gaasd.com/statistics`      | 访问、IP 归属地、浏览器、视频播放报表与 CSV                    | 管理员     |
-| `https://gaasd.com/status`          | CPU 各核心、内存、Swap、磁盘、网络、服务及趋势                 | 同一管理员 |
+| `https://gaasd.com/status`          | 腾讯云 / 内网切换；CPU、内存、Swap、磁盘、网络、服务、趋势及内网 8 GPU | 同一管理员 |
 | `https://gaasd.com/healthz`         | Nginx 存活响应                                                 | 公开       |
 
 HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn` 以 301 跳转至 `/cn/`。`http://49.232.60.144/gaasd-test/` 保留兼容预览，正式访问使用域名 HTTPS。主站文案、操作提示、无障碍标签及五张封面均为英文，备案号保留中文；中文站使用独立中文入口。
@@ -27,7 +27,7 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn` 以 301 跳�
 | SSH          | `ssh ubuntu@49.232.60.144`，使用已有 SSH 密钥        |
 | 前端版本     | `/var/www/gaasd-test/releases/20260929T204817`       |
 | 前端活动链接 | `/var/www/gaasd-test/public`                         |
-| 后端版本     | `/opt/gaasd-analytics/releases/20260914T201120`      |
+| 后端版本     | `/opt/gaasd-analytics/releases/20261001T210800`      |
 | 后端活动链接 | `/opt/gaasd-analytics/current`                       |
 | Python 环境  | `/opt/gaasd-analytics/venv`，Python 3.12.3           |
 | 系统         | Ubuntu 24.04、Nginx、systemd                         |
@@ -38,6 +38,8 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn` 以 301 跳�
 前后端版本可以不同：本次上线双语 Why CBDES、当前首屏及缩写说明、桌面 2×2 / 手机 1×4 开发方向、中英文切换，以及方向 02/04 四个新视频。方向 01 视频于 2026-09-29 另行更新；总览、方向 03、封面、备案信息及后端保持原样。实际版本以 `readlink -f` 为准；`/healthz` 中的旧 `release` 字符串不是部署版本号。源码通过 Git 和 GitHub 备份；线上发布继续使用时间戳版本目录和 SHA-256 清单管理，推送 GitHub 不会自动部署。
 
 公安备案链接为 `https://beian.mps.gov.cn/#/query/webSearch?code=11010802050298`，使用新窗口打开及 `noopener noreferrer`。备案图标保存在 `site/images/public-security-beian.png`，来源为备案平台自身使用的 `https://beian.mps.gov.cn/img/logo01.dd7ff50e.png`，网页从本站加载图片。电脑端备案号并排、手机端分行；发布和校验记录保存在 `work/public-security-20260915/`。
+
+2026-10-01 单独更新状态后端：加入腾讯云 / 内网切换、内网 8 张 GPU 指标，默认刷新改为 30 秒，提供 30 / 60 / 600 秒选项。此次宣传网站和视频版本不变，详见 [发布与回退记录](docs/status-20261001.md)。
 
 ## 2. 整体架构
 
@@ -51,7 +53,9 @@ flowchart LR
   Flask --> DB[(SQLite WAL)]
   Flask --> Geo[离线 IP 地区库]
   Flask --> Snapshot[状态 JSON 与 24 小时趋势]
-  Collector[systemd 独立采样进程] -->|每 5 秒| Snapshot
+  Collector[腾讯云 systemd 独立采样进程] -->|每 30 秒| Snapshot
+  Remote[腾讯云内网轮询服务] -->|每 30 秒| Snapshot
+  Remote -->|OpenVPN 与受限 SSH| Probe[内网 CPU / 内存 / 磁盘 / 8 GPU 探针]
   DB --> Backup[每日 SQLite 一致性备份]
 ```
 
@@ -85,6 +89,9 @@ GAASD-Web/
 │  ├─ database.py                表结构、事务、连接、初始化
 │  ├─ geo.py / geo-data/         IPv4/IPv6 地区库、版本和许可证
 │  ├─ status_collector.py        独立采样进程
+│  ├─ status_remote.py           固定内网服务器的 SSH 轮询
+│  ├─ status_probe.py            内网只读状态探针
+│  ├─ gpu_metrics.py             NVIDIA GPU 和计算进程指标
 │  ├─ backup.py                  每日数据库备份，保留最近 14 份
 │  ├─ import_logs.py             一次性历史日志导入
 │  ├─ refresh_agents.py          重新解析已有 User-Agent
@@ -190,7 +197,7 @@ SQLite 使用 WAL 和事务。`visits` 保存访问、IP、地区、浏览器、
 
 前端尊重 Do Not Track 和隐私页开关，自动化浏览器默认不采集；Nginx 基本访问日志仍保留。`/` 与 `/cn/` 按访问路径区分，视频 ID 共用，汇总包含历史记录。更完整的口径和历史回填说明见 [STATISTICS.md](STATISTICS.md)。
 
-状态独立进程每 5 秒采样，网页仅读取 JSON；每分钟聚合趋势，保留 24 小时。快照超过 20 秒提示过期。后台不提供重启或修改服务器的功能。整机或公网不可用时此页也可能不可达，不能替代外部监控。详见 [STATUS.md](STATUS.md)。
+两台服务器每 30 秒独立采样，网页默认 30 秒刷新，可选 30 / 60 / 600 秒；接口仅读取 JSON。`server=cloud` / `server=intranet` 选择数据源，分别保存每分钟聚合的 24 小时趋势。内网显示 8 张 A100 GPU；快照超过 90 秒或内网采集失败时提示异常。后台不提供重启或修改服务器的功能。整机或公网不可用时此页也可能不可达，不能替代外部监控。详见 [STATUS.md](STATUS.md) 和 [本次发布记录](docs/status-20261001.md)。
 
 ## 6. 本地开发与检查
 
@@ -274,12 +281,13 @@ Remove-Item Env:GAASD_TEST_URL
 | `/etc/gaasd-analytics/config.json`            | 数据路径、账号哈希、来源和代理设置   |
 | `/etc/gaasd-analytics/admin-credentials.json` | 初始管理员登录信息，root-only        |
 | `/var/lib/gaasd-analytics/analytics.sqlite3`  | 持久统计数据库                       |
-| `/var/lib/gaasd-analytics/status/`            | latest.json、history.json            |
+| `/var/lib/gaasd-analytics/status/`            | 腾讯云 latest.json、history.json；intranet/ 保存内网快照、历史、连接状态 |
 | `/var/lib/gaasd-analytics/backups/`           | 最近 14 份每日数据库备份             |
 | `/etc/letsencrypt/live/gaasd.com/`            | HTTPS 证书链接                       |
 | `/var/log/nginx/gaasd-test.access.log*`       | 请求日志，每日轮换、保留 14 份       |
 | `gaasd-analytics.service`                     | Flask/Gunicorn，非特权用户运行       |
 | `gaasd-status-collector.service`              | 独立采样，192 MiB 内存、20% CPU 配额 |
+| `gaasd-status-intranet.service`               | 内网 SSH 轮询，30 秒间隔，开机自启 |
 | `gaasd-analytics-backup.timer`                | 每天服务器北京时间 03:15 数据库备份  |
 | `certbot.timer`                               | 证书续期                             |
 

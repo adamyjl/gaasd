@@ -69,7 +69,34 @@ let latest,
   busy = false,
   paused = false,
   hours = 1,
-  historyFetched = 0;
+  historyFetched = 0,
+  activeController,
+  requestVersion = 0;
+const serverNames = { cloud: "腾讯云服务器", intranet: "内网服务器" };
+function preference(key, fallback) {
+  try {
+    return window.localStorage.getItem(key) || fallback;
+  } catch {
+    return fallback;
+  }
+}
+function savePreference(key, value) {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    /* Storage is optional. */
+  }
+}
+const requestedServer =
+  new URL(location.href).searchParams.get("server") ||
+  preference("gaasdStatusServer", "cloud");
+$("server-select").value = Object.hasOwn(serverNames, requestedServer)
+  ? requestedServer
+  : "cloud";
+const requestedInterval = preference("gaasdStatusInterval", "30");
+$("interval").value = ["30", "60", "600"].includes(requestedInterval)
+  ? requestedInterval
+  : "30";
 function setLive(text, state) {
   $("live-state").textContent = text;
   $("live-state").dataset.state = state;
@@ -90,7 +117,11 @@ function render(data) {
   latest = data;
   const { host, cpu, memory, swap } = data;
   $("host-summary").textContent =
-    `${host.name} · ${host.os} · ${host.logical_cpus} 个逻辑核心 · ${bytes(memory.total)} 内存`;
+    `${data.server?.name || serverNames[$("server-select").value]} · ${data.server?.address || ""} · ${host.name} · ${host.os} · ${host.logical_cpus} 个逻辑核心 · ${bytes(memory.total)} 内存`;
+  $("server-data").hidden = false;
+  $("sampling-note").textContent =
+    `每 ${data.interval_seconds || 30} 秒更新采样${data.server?.id === "intranet" ? ` · CPU / 速率测量窗口 ${number(data.sample_seconds)} 秒` : ""} · 时间均为北京时间`;
+  renderGpu(data);
   $("status-updated").textContent = `采样于 ${date(data.generated_at)}`;
   const root = data.filesystems.find((item) => item.mount === "/");
   const net = data.network.filter((n) => n.name !== "lo");
@@ -247,6 +278,9 @@ function render(data) {
     "gaasd-status-collector.service": "服务器状态采集",
     "gaasd-analytics-backup.timer": "每日统计备份",
     "certbot.timer": "HTTPS 证书续期",
+    "openvpn-client@platform.service": "内网 OpenVPN 连接",
+    "gaasd-status-intranet.service": "内网服务器状态采集",
+    "docker.service": "Docker 容器服务",
   };
   replace(
     "services",
@@ -279,11 +313,13 @@ function render(data) {
       details([
         [
           "HTTPS 证书",
-          data.certificate.valid
+          data.certificate?.valid
             ? `有效 · 剩余 ${data.certificate.days_left} 天`
-            : "校验未通过",
+            : data.certificate
+              ? "校验未通过"
+              : "不适用",
         ],
-        ["证书到期", date(data.certificate.expires_at)],
+        ["证书到期", date(data.certificate?.expires_at)],
         [
           "最近数据备份",
           data.backup ? date(data.backup.updated_at) : "未发现备份",
@@ -298,6 +334,7 @@ function render(data) {
       { id: "maintenance" },
     ),
   );
+  $("maintenance").hidden = $("server-select").value === "intranet";
   renderProcesses();
   const uptime = host.uptime_seconds;
   const temps = Object.entries(data.temperatures)
@@ -329,7 +366,7 @@ function render(data) {
             ? `${number(data.files.open, 0)} / ${number(data.files.limit, 0)}`
             : "未提供",
         ],
-        ["硬件温度", temps || "云服务器未提供"],
+        ["硬件温度", temps || "当前服务器未提供"],
         [
           "进程状态",
           Object.entries(data.processes.states)
@@ -377,16 +414,110 @@ function render(data) {
   for (const s of data.services)
     if (s.ActiveState !== "active")
       alerts.push(`${names[s.Id] || s.Id}：${s.ActiveState || "未知状态"}。`);
-  if (!data.certificate.valid) alerts.push("服务器本机 HTTPS 证书校验未通过。");
-  else if (data.certificate.days_left < 14)
+  if (data.certificate && !data.certificate.valid)
+    alerts.push("服务器本机 HTTPS 证书校验未通过。");
+  else if (data.certificate?.days_left < 14)
     alerts.push(`HTTPS 证书将在 ${data.certificate.days_left} 天内到期。`);
-  if (!data.backup || data.generated_at - data.backup.updated_at > 36 * 3600)
+  if (
+    $("server-select").value === "cloud" &&
+    (!data.backup || data.generated_at - data.backup.updated_at > 36 * 3600)
+  )
     alerts.push("最近 36 小时内未发现统计数据库备份。");
   replace(
     "alerts",
     alerts.map((text) => el("p", text)),
   );
   $("alerts").hidden = !alerts.length;
+}
+function renderGpu(data) {
+  const panel = $("gpu-panel");
+  panel.hidden = $("server-select").value !== "intranet";
+  if (panel.hidden) return;
+  const gpu = data.gpu || {
+    available: false,
+    devices: [],
+    processes: [],
+    note: "GPU 采集暂不可用。",
+  };
+  const devices = gpu.devices || [];
+  const known = (value, unit) =>
+    Number.isFinite(value) ? `${number(value)} ${unit}` : "未提供";
+  const utilization = (value) =>
+    Number.isFinite(value) ? percent(value) : "未提供";
+  const total = devices.every((g) => Number.isFinite(g.memory_total))
+    ? devices.reduce((n, g) => n + g.memory_total, 0)
+    : null;
+  const used = devices.every((g) => Number.isFinite(g.memory_used))
+    ? devices.reduce((n, g) => n + g.memory_used, 0)
+    : null;
+  $("gpu-summary").textContent = gpu.available
+    ? `${devices.length} / ${gpu.expected_count || 8} 张 GPU · 显存已用 ${bytes(used)} / ${bytes(total)}`
+    : "GPU 状态暂不可用";
+  $("gpu-driver").textContent = devices.length
+    ? `NVIDIA 驱动 ${devices[0].driver}`
+    : "";
+  $("gpu-notice").hidden = !gpu.note;
+  $("gpu-notice").textContent = gpu.note || "";
+  replace(
+    "gpu-cards",
+    devices.map((g) => {
+      const card = el("article", undefined, "gpu-card");
+      card.append(el("h3", `GPU ${g.index}`), el("p", g.name));
+      const usage = el("div", undefined, "resource-title");
+      usage.append(
+        el("span", "计算利用率"),
+        el("strong", utilization(g.utilization_percent)),
+      );
+      const memory = el("div", undefined, "resource-title");
+      memory.append(
+        el("span", "显存"),
+        el("strong", `${bytes(g.memory_used)} / ${bytes(g.memory_total)}`),
+      );
+      card.append(
+        usage,
+        bar(g.utilization_percent, `GPU ${g.index} 计算利用率`),
+        memory,
+        bar(
+          Number.isFinite(g.memory_used) && g.memory_total > 0
+            ? (g.memory_used / g.memory_total) * 100
+            : null,
+          `GPU ${g.index} 显存占用率`,
+        ),
+        details([
+          ["可用显存", bytes(g.memory_free)],
+          ["温度", known(g.temperature_c, "°C")],
+          [
+            "功耗 / 上限",
+            `${known(g.power_w, "W")} / ${known(g.power_limit_w, "W")}`,
+          ],
+          ["显存读写活动", utilization(g.memory_activity_percent)],
+          ["风扇", utilization(g.fan_percent)],
+          ["性能状态", g.performance_state || "未提供"],
+        ]),
+      );
+      const identity = el("details");
+      identity.append(
+        el("summary", "设备标识"),
+        el("p", g.uuid),
+        el("p", `PCI ${g.pci_bus}`),
+      );
+      card.append(identity);
+      return card;
+    }),
+  );
+  rows(
+    "gpu-processes",
+    (gpu.processes || []).map((p) => [
+      `GPU ${devices.find((g) => g.uuid === p.gpu_uuid)?.index ?? "—"}`,
+      p.pid,
+      p.name,
+      bytes(p.memory_used),
+    ]),
+    4,
+  );
+  $("gpu-process-note").textContent =
+    gpu.process_note ||
+    "显存占用与计算利用率分别显示；驱动未提供的指标显示“未提供”。";
 }
 function rows(id, values, cols) {
   replace(
@@ -447,6 +578,15 @@ function renderHistory() {
       ["CPU", ["cpu"], "绿色：CPU 占用率"],
       ["内存 / Swap", ["memory", "swap"], "绿色：内存 · 蓝色：Swap"],
       ["网络接收 / 发送", ["rx", "tx"], "绿色：接收 · 蓝色：发送"],
+      ...(latest?.gpu
+        ? [
+            [
+              "GPU / 显存",
+              ["gpu", "gpu_memory"],
+              "绿色：GPU 平均利用率 · 蓝色：显存占用",
+            ],
+          ]
+        : []),
     ].map(([title, keys, keyText]) => {
       const card = el("div", undefined, "chart");
       card.append(el("h3", title), el("p", keyText, "chart-key"));
@@ -486,6 +626,11 @@ function renderHistory() {
             );
         };
         points.forEach((p, i) => {
+          if (!Number.isFinite(p[key])) {
+            draw();
+            segment = [];
+            return;
+          }
           if (i && p.timestamp - points[i - 1].timestamp > 180) {
             draw();
             segment = [];
@@ -527,9 +672,12 @@ async function refresh() {
   clearTimeout(timer);
   $("refresh-status").disabled = true;
   const controller = new AbortController();
+  activeController = controller;
+  const version = ++requestVersion;
+  const selected = $("server-select").value;
   const timeout = setTimeout(() => controller.abort(), 12000);
   try {
-    const response = await fetch("/status/api/snapshot", {
+    const response = await fetch(`/status/api/snapshot?server=${selected}`, {
       cache: "no-store",
       credentials: "same-origin",
       signal: controller.signal,
@@ -538,39 +686,71 @@ async function refresh() {
       throw new Error("登录已失效，请重新打开状态页登录。");
     if (!response.ok) throw new Error("采集暂未就绪，请稍后重试。");
     const data = await response.json();
+    if (version !== requestVersion) return;
+    if (data.server?.id && data.server.id !== selected)
+      throw new Error("服务器数据不匹配，请重试。");
     render(data);
     $("status-error").hidden = !data.stale;
     if (data.stale) {
       $("status-error").textContent =
+        data.connection?.message ||
         `数据已 ${number(data.age_seconds, 0)} 秒未更新，以下为最后一次采样；请检查采集服务。`;
       setLive("采样已过期", "error");
     } else setLive(paused ? "已暂停" : "实时更新", paused ? "paused" : "live");
     if (Date.now() - historyFetched > 60000) {
-      const report = await fetch("/status/api/history", {
+      const report = await fetch(`/status/api/history?server=${selected}`, {
         cache: "no-store",
         credentials: "same-origin",
         signal: controller.signal,
       });
       if (report.ok) {
-        historyData = await report.json();
+        const history = await report.json();
+        if (version !== requestVersion) return;
+        historyData = history;
         historyFetched = Date.now();
       }
     }
     renderHistory();
   } catch (error) {
+    if (version !== requestVersion) return;
     setLive("连接异常", "error");
     $("status-error").hidden = false;
     $("status-error").textContent =
       `${error.name === "AbortError" ? "请求超时。" : error.message} ${latest ? "保留最后一次采样，恢复连接后继续更新。" : "尚未取得服务器数据。"}`;
   } finally {
     clearTimeout(timeout);
-    busy = false;
-    $("refresh-status").disabled = false;
-    schedule();
+    if (version === requestVersion) {
+      busy = false;
+      $("refresh-status").disabled = false;
+      schedule();
+    }
   }
 }
 $("refresh-status").addEventListener("click", refresh);
-$("interval").addEventListener("change", schedule);
+$("interval").addEventListener("change", () => {
+  savePreference("gaasdStatusInterval", $("interval").value);
+  schedule();
+});
+$("server-select").addEventListener("change", () => {
+  ++requestVersion;
+  activeController?.abort();
+  clearTimeout(timer);
+  busy = false;
+  latest = undefined;
+  historyData = undefined;
+  historyFetched = 0;
+  $("server-data").hidden = true;
+  $("status-error").hidden = true;
+  $("status-updated").textContent = "等待该服务器采样";
+  $("host-summary").textContent =
+    `正在连接${serverNames[$("server-select").value]}…`;
+  savePreference("gaasdStatusServer", $("server-select").value);
+  const url = new URL(location.href);
+  url.searchParams.set("server", $("server-select").value);
+  history.replaceState(null, "", url);
+  setLive("连接中", "paused");
+  refresh();
+});
 $("process-sort").addEventListener("change", renderProcesses);
 $("pause").addEventListener("click", () => {
   paused = !paused;
@@ -597,4 +777,6 @@ document.querySelectorAll("[data-hours]").forEach((button) =>
   }),
 );
 renderHistory();
+$("host-summary").textContent =
+  `正在连接${serverNames[$("server-select").value]}…`;
 refresh();

@@ -2,6 +2,65 @@
   display: grid;
   gap: 24px;
 }
+#server-data {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+.status-dashboard [hidden] {
+  display: none !important;
+}
+#cpu-cores {
+  max-height: 440px;
+  overflow-y: auto;
+  scrollbar-color: var(--line) transparent;
+}
+.gpu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.gpu-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+}
+.gpu-card h3 {
+  color: var(--accent);
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+.gpu-card > p {
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.gpu-card .resource-title {
+  margin-top: 18px;
+  font-size: 13px;
+}
+.gpu-card .usage-track {
+  margin-block: 10px 16px;
+}
+.gpu-card .detail-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.gpu-card .detail-item dd {
+  font-size: 14px;
+}
+.gpu-card details {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.gpu-card summary {
+  cursor: pointer;
+}
+.gpu-panel .table-wrap {
+  margin-top: 18px;
+}
 .status-dashboard .page-heading {
   margin-bottom: 0;
 }
@@ -376,6 +435,9 @@ dl {
   margin-top: 4px;
 }
 @media (max-width: 1199px) {
+  .gpu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .status-metrics {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -384,6 +446,15 @@ dl {
   }
 }
 @media (max-width: 767px) {
+  #server-data {
+    gap: 18px;
+  }
+  .gpu-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #cpu-cores {
+    max-height: 360px;
+  }
   .status-dashboard {
     gap: 18px;
     padding-inline: 18px;

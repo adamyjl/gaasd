@@ -14,8 +14,9 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import psutil
+from gpu_metrics import collect_gpus
 
-INTERVAL = 5
+INTERVAL = 30
 SERVICES = [
     "nginx.service",
     "ssh.service",
@@ -23,6 +24,8 @@ SERVICES = [
     "gaasd-status-collector.service",
     "gaasd-analytics-backup.timer",
     "certbot.timer",
+    "openvpn-client@platform.service",
+    "gaasd-status-intranet.service",
 ]
 
 
@@ -146,13 +149,13 @@ def tcp_summary():
     return dict(states=dict(counts), listen_ports=sorted(ports)) if available else None
 
 
-def service_rows():
+def service_rows(profile="cloud"):
     try:
         result = subprocess.run(
             [
                 "systemctl",
                 "show",
-                *SERVICES,
+                *(SERVICES if profile == "cloud" else ["ssh.service", "docker.service"]),
                 "--no-pager",
                 "--property=Id,ActiveState,SubState,UnitFileState,Result,NextElapseUSecRealtime",
             ],
@@ -184,9 +187,13 @@ def certificate():
         return dict(valid=False, note="本机 HTTPS 证书校验未通过或连接不可用")
 
 
-def slow_details():
+def slow_details(profile="cloud"):
     try:
-        backups = list(Path("/var/lib/gaasd-analytics/backups").glob("analytics-*.sqlite3"))
+        backups = (
+            list(Path("/var/lib/gaasd-analytics/backups").glob("analytics-*.sqlite3"))
+            if profile == "cloud"
+            else []
+        )
         latest = max(backups, key=lambda item: item.stat().st_mtime) if backups else None
         backup = (
             dict(
@@ -206,25 +213,28 @@ def slow_details():
         sensors = {}
     return dict(
         checked_at=time.time(),
-        services=service_rows(),
-        certificate=certificate(),
+        services=service_rows(profile),
+        certificate=certificate() if profile == "cloud" else None,
         backup=backup,
         temperatures=sensors,
     )
 
 
 class Sampler:
-    def __init__(self, directory):
-        self.directory = Path(directory)
-        self.directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    def __init__(self, directory, profile="cloud"):
+        self.profile = profile
+        self.directory = Path(directory) if directory is not None else None
+        if self.directory:
+            self.directory.mkdir(parents=True, exist_ok=True, mode=0o700)
         self.previous = None
         self.details = {}
         self.bucket = []
         self.history = []
         try:
-            self.history = json.loads(
-                (self.directory / "history.json").read_text(encoding="utf-8")
-            )["points"]
+            if self.directory:
+                self.history = json.loads(
+                    (self.directory / "history.json").read_text(encoding="utf-8")
+                )["points"]
         except (OSError, ValueError, KeyError):
             pass
         self.history = [
@@ -327,7 +337,7 @@ class Sampler:
         swap["in_rate"] = rate(swap["sin"], previous.get("swap", {}).get("sin"), elapsed)
         swap["out_rate"] = rate(swap["sout"], previous.get("swap", {}).get("sout"), elapsed)
         if now - self.details.get("checked_at", 0) >= 60:
-            self.details = slow_details()
+            self.details = slow_details(self.profile)
         try:
             distro = platform.freedesktop_os_release().get("PRETTY_NAME", platform.system())
         except (OSError, AttributeError):
@@ -376,28 +386,48 @@ class Sampler:
             pressure=pressure(),
             tcp=tcp_summary(),
             files=files,
+            gpu=collect_gpus() if self.profile == "intranet" else None,
             **self.details,
         )
         self.previous = dict(
             mono=mono, cores=cores, net=net, disks=disks, processes=proc_values, swap=swap
         )
+        if self.directory:
+            self.publish(snapshot)
+        return snapshot
+
+    def publish(self, snapshot):
+        """Persist one host's snapshot and its independent minute history."""
+        now = snapshot["generated_at"]
         atomic_json(self.directory / "latest.json", snapshot)
-        if cpu_percent is not None:
+        if snapshot["cpu"]["percent"] is not None:
+            gpu = snapshot.get("gpu") or {}
+            devices = gpu.get("devices", [])
+            usage = [g["utilization_percent"] for g in devices]
+            memory_used = [g["memory_used"] for g in devices]
+            memory_total = [g["memory_total"] for g in devices]
             self.bucket.append(
                 dict(
                     timestamp=now,
-                    cpu=cpu_percent,
-                    memory=memory["percent"],
-                    swap=swap["percent"],
-                    rx=sum(n["rx_rate"] or 0 for n in network if n["name"] != "lo"),
-                    tx=sum(n["tx_rate"] or 0 for n in network if n["name"] != "lo"),
+                    cpu=snapshot["cpu"]["percent"],
+                    memory=snapshot["memory"]["percent"],
+                    swap=snapshot["swap"]["percent"],
+                    rx=sum(n["rx_rate"] or 0 for n in snapshot["network"] if n["name"] != "lo"),
+                    tx=sum(n["tx_rate"] or 0 for n in snapshot["network"] if n["name"] != "lo"),
+                    gpu=sum(usage) / len(usage) if usage and None not in usage else None,
+                    gpu_memory=100 * sum(memory_used) / sum(memory_total)
+                    if memory_total
+                    and None not in memory_total
+                    and None not in memory_used
+                    and sum(memory_total)
+                    else None,
                 )
             )
         if self.bucket and now - self.last_history >= 60:
-            point = {
-                key: round(sum(p[key] for p in self.bucket) / len(self.bucket), 2)
-                for key in ["cpu", "memory", "swap", "rx", "tx"]
-            }
+            point = {}
+            for key in ["cpu", "memory", "swap", "rx", "tx", "gpu", "gpu_memory"]:
+                values = [p[key] for p in self.bucket if p[key] is not None]
+                point[key] = round(sum(values) / len(values), 2) if values else None
             point["timestamp"] = now
             self.history.append(point)
             self.history = [row for row in self.history if now - 86400 <= row["timestamp"] <= now][
@@ -409,7 +439,6 @@ class Sampler:
             )
             self.last_history = now
             self.bucket.clear()
-        return snapshot
 
 
 def main():
@@ -418,6 +447,9 @@ def main():
     parser.add_argument("--once", action="store_true")
     args = parser.parse_args()
     sampler = Sampler(args.directory)
+    if not args.once:
+        sampler.sample()
+        time.sleep(1)  # Prime deltas promptly, then use the normal 30-second cadence.
     while True:
         started = time.monotonic()
         try:
