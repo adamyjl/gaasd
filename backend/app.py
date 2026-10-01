@@ -249,16 +249,44 @@ def create_app(overrides=None):
     @app.get("/status/api/snapshot")
     @app.get("/status/api/history")
     def status_data():
+        servers = {
+            "cloud": dict(id="cloud", name="腾讯云服务器", address="49.232.60.144"),
+            "intranet": dict(
+                id="intranet", name="内网服务器", address="192.168.2.201", expected_gpus=8
+            ),
+        }
+        selected = request.args.get("server", "cloud")
+        if selected not in servers:
+            abort(400)
         directory = Path(config.get("status_directory", "/var/lib/gaasd-analytics/status"))
+        if selected == "intranet":
+            directory = directory / "intranet"
         name = "history.json" if request.path.endswith("/history") else "latest.json"
         try:
             data = json.loads((directory / name).read_text(encoding="utf-8"))
             age = max(0, time.time() - data["generated_at"])
         except (OSError, ValueError, KeyError, TypeError):
-            return jsonify(error="状态采集尚未就绪，请稍后刷新。", stale=True), 503
-        return jsonify(
-            **data, age_seconds=round(age, 1), stale=age > (150 if name == "history.json" else 20)
+            return jsonify(
+                error="该服务器的状态采集尚未就绪，请稍后刷新。",
+                stale=True,
+                server=servers[selected],
+            ), 503
+        connection = None
+        if selected == "intranet":
+            try:
+                connection = json.loads((directory / "connection.json").read_text(encoding="utf-8"))
+                if not isinstance(connection, dict):
+                    connection = None
+            except (OSError, ValueError):
+                pass
+        data.update(
+            server=servers[selected],
+            age_seconds=round(age, 1),
+            stale=age > (180 if name == "history.json" else 90)
+            or bool(connection and not connection.get("ok")),
+            connection=connection,
         )
+        return jsonify(data)
 
     def filters():
         today = datetime.now(SHANGHAI).date()

@@ -1,5 +1,6 @@
 /** First-party events only; no persistent visitor ID or third-party requests. */
 export function initAnalytics() {
+  if (document.documentElement.dataset.preview === "true") return;
   if (!["gaasd.com", "127.0.0.1", "localhost"].includes(location.hostname))
     return;
   const video = document.querySelector("#media-video");

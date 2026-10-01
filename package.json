@@ -12,9 +12,13 @@
     "typecheck": "tsc --project jsconfig.json",
     "test": "playwright test",
     "test:analytics": "playwright test -c playwright.analytics.config.mjs",
+    "test:status": "playwright test -c playwright.status.config.mjs",
     "dev:analytics": "node scripts/analytics-dev.mjs",
     "build": "node scripts/build.mjs",
-    "preview": "node scripts/serve.mjs --dir dist --port 4173"
+    "build:status": "node scripts/build-status-release.mjs",
+    "preview": "node scripts/serve.mjs --dir dist --port 4173",
+    "build:preview": "node scripts/build-preview.mjs",
+    "test:preview": "playwright test -c playwright.preview.config.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

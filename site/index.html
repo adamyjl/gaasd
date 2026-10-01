@@ -12,16 +12,25 @@
     <meta property="og:title" content="GAASD · Visual Software Development" />
     <meta
       property="og:description"
-      content="Decouple software layers. Reuse proven components. Refactor visually with AI. Explore four GAASD development tracks."
+      content="Layered Software Decoupling. Cross-Domain Reuse &amp; Refactoring. AI-Augmented Visual Development."
     />
     <meta property="og:url" content="https://gaasd.com/" />
     <meta property="og:locale" content="en_US" />
     <link rel="canonical" href="https://gaasd.com/" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="style.css?v=20260923-mobile-headline" />
+    <link rel="stylesheet" href="style.css?v=production-20260928" />
     <link rel="preload" href="images/en/overview-20260922.webp" as="image" />
-    <script type="module" src="app.js?v=english-20260922"></script>
+    <script type="module" src="app.js?v=platform-20260929"></script>
+    <script
+      type="module"
+      src="language-switch.js?v=production-20260928"
+    ></script>
     <title>GAASD · Visual Software Development</title>
+    <link rel="stylesheet" href="why-cbdes.css?v=review-feedback-20260928" />
+    <script
+      type="module"
+      src="why-cbdes.js?v=review-feedback-20260928"
+    ></script>
   </head>
   <body>
     <a class="skip-link" href="#overview">Skip to main content</a>
@@ -36,21 +45,29 @@
         >
         <nav class="desktop-nav" aria-label="Primary navigation">
           <a href="#overview" aria-current="location">Overview</a
-          ><a href="#tracks">Tracks</a><a href="#capabilities">Capabilities</a
-          ><a href="#about">About</a>
+          ><a href="#why-cbdes">Why CBDES</a><a href="#tracks">Tracks</a
+          ><a href="#capabilities">Capabilities</a><a href="#about">About</a>
         </nav>
-        <button class="overview-link" type="button" data-video-id="overview">
-          Watch overview <span aria-hidden="true">↗</span>
-        </button>
-        <button
-          class="menu-toggle"
-          type="button"
-          aria-label="Open navigation menu"
-          aria-controls="mobile-menu"
-          aria-expanded="false"
-        >
-          <span></span><span></span>
-        </button>
+        <div class="header-actions">
+          <nav class="language-switch" aria-label="Language">
+            <a href="/" data-review-language="en" lang="en" aria-current="page"
+              >EN</a
+            >
+            <a href="/cn/" data-review-language="cn" lang="zh-CN">中文</a>
+          </nav>
+          <button class="overview-link" type="button" data-video-id="overview">
+            Watch overview <span aria-hidden="true">↗</span>
+          </button>
+          <button
+            class="menu-toggle"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-controls="mobile-menu"
+            aria-expanded="false"
+          >
+            <span></span><span></span>
+          </button>
+        </div>
       </div>
     </header>
     <main>
@@ -65,9 +82,9 @@
             Computing Base Brain &amp; Development System
           </p>
           <h1 id="page-title">
-            <span>Decouple Software Layers</span>
-            <span>Reuse Proven Components</span>
-            <span>Refactor Visually With AI</span>
+            <span>Layered Software Decoupling.</span>
+            <span>Cross-Domain Reuse &amp; Refactoring.</span>
+            <span>AI-Augmented Visual Development.</span>
           </h1>
           <div
             class="systems"
@@ -85,13 +102,13 @@
               <p class="acronym-expansion">Computing Base Brain</p>
               <div class="system-copy">
                 <ul class="feature-row" role="list">
-                  <li>Layer decoupling</li>
-                  <li>Modularization</li>
+                  <li>Layered decoupling</li>
+                  <li>Prefabricated modules</li>
                   <li>Standard interfaces</li>
                 </ul>
                 <ul class="feature-row" role="list">
-                  <li>Software reuse</li>
-                  <li>Cross-platform support</li>
+                  <li>Cross-domain reuse</li>
+                  <li>Application refactoring</li>
                 </ul>
               </div>
             </section>
@@ -148,6 +165,267 @@
           <div class="metric">
             <span class="metric-value">04</span
             ><span class="metric-label">Tracks</span>
+          </div>
+        </div>
+      </section>
+      <section
+        class="why-cbdes"
+        id="why-cbdes"
+        aria-labelledby="why-title"
+        lang="en"
+      >
+        <div class="why-shell">
+          <div class="why-intro">
+            <div>
+              <p class="why-kicker">WHY CBDES <span>/ 01</span></p>
+              <h2 id="why-title">
+                Why is a new approach to autonomous driving development needed?
+              </h2>
+            </div>
+            <p class="why-lead">
+              From algorithm design and software integration to deployment and
+              on-board verification, R&amp;D must connect multiple stages. How
+              can mature capabilities be reused, and how can each round of
+              verification drive the next iteration of development?
+            </p>
+          </div>
+
+          <div class="why-challenges" aria-label="Development challenges">
+            <article class="why-challenge">
+              <div class="why-card-meta">
+                <span>01</span><span>SAFETY</span>
+              </div>
+              <h3>Software Safety Risks</h3>
+              <p>
+                Tightly coupled algorithms, application functions, and
+                underlying platforms make the impact of changes difficult to
+                isolate and expand the scope of safety verification.
+              </p>
+              <div class="why-need">
+                <span class="why-need-label">Solution</span
+                ><strong
+                  >Layered decoupling and prefabricated functional
+                  software</strong
+                >
+              </div>
+            </article>
+            <article class="why-challenge">
+              <div class="why-card-meta">
+                <span>02</span><span>DEVELOPMENT COST</span>
+              </div>
+              <h3>High Development Costs</h3>
+              <p>
+                Similar functions are developed repeatedly across application
+                domains. Existing modules are difficult to share, increasing the
+                cost of application refactoring.
+              </p>
+              <div class="why-need">
+                <span class="why-need-label">Solution</span
+                ><strong>Cross-domain reuse for application refactoring</strong>
+              </div>
+            </article>
+            <article class="why-challenge">
+              <div class="why-card-meta">
+                <span>03</span><span>DEVELOPMENT EFFICIENCY</span>
+              </div>
+              <h3>Low Development Efficiency</h3>
+              <p>
+                When algorithm design is tied to code implementation, each
+                algorithm change requires repeated coding and integration,
+                slowing development iterations.
+              </p>
+              <div class="why-need">
+                <span class="why-need-label">Solution</span
+                ><strong
+                  >Decouple algorithm design from code development</strong
+                >
+              </div>
+            </article>
+          </div>
+
+          <div class="why-solution">
+            <div class="why-equation-row">
+              <div>
+                <p class="why-small-label">Our Solution</p>
+                <h3>Computing Base-brain &amp; Development System</h3>
+              </div>
+              <p class="why-equation" aria-label="CBDES equals CBB plus GAASD">
+                <strong>CBDES</strong><span>=</span><b>CBB</b><span>+</span
+                ><b>GAASD</b>
+              </p>
+            </div>
+            <div class="why-platforms">
+              <article class="why-platform">
+                <div class="why-platform-top">
+                  <span class="why-product">CBB</span>
+                  <h4>Computing Base-Brain</h4>
+                </div>
+                <p>
+                  Use layered decoupling and standard interfaces to create
+                  prefabricated functional software. Build reusable modules that
+                  support application composition and refactoring across
+                  domains.
+                </p>
+                <div class="why-capabilities">
+                  <span>Layered Decoupling</span
+                  ><span>Prefabricated Modules</span
+                  ><span>Cross-Domain Reuse</span>
+                </div>
+              </article>
+              <article class="why-platform">
+                <div class="why-platform-top">
+                  <span class="why-product">GAASD</span>
+                  <h4>Graphic AI-Augmented Software Developer</h4>
+                </div>
+                <p>
+                  Bring AI to graphical algorithm design and application
+                  modeling. Decouple algorithm design from code development, and
+                  connect module reuse, code generation, deployment,
+                  verification, and iteration.
+                </p>
+                <div class="why-capabilities">
+                  <span>Visual Algorithm Design</span
+                  ><span>Application Modeling</span
+                  ><span>Generation &amp; Verification</span>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="why-workflow">
+            <div class="why-flow-heading">
+              <h3>The GAASD Development Loop</h3>
+              <span>Select a step to view work and deliverables</span>
+            </div>
+            <div class="why-flow-track">
+              <div
+                class="why-stages"
+                role="group"
+                aria-label="Development stages"
+              >
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="0"
+                  aria-pressed="true"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">01</span
+                  ><span class="why-step-name">Algorithm Design</span
+                  ><span class="why-step-caption">Module-Level Design</span>
+                </button>
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="1"
+                  aria-pressed="false"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">02</span
+                  ><span class="why-step-name">Application Modeling</span
+                  ><span class="why-step-caption"
+                    >Module Reuse &amp; Composition</span
+                  >
+                </button>
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="2"
+                  aria-pressed="false"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">03</span
+                  ><span class="why-step-name"
+                    >Deployment &amp; Verification</span
+                  ><span class="why-step-caption"
+                    >Generation &amp; Testing</span
+                  >
+                </button>
+                <button
+                  class="why-stage"
+                  type="button"
+                  data-step="3"
+                  aria-pressed="false"
+                  aria-controls="why-step-detail"
+                >
+                  <span class="why-step-number">04</span
+                  ><span class="why-step-name"
+                    >Optimization &amp; Iteration</span
+                  ><span class="why-step-caption"
+                    >Feedback &amp; Improvement</span
+                  >
+                </button>
+              </div>
+              <div class="why-return">
+                <button type="button" class="why-restart">
+                  <span aria-hidden="true">↶</span
+                  ><span
+                    >Verification feedback returns to algorithm design and
+                    application modeling for the next iteration.</span
+                  >
+                </button>
+              </div>
+            </div>
+            <div
+              class="why-step-detail"
+              id="why-step-detail"
+              role="region"
+              aria-live="polite"
+              aria-atomic="true"
+              aria-label="Selected stage details"
+            >
+              <div class="why-detail-title">
+                <span class="why-detail-number">01 / 04</span>
+                <h4 class="why-detail-name">Algorithm Design</h4>
+              </div>
+              <div class="why-detail-copy">
+                <p class="why-detail-body">
+                  Design the algorithm logic of individual functional modules
+                  graphically in GAASD. Define module interfaces, parameters,
+                  and behavior, using AI-assisted development to decouple
+                  algorithm design from code implementation.
+                </p>
+                <div class="why-output">
+                  <span>Deliverables of this step:</span
+                  ><strong class="why-detail-output"
+                    >Functional Algorithm Modules · Module Interfaces &amp;
+                    Parameters</strong
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="why-section-end">
+            <div class="why-source-links">
+              <button
+                type="button"
+                class="why-source-toggle"
+                hidden
+                aria-expanded="false"
+                aria-controls="why-source-panel"
+              >
+                <span>Background slide</span
+                ><span class="why-source-symbol" aria-hidden="true"
+                  >＋</span
+                ></button
+              ><a class="why-pdf-link" hidden target="_blank" rel="noopener"
+                >Platform overview PDF ↗</a
+              >
+            </div>
+            <a class="why-cta" href="#tracks"
+              ><span>Explore Four Development Tracks</span
+              ><span aria-hidden="true">↗</span></a
+            >
+          </div>
+          <div class="why-source-panel" id="why-source-panel" hidden>
+            <p>
+              Source slide (Chinese): development challenges and the iterative
+              workflow
+            </p>
+            <img
+              alt="Chinese source slide showing development challenges, CBDES, and the modeling-to-refinement loop"
+              loading="lazy"
+            />
           </div>
         </div>
       </section>
@@ -224,6 +502,7 @@
       </div>
       <nav aria-label="Mobile primary navigation">
         <a href="#overview">Overview <span aria-hidden="true">↗</span></a
+        ><a href="#why-cbdes">Why CBDES</a
         ><a href="#tracks">Tracks <span aria-hidden="true">↗</span></a
         ><a href="#capabilities"
           >Capabilities <span aria-hidden="true">↗</span></a

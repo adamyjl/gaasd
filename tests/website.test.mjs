@@ -3,16 +3,16 @@ import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
 const expectedTitles = [
-  "Decouple Software Layers",
-  "Reuse Proven Components",
-  "Refactor Visually With AI",
+  "Layered Software Decoupling.",
+  "Cross-Domain Reuse & Refactoring.",
+  "AI-Augmented Visual Development.",
 ];
 const sources = {
   overview: "media/present2/en/overview-en-ja-20260914.mp4",
-  platform: "media/present2/en/platform-20260915.mp4",
-  "ai-assist": "media/present2/en/ai-assist.mp4",
+  platform: "media/present2/en/platform-20260929.mp4",
+  "ai-assist": "media/present2/en/ai-assist-20260928.mp4",
   nnide: "media/present2/en/nnide-20260916.mp4",
-  vla: "media/present2/en/vla-20260916.mp4",
+  vla: "media/present2/en/vla-20260928.mp4",
 };
 const screenshots = path.resolve("work/screenshots");
 
@@ -111,8 +111,7 @@ test("responsive layout, content, real images and screenshots", async ({
       expect(line.height).toBeCloseTo(layout.titles[0].height, 0);
   }
   expect(layout.metrics[0].width).toBeCloseTo(layout.metrics[1].width, 0);
-  const expectedColumns =
-    layout.width >= 1200 ? 4 : layout.width >= 768 ? 2 : 1;
+  const expectedColumns = layout.width >= 768 ? 2 : 1;
   expect(
     layout.cards.filter((box) => Math.abs(box.y - layout.cards[0].y) < 2),
   ).toHaveLength(expectedColumns);
@@ -203,8 +202,8 @@ test("all five videos play, seek, switch and release on close", async ({
   const video = page.locator("#media-video");
   const items = [
     ["overview", 28],
-    ["platform", 207],
-    ["ai-assist", 194],
+    ["platform", 125],
+    ["ai-assist", 239],
     ["nnide", 296],
     ["vla", 275],
   ];
