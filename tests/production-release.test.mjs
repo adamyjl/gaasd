@@ -1,6 +1,33 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 
+test("Chinese is the default homepage and the previous Chinese URL remains usable", async ({
+  page,
+  request,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Check compatibility once");
+  for (const path of ["/", "/index.html", "/cn/"]) {
+    await page.goto(path);
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
+    await expect(page.locator("html")).toHaveAttribute(
+      "data-video-language",
+      "cn",
+    );
+    await expect(page.locator('[data-review-language="en"]')).toHaveAttribute(
+      "href",
+      "/en/",
+    );
+    await expect(page.locator('[data-review-language="cn"]')).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  }
+  const entry = await request.get("/en");
+  expect(entry.status()).toBe(200);
+  expect(entry.url()).toMatch(/\/en\/$/);
+});
+
 for (const language of ["en", "cn"]) {
   test(`${language}: production home preserves review features and language navigation`, async ({
     page,
@@ -14,7 +41,7 @@ for (const language of ["en", "cn"]) {
       if (response.status() >= 400)
         errors.push(`${response.status()} ${response.url()}`);
     });
-    await page.goto(language === "cn" ? "/cn/" : "/");
+    await page.goto(language === "cn" ? "/" : "/en/");
     await page.reload();
     await expect(page.locator(".track-card")).toHaveCount(4);
     await expect(page.locator("html")).not.toHaveAttribute(
@@ -83,7 +110,7 @@ for (const language of ["en", "cn"]) {
       .boundingBox();
     await page.mouse.click(link.x + link.width / 2, link.y + link.height / 2);
     await expect(page).toHaveURL(
-      language === "en" ? /\/cn\/#tracks$/ : /\/#tracks$/,
+      language === "en" ? /\/#tracks$/ : /\/en\/#tracks$/,
     );
     await expect(page.locator("html")).toHaveAttribute(
       "lang",

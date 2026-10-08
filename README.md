@@ -2,7 +2,7 @@
 
 GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计、服务器状态后台。当前发布源码位于 `D:\Code\GAASD-Web-Review`（`feature/why-cbdes-review`），原 `D:\Code\GAASD-Web` 的 main 检出保留，线上运行于腾讯云轻量应用服务器 `49.232.60.144`。网站、视频、统计和采集均在服务器运行，本机关机不影响线上服务。
 
-本文按 **2026-10-01 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，双服务器状态与 GPU 指标详见 [STATUS.md](STATUS.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
+本文按 **2026-10-08 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，双服务器状态与 GPU 指标详见 [STATUS.md](STATUS.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
 
 代码备份仓库：[adamyjl/gaasd](https://github.com/adamyjl/gaasd)。**GitHub 仅保存源码、测试、构建/部署脚本、依赖清单和说明文件**，不上传视频、图片、PDF、地区数据库、访问数据、生产凭据或完整备份包。下文的目录结构描述完整本地项目；克隆仓库后须先恢复外部资源才能完整预览、构建和部署。具体步骤及资源校验清单见 [GitHub 代码备份说明](docs/github-backup.md)。
 
@@ -12,22 +12,23 @@ GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计
 
 | 地址                                | 内容                                                           | 权限       |
 | ----------------------------------- | -------------------------------------------------------------- | ---------- |
-| `https://gaasd.com/`                | 英文文案和封面；英文配音、上英下日字幕的总览；四个英文模块视频 | 公开       |
-| `https://gaasd.com/cn/`             | 相同布局；中文文案、原封面、中文总览及四个中文模块视频         | 公开       |
-| `https://gaasd.com/privacy.html`    | 英文数据用途说明、当前浏览器统计开关                           | 公开       |
-| `https://gaasd.com/cn/privacy.html` | 中文数据用途说明、共用当前浏览器统计偏好                       | 公开       |
+| `https://gaasd.com/`                | 默认中文首页、中文封面、中文总览及四个中文模块视频 | 公开       |
+| `https://gaasd.com/en/`             | 英文首页、英文封面、英文配音总览及四个英文模块视频 | 公开       |
+| `https://gaasd.com/cn/`             | 原中文地址保留，与默认首页相同内容         | 公开       |
+| `https://gaasd.com/privacy.html`    | 中文数据用途说明、当前浏览器统计开关                           | 公开       |
+| `https://gaasd.com/en/privacy.html` | 英文数据用途说明、共用当前浏览器统计偏好                       | 公开       |
 | `https://gaasd.com/statistics`      | 访问、IP 归属地、浏览器、视频播放报表与 CSV                    | 管理员     |
 | `https://gaasd.com/status`          | 腾讯云 / 内网切换；CPU、内存、Swap、磁盘、网络、服务、趋势及内网 8 GPU | 同一管理员 |
 | `https://gaasd.com/healthz`         | Nginx 存活响应                                                 | 公开       |
 
-HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn` 以 301 跳转至 `/cn/`。`http://49.232.60.144/gaasd-test/` 保留兼容预览，正式访问使用域名 HTTPS。主站文案、操作提示、无障碍标签及五张封面均为英文，备案号保留中文；中文站使用独立中文入口。
+HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分别以 301 跳转至 `/cn/`、`/en/`。`http://49.232.60.144/gaasd-test/` 保留兼容预览，正式访问使用域名 HTTPS。主站默认中文，顶部 EN 可切换到 `/en/`；英文文案、封面和对应视频保留，备案号仍为中文。旧 `/cn/` 地址可继续访问，其 canonical 指向主站。
 
 | 项目         | 当前值                                               |
 | ------------ | ---------------------------------------------------- |
 | SSH          | `ssh ubuntu@49.232.60.144`，使用已有 SSH 密钥        |
-| 前端版本     | `/var/www/gaasd-test/releases/20260929T204817`       |
+| 前端版本     | `/var/www/gaasd-test/releases/20261008T095600`       |
 | 前端活动链接 | `/var/www/gaasd-test/public`                         |
-| 后端版本     | `/opt/gaasd-analytics/releases/20261001T210800`      |
+| 后端版本     | `/opt/gaasd-analytics/releases/20261008T095600`      |
 | 后端活动链接 | `/opt/gaasd-analytics/current`                       |
 | Python 环境  | `/opt/gaasd-analytics/venv`，Python 3.12.3           |
 | 系统         | Ubuntu 24.04、Nginx、systemd                         |
@@ -40,6 +41,8 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn` 以 301 跳�
 公安备案链接为 `https://beian.mps.gov.cn/#/query/webSearch?code=11010802050298`，使用新窗口打开及 `noopener noreferrer`。备案图标保存在 `site/images/public-security-beian.png`，来源为备案平台自身使用的 `https://beian.mps.gov.cn/img/logo01.dd7ff50e.png`，网页从本站加载图片。电脑端备案号并排、手机端分行；发布和校验记录保存在 `work/public-security-20260915/`。
 
 2026-10-01 单独更新状态后端：加入腾讯云 / 内网切换、内网 8 张 GPU 指标，默认刷新改为 30 秒，提供 30 / 60 / 600 秒选项。此次宣传网站和视频版本不变，详见 [发布与回退记录](docs/status-20261001.md)。
+
+2026-10-08 主站默认改为中文，英文版迁移至 `/en/`。仅更新页面入口、语言/隐私链接、SEO 语言标记及英文路径的统计白名单；媒体文件保持原字节。详见 [默认语言发布记录](docs/default-language-20261008.md)。
 
 ## 2. 整体架构
 
@@ -71,8 +74,10 @@ flowchart LR
 ```text
 GAASD-Web/
 ├─ site/                         前端源码与运行媒体
-│  ├─ index.html                 英文主站入口源码
-│  ├─ cn/index.html              独立的中文入口源码，build 不覆盖
+│  ├─ index.html                 默认中文首页
+│  ├─ en/index.html              英文首页与英文媒体入口
+│  ├─ en/privacy.html            英文隐私与统计偏好页面
+│  ├─ cn/index.html              保留旧中文访问地址，build 不覆盖
 │  ├─ cn/privacy.html            中文数据说明及统计偏好入口
 │  ├─ app.js                     初始化、传递媒体目录缓存版本
 │  ├─ video-catalog.js           两种语言的五段视频及封面、时长、说明
@@ -81,7 +86,7 @@ GAASD-Web/
 │  ├─ player.js                  单一 video + dialog 播放器
 │  ├─ analytics.js               第一方访问和播放事件采集
 │  ├─ style.css                  响应式布局、主题、页脚
-│  ├─ privacy.*                  英文数据说明和双语浏览器采集偏好逻辑
+│  ├─ privacy.*                  中文数据说明和双语浏览器采集偏好逻辑
 │  ├─ images/                    原中文封面、en/ 英文封面及公安备案图标
 │  └─ media/                     原路径兼容媒体、present2 中英文媒体
 ├─ backend/
@@ -137,7 +142,7 @@ GAASD-Web/
 
 路径相对于 `site/`，上线后相对于站点根目录。
 
-| 视频             | 主站 `/`                                        | 中文站 `/cn/`                             | 时长               |
+| 视频             | 英文站 `/en/`                                        | 中文主站 `/`（兼容 `/cn/`）                             | 时长               |
 | ---------------- | ----------------------------------------------- | ----------------------------------------- | ------------------ |
 | 总览             | `media/present2/en/overview-en-ja-20260914.mp4` | `media/overview.mp4`                      | 28.44 秒           |
 | 1 平台与功能软件 | `media/present2/en/platform-20260929.mp4`       | `media/present2/cn/platform-20260929.mp4` | 02:05              |

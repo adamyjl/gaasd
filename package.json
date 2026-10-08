@@ -6,8 +6,8 @@
   "description": "GAASD static promotional website",
   "scripts": {
     "dev": "node scripts/serve.mjs --dir site --port 4173",
-    "format": "prettier --write site/*.{html,css,js,svg} backend/ui/*.{html,css,js} scripts/*.mjs tests/*.mjs *.json *.mjs",
-    "format:check": "prettier --check site/*.{html,css,js,svg} backend/ui/*.{html,css,js} scripts/*.mjs tests/*.mjs *.json *.mjs",
+    "format": "prettier --write site/*.{html,css,js,svg} site/{cn,en}/*.html backend/ui/*.{html,css,js} scripts/*.mjs tests/*.mjs *.json *.mjs",
+    "format:check": "prettier --check site/*.{html,css,js,svg} site/{cn,en}/*.html backend/ui/*.{html,css,js} scripts/*.mjs tests/*.mjs *.json *.mjs",
     "lint": "eslint site/*.js backend/ui/*.js scripts/*.mjs tests/*.mjs *.mjs",
     "typecheck": "tsc --project jsconfig.json",
     "test": "playwright test",

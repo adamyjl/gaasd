@@ -129,6 +129,9 @@ def create_app(overrides=None):
             "/cn",
             "/cn/",
             "/cn/index.html",
+            "/en",
+            "/en/",
+            "/en/index.html",
         }:
             abort(400)
         if body["kind"] == "video":

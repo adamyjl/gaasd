@@ -67,8 +67,10 @@ def report(client, query=""):
     return response.json
 
 
-@pytest.mark.parametrize("path", ["/", "/cn", "/cn/", "/cn/index.html"])
-def test_new_video_lengths_and_chinese_paths_are_tracked(client, path):
+@pytest.mark.parametrize(
+    "path", ["/", "/cn", "/cn/", "/cn/index.html", "/en", "/en/", "/en/index.html"]
+)
+def test_new_video_lengths_and_bilingual_paths_are_tracked(client, path):
     body = event(path=path)
     assert post(client, body).status_code == 204
     body.update(

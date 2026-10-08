@@ -20,7 +20,7 @@ test("breakpoint edges keep navigation, headings and cards inside the viewport",
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "Run the width sweep once.");
-  await page.goto("/");
+  await page.goto("/en/");
   for (const width of [340, 360, 600, 767, 768, 820, 1199, 1200, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     const overflow = await page.evaluate(() => {
@@ -56,7 +56,7 @@ test("responsive layout, content, real images and screenshots", async ({
   page.on("request", (request) => {
     if (request.url().includes("/media/")) mediaRequests.push(request.url());
   });
-  await page.goto("/");
+  await page.goto("/en/");
   await expect(page.locator(".track-card")).toHaveCount(4);
   await expect(page.locator("h1 span")).toHaveText(expectedTitles);
   await expect(page.locator(".metric")).toHaveCount(2);
@@ -157,7 +157,7 @@ test("responsive layout, content, real images and screenshots", async ({
 });
 
 test("navigation, keyboard focus and mobile menu", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/en/");
   const mobile = page.viewportSize().width < 768;
   if (mobile) {
     const toggle = page.locator(".menu-toggle");
@@ -197,7 +197,7 @@ test("all five videos play, seek, switch and release on close", async ({
   page,
 }, testInfo) => {
   test.setTimeout(150000);
-  await page.goto("/");
+  await page.goto("/en/");
   await page.locator(".overview-video").click();
   const video = page.locator("#media-video");
   const items = [
@@ -210,7 +210,7 @@ test("all five videos play, seek, switch and release on close", async ({
   for (const [id, duration] of items) {
     if (id !== "overview")
       await page.locator(`.media-switcher [data-video-id="${id}"]`).click();
-    await expect(video).toHaveAttribute("src", sources[id]);
+    await expect(video).toHaveAttribute("src", `/${sources[id]}`);
     await expect
       .poll(
         () =>
@@ -265,7 +265,7 @@ test("all five videos play, seek, switch and release on close", async ({
   await expect(page.locator(".overview-video")).toBeFocused();
   for (const [id] of items.slice(1)) {
     await page.locator(`.track-card[data-video-id="${id}"]`).click();
-    await expect(video).toHaveAttribute("src", sources[id]);
+    await expect(video).toHaveAttribute("src", `/${sources[id]}`);
     await page.keyboard.press("Escape");
   }
 });
@@ -278,7 +278,7 @@ test("video failure shows a working retry action", async ({
     "One browser network failure check is sufficient.",
   );
   await page.route(`**/${sources.overview}`, (route) => route.abort("failed"));
-  await page.goto("/");
+  await page.goto("/en/");
   await page.locator(".overview-video").click();
   await expect(page.locator(".retry-button")).toBeVisible();
   await expect(page.locator(".media-message")).toHaveText(

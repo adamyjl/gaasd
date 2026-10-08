@@ -49,13 +49,15 @@ for (const filename of await sourceFiles(path.join(root, "site"))) {
     text =
       "// Review builds never collect business analytics.\nexport function initAnalytics() {}\n";
   if (relative.endsWith(".html")) {
-    const chinese = relative.startsWith("cn/");
-    const homepage = `${base}${chinese ? "cn/" : ""}`;
+    const chinese = /<html[^>]*lang="zh-CN"/.test(text);
+    const homepage = `${base}${relative.includes("/") ? relative.slice(0, relative.lastIndexOf("/") + 1) : ""}`;
+    text = text.replace(/ data-media-base="[^"]*"/g, "");
     text = text.replace(
       /<html /,
       '<html data-preview="true" data-media-base="https://gaasd.com/" ',
     );
     text = text.replace(/<link rel="canonical"[^>]*>/g, "");
+    text = text.replace(/<link rel="alternate"[^>]*>/g, "");
     text = text.replace(/<meta property="og:url"[^>]*>/g, "");
     text = text.replace(/(href|src)="([^"]+)"/g, (match, attribute, value) => {
       if (/^(?:https?:|#|mailto:)/.test(value)) return match;
@@ -70,7 +72,7 @@ for (const filename of await sourceFiles(path.join(root, "site"))) {
     });
     const languages = text.includes('class="language-switch"')
       ? ""
-      : `<nav class="language-switch" aria-label="Language"><a href="${base}" data-review-language="en" lang="en" ${chinese ? "" : 'aria-current="page"'}>EN</a><a href="${base}cn/" data-review-language="cn" lang="zh-CN" ${chinese ? 'aria-current="page"' : ""}>中文</a></nav>`;
+      : `<nav class="language-switch" aria-label="Language"><a href="${base}en/" data-review-language="en" lang="en" ${chinese ? "" : 'aria-current="page"'}>EN</a><a href="${base}" data-review-language="cn" lang="zh-CN" ${chinese ? 'aria-current="page"' : ""}>中文</a></nav>`;
     const banner = `<aside class="review-banner" aria-label="Design review"><p><strong>${chinese ? "设计评审预览" : "Design Review Preview"}</strong> · <code>${version}</code> · ${chinese ? "未上线 · 不采集访问及播放事件" : "Not a production release · Analytics off"}</p>${languages}</aside>`;
     if (text.includes('class="site-header"')) {
       text = text.replace(

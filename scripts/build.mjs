@@ -17,7 +17,7 @@ const dist = path.join(root, "dist");
 // Each locale owns its HTML copy; shared CSS and JS retain the same layout.
 for (const [entry, language, lines] of [
   [
-    "index.html",
+    "en/index.html",
     "en",
     [
       "Layered Software Decoupling.",
@@ -25,6 +25,7 @@ for (const [entry, language, lines] of [
       "AI-Augmented Visual Development.",
     ],
   ],
+  ["index.html", "zh-CN", ["分层解耦拆解", "跨域共用重构", "图形化AI赋能"]],
   ["cn/index.html", "zh-CN", ["分层解耦拆解", "跨域共用重构", "图形化AI赋能"]],
 ]) {
   const html = await readFile(path.join(site, entry), "utf8");

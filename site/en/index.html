@@ -1,34 +1,34 @@
 <!doctype html>
-<html lang="zh-CN" data-video-language="cn">
+<html lang="en" data-video-language="en" data-media-base="/">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0b0b0b" />
     <meta
       name="description"
-      content="CBDES = CBB + GAASD。以功能软件分层解耦与组件复用为基础，支持图形化建模、应用算法重构、代码生成、编译部署和仿真验证。观看 GAASD 四个开发方向的真实演示。"
+      content="CBDES = CBB + GAASD. Decouple software layers and reuse components for visual modeling, algorithm refactoring, code generation, deployment, and simulation. Explore four development tracks through real demos."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="GAASD · 图形化开发系统" />
+    <meta property="og:title" content="GAASD · Visual Software Development" />
     <meta
       property="og:description"
-      content="分层解耦拆解 跨域共用重构 图形化AI赋能"
+      content="Layered Software Decoupling. Cross-Domain Reuse &amp; Refactoring. AI-Augmented Visual Development."
     />
-    <meta property="og:url" content="https://gaasd.com/" />
-    <meta property="og:locale" content="zh_CN" />
-    <link rel="canonical" href="https://gaasd.com/" />
+    <meta property="og:url" content="https://gaasd.com/en/" />
+    <meta property="og:locale" content="en_US" />
+    <link rel="canonical" href="https://gaasd.com/en/" />
     <link rel="alternate" hreflang="zh-CN" href="https://gaasd.com/" />
     <link rel="alternate" hreflang="en" href="https://gaasd.com/en/" />
     <link rel="alternate" hreflang="x-default" href="https://gaasd.com/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/style.css?v=production-20260928" />
-    <link rel="preload" href="/images/overview.webp" as="image" />
+    <link rel="preload" href="/images/en/overview-20260922.webp" as="image" />
     <script type="module" src="/app.js?v=platform-20260929"></script>
     <script
       type="module"
       src="/language-switch.js?v=production-20260928"
     ></script>
-    <title>GAASD · 图形化开发系统</title>
+    <title>GAASD · Visual Software Development</title>
     <link rel="stylesheet" href="/why-cbdes.css?v=review-feedback-20260928" />
     <script
       type="module"
@@ -36,39 +36,39 @@
     ></script>
   </head>
   <body>
-    <a class="skip-link" href="#overview">跳到主要内容</a>
+    <a class="skip-link" href="#overview">Skip to main content</a>
     <header class="site-header">
       <div class="container header-inner">
-        <a class="brand" href="#overview" aria-label="GAASD 首页"
+        <a class="brand" href="#overview" aria-label="GAASD home"
           ><span class="brand-name">GAASD</span
           ><span class="brand-full"
             ><span>GRAPHIC AI-AUGMENTED</span
             ><span>SOFTWARE DEVELOPER</span></span
           ></a
         >
-        <nav class="desktop-nav" aria-label="主导航">
-          <a href="#overview" aria-current="location">概览</a
-          ><a href="#why-cbdes">为何 CBDES</a><a href="#tracks">开发方向</a
-          ><a href="#capabilities">核心能力</a><a href="#about">关于</a>
+        <nav class="desktop-nav" aria-label="Primary navigation">
+          <a href="#overview" aria-current="location">Overview</a
+          ><a href="#why-cbdes">Why CBDES</a><a href="#tracks">Tracks</a
+          ><a href="#capabilities">Capabilities</a><a href="#about">About</a>
         </nav>
         <div class="header-actions">
-          <nav class="language-switch" aria-label="语言切换">
-            <a href="/en/" data-review-language="en" lang="en">EN</a>
+          <nav class="language-switch" aria-label="Language">
             <a
-              href="/"
-              data-review-language="cn"
-              lang="zh-CN"
+              href="/en/"
+              data-review-language="en"
+              lang="en"
               aria-current="page"
-              >中文</a
+              >EN</a
             >
+            <a href="/" data-review-language="cn" lang="zh-CN">中文</a>
           </nav>
           <button class="overview-link" type="button" data-video-id="overview">
-            观看总览 <span aria-hidden="true">↗</span>
+            Watch overview <span aria-hidden="true">↗</span>
           </button>
           <button
             class="menu-toggle"
             type="button"
-            aria-label="打开导航菜单"
+            aria-label="Open navigation menu"
             aria-controls="mobile-menu"
             aria-expanded="false"
           >
@@ -85,41 +85,58 @@
       >
         <div class="hero-copy">
           <p class="eyebrow">CBDES = CBB + GAASD</p>
+          <p class="acronym-expansion hero-expansion">
+            Computing Base Brain &amp; Development System
+          </p>
           <h1 id="page-title">
-            <span>分层解耦拆解</span>
-            <span>跨域共用重构</span>
-            <span>图形化AI赋能</span>
+            <span>Layered Software Decoupling.</span>
+            <span>Cross-Domain Reuse &amp; Refactoring.</span>
+            <span>AI-Augmented Visual Development.</span>
           </h1>
           <div
             class="systems"
             id="capabilities"
-            aria-label="核心能力与系统定位"
+            aria-label="Core capabilities and system roles"
           >
             <section class="system" aria-labelledby="cbb-title">
-              <h2 id="cbb-title">CBB / 功能软件基础平台</h2>
+              <h2 id="cbb-title">
+                <strong class="system-name">CBB</strong>
+                <span class="system-slash">/</span>
+                <span class="system-position"
+                  >Functional Software Platform</span
+                >
+              </h2>
+              <p class="acronym-expansion">Computing Base Brain</p>
               <div class="system-copy">
                 <ul class="feature-row" role="list">
-                  <li>分层解耦</li>
-                  <li>预制功能模块</li>
-                  <li>接口标准化</li>
+                  <li>Layered decoupling</li>
+                  <li>Prefabricated modules</li>
+                  <li>Standard interfaces</li>
                 </ul>
                 <ul class="feature-row" role="list">
-                  <li>跨域共用</li>
-                  <li>应用重构</li>
+                  <li>Cross-domain reuse</li>
+                  <li>Application refactoring</li>
                 </ul>
               </div>
             </section>
             <section class="system" aria-labelledby="gaasd-title">
-              <h2 id="gaasd-title">GAASD / 图形化开发系统</h2>
+              <h2 id="gaasd-title">
+                <strong class="system-name">GAASD</strong>
+                <span class="system-slash">/</span>
+                <span class="system-position">Visual Development System</span>
+              </h2>
+              <p class="acronym-expansion">
+                Graphic AI-Augmented Software Developer
+              </p>
               <div class="system-copy">
                 <ul class="feature-row" role="list">
-                  <li>拖拉拽建模</li>
-                  <li>应用算法重构</li>
+                  <li>Drag-and-drop modeling</li>
+                  <li>Algorithm refactoring</li>
                 </ul>
                 <ul class="feature-row" role="list">
-                  <li>代码生成</li>
-                  <li>编译部署</li>
-                  <li>仿真验证</li>
+                  <li>Code generation</li>
+                  <li>Build &amp; deploy</li>
+                  <li>Simulation &amp; validation</li>
                 </ul>
               </div>
             </section>
@@ -129,31 +146,32 @@
           class="overview-video"
           type="button"
           data-video-id="overview"
-          aria-label="播放 GAASD 总览，28 秒"
+          aria-label="Play the GAASD overview, 28 seconds"
         >
           <img
-            src="/images/overview.webp"
+            src="/images/en/overview-20260922.webp"
             width="1280"
             height="720"
             fetchpriority="high"
-            alt="GAASD 总览视频中的真实软件开发界面"
+            alt="Software development interfaces from the GAASD overview video"
           /><span class="overview-shade" aria-hidden="true"></span
           ><span class="play-disc" aria-hidden="true"
             ><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg></span
           ><span class="overview-caption"
-            ><strong>GAASD 总览</strong><span class="time">00:28</span></span
+            ><strong>GAASD Overview</strong
+            ><span class="time">00:28</span></span
           >
         </button>
       </section>
-      <section class="metrics-band" aria-label="平台数据">
+      <section class="metrics-band" aria-label="Platform at a glance">
         <div class="container metrics">
           <div class="metric">
             <span class="metric-value">815+</span
-            ><span class="metric-label">功能软件组件</span>
+            ><span class="metric-label">Software components</span>
           </div>
           <div class="metric">
             <span class="metric-value">04</span
-            ><span class="metric-label">开发方向</span>
+            ><span class="metric-label">Tracks</span>
           </div>
         </div>
       </section>
@@ -161,59 +179,73 @@
         class="why-cbdes"
         id="why-cbdes"
         aria-labelledby="why-title"
-        lang="zh-CN"
+        lang="en"
       >
         <div class="why-shell">
           <div class="why-intro">
             <div>
-              <p class="why-kicker">为什么选择 CBDES <span>/ 01</span></p>
+              <p class="why-kicker">WHY CBDES <span>/ 01</span></p>
               <h2 id="why-title">
-                <span>为什么需要新的</span><span>自动驾驶开发方式？</span>
+                Why is a new approach to autonomous driving development needed?
               </h2>
             </div>
             <p class="why-lead">
-              从算法设计、软件集成到部署与上车验证，研发需要贯通多个环节。如何让成熟能力得到复用，让每一轮验证推动下一轮开发？
+              From algorithm design and software integration to deployment and
+              on-board verification, R&amp;D must connect multiple stages. How
+              can mature capabilities be reused, and how can each round of
+              verification drive the next iteration of development?
             </p>
           </div>
 
-          <div class="why-challenges" aria-label="研发挑战">
+          <div class="why-challenges" aria-label="Development challenges">
             <article class="why-challenge">
               <div class="why-card-meta">
-                <span>01</span><span>软件安全</span>
+                <span>01</span><span>SAFETY</span>
               </div>
-              <h3>软件安全风险</h3>
+              <h3>Software Safety Risks</h3>
               <p>
-                算法逻辑、应用功能与底层平台紧密耦合，变更影响难以隔离，软件安全验证范围随之扩大。
+                Tightly coupled algorithms, application functions, and
+                underlying platforms make the impact of changes difficult to
+                isolate and expand the scope of safety verification.
               </p>
               <div class="why-need">
-                <span class="why-need-label">对应方案</span
-                ><strong>分层解耦，预制功能软件</strong>
+                <span class="why-need-label">Solution</span
+                ><strong
+                  >Layered decoupling and prefabricated functional
+                  software</strong
+                >
               </div>
             </article>
             <article class="why-challenge">
               <div class="why-card-meta">
-                <span>02</span><span>开发成本</span>
+                <span>02</span><span>DEVELOPMENT COST</span>
               </div>
-              <h3>开发成本高</h3>
+              <h3>High Development Costs</h3>
               <p>
-                相似功能在不同应用领域重复开发，已有模块难以跨域共用，抬高应用重构成本。
+                Similar functions are developed repeatedly across application
+                domains. Existing modules are difficult to share, increasing the
+                cost of application refactoring.
               </p>
               <div class="why-need">
-                <span class="why-need-label">对应方案</span
-                ><strong>跨域共用，实现应用重构</strong>
+                <span class="why-need-label">Solution</span
+                ><strong>Cross-domain reuse for application refactoring</strong>
               </div>
             </article>
             <article class="why-challenge">
               <div class="why-card-meta">
-                <span>03</span><span>开发效率</span>
+                <span>03</span><span>DEVELOPMENT EFFICIENCY</span>
               </div>
-              <h3>开发效率低</h3>
+              <h3>Low Development Efficiency</h3>
               <p>
-                算法设计与代码实现紧密绑定，每次算法调整都需要重复编码和集成，拖慢开发迭代。
+                When algorithm design is tied to code implementation, each
+                algorithm change requires repeated coding and integration,
+                slowing development iterations.
               </p>
               <div class="why-need">
-                <span class="why-need-label">对应方案</span
-                ><strong>算法设计与代码开发解耦</strong>
+                <span class="why-need-label">Solution</span
+                ><strong
+                  >Decouple algorithm design from code development</strong
+                >
               </div>
             </article>
           </div>
@@ -221,8 +253,8 @@
           <div class="why-solution">
             <div class="why-equation-row">
               <div>
-                <p class="why-small-label">我们的方案</p>
-                <h3>计算基础平台及开发系统</h3>
+                <p class="why-small-label">Our Solution</p>
+                <h3>Computing Base-brain &amp; Development System</h3>
               </div>
               <p class="why-equation" aria-label="CBDES equals CBB plus GAASD">
                 <strong>CBDES</strong><span>=</span><b>CBB</b><span>+</span
@@ -233,31 +265,35 @@
               <article class="why-platform">
                 <div class="why-platform-top">
                   <span class="why-product">CBB</span>
-                  <h4>功能软件基础平台</h4>
+                  <h4>Computing Base-Brain</h4>
                 </div>
                 <p>
-                  通过分层解耦和标准接口预制功能软件，沉淀可跨域共用的模块，为不同应用的组合与重构提供基础。
+                  Use layered decoupling and standard interfaces to create
+                  prefabricated functional software. Build reusable modules that
+                  support application composition and refactoring across
+                  domains.
                 </p>
                 <div class="why-capabilities">
-                  <span>分层解耦</span><span>预制功能模块</span
-                  ><span>跨域共用</span>
+                  <span>Layered Decoupling</span
+                  ><span>Prefabricated Modules</span
+                  ><span>Cross-Domain Reuse</span>
                 </div>
               </article>
               <article class="why-platform">
                 <div class="why-platform-top">
                   <span class="why-product">GAASD</span>
-                  <h4>图形化开发系统</h4>
+                  <h4>Graphic AI-Augmented Software Developer</h4>
                 </div>
-                <p class="why-product-expansion" lang="en">
-                  Graphic AI-Augmented Software Developer
-                </p>
                 <p>
-                  以 AI
-                  赋能图形化算法设计与应用建模，将算法设计与代码开发解耦，连接模块复用、代码生成、部署验证及优化迭代。
+                  Bring AI to graphical algorithm design and application
+                  modeling. Decouple algorithm design from code development, and
+                  connect module reuse, code generation, deployment,
+                  verification, and iteration.
                 </p>
                 <div class="why-capabilities">
-                  <span>图形化算法设计</span><span>应用建模</span
-                  ><span>生成与验证</span>
+                  <span>Visual Algorithm Design</span
+                  ><span>Application Modeling</span
+                  ><span>Generation &amp; Verification</span>
                 </div>
               </article>
             </div>
@@ -265,11 +301,15 @@
 
           <div class="why-workflow">
             <div class="why-flow-heading">
-              <h3>GAASD 持续迭代的开发闭环</h3>
-              <span>选择步骤，查看工作与产出</span>
+              <h3>The GAASD Development Loop</h3>
+              <span>Select a step to view work and deliverables</span>
             </div>
             <div class="why-flow-track">
-              <div class="why-stages" role="group" aria-label="开发流程步骤">
+              <div
+                class="why-stages"
+                role="group"
+                aria-label="Development stages"
+              >
                 <button
                   class="why-stage"
                   type="button"
@@ -278,8 +318,8 @@
                   aria-controls="why-step-detail"
                 >
                   <span class="why-step-number">01</span
-                  ><span class="why-step-name">算法设计</span
-                  ><span class="why-step-caption">模块级设计</span>
+                  ><span class="why-step-name">Algorithm Design</span
+                  ><span class="why-step-caption">Module-Level Design</span>
                 </button>
                 <button
                   class="why-stage"
@@ -289,8 +329,10 @@
                   aria-controls="why-step-detail"
                 >
                   <span class="why-step-number">02</span
-                  ><span class="why-step-name">应用建模</span
-                  ><span class="why-step-caption">模块复用与组合</span>
+                  ><span class="why-step-name">Application Modeling</span
+                  ><span class="why-step-caption"
+                    >Module Reuse &amp; Composition</span
+                  >
                 </button>
                 <button
                   class="why-stage"
@@ -300,8 +342,11 @@
                   aria-controls="why-step-detail"
                 >
                   <span class="why-step-number">03</span
-                  ><span class="why-step-name">部署验证</span
-                  ><span class="why-step-caption">代码生成与验证</span>
+                  ><span class="why-step-name"
+                    >Deployment &amp; Verification</span
+                  ><span class="why-step-caption"
+                    >Generation &amp; Testing</span
+                  >
                 </button>
                 <button
                   class="why-stage"
@@ -311,14 +356,20 @@
                   aria-controls="why-step-detail"
                 >
                   <span class="why-step-number">04</span
-                  ><span class="why-step-name">优化迭代</span
-                  ><span class="why-step-caption">反馈与改进</span>
+                  ><span class="why-step-name"
+                    >Optimization &amp; Iteration</span
+                  ><span class="why-step-caption"
+                    >Feedback &amp; Improvement</span
+                  >
                 </button>
               </div>
               <div class="why-return">
                 <button type="button" class="why-restart">
                   <span aria-hidden="true">↶</span
-                  ><span>验证反馈回到算法设计与应用建模，开始下一轮迭代</span>
+                  ><span
+                    >Verification feedback returns to algorithm design and
+                    application modeling for the next iteration.</span
+                  >
                 </button>
               </div>
             </div>
@@ -328,22 +379,24 @@
               role="region"
               aria-live="polite"
               aria-atomic="true"
-              aria-label="当前步骤说明"
+              aria-label="Selected stage details"
             >
               <div class="why-detail-title">
                 <span class="why-detail-number">01 / 04</span>
-                <h4 class="why-detail-name">算法设计</h4>
+                <h4 class="why-detail-name">Algorithm Design</h4>
               </div>
               <div class="why-detail-copy">
                 <p class="why-detail-body">
-                  在 GAASD
-                  中以图形化方式设计单个功能模块的算法逻辑，定义模块接口、参数与行为，通过
-                  AI 辅助开发将算法设计与代码实现解耦。
+                  Design the algorithm logic of individual functional modules
+                  graphically in GAASD. Define module interfaces, parameters,
+                  and behavior, using AI-assisted development to decouple
+                  algorithm design from code implementation.
                 </p>
                 <div class="why-output">
-                  <span>本步产出：</span
+                  <span>Deliverables of this step:</span
                   ><strong class="why-detail-output"
-                    >功能算法模块 · 模块接口与参数</strong
+                    >Functional Algorithm Modules · Module Interfaces &amp;
+                    Parameters</strong
                   >
                 </div>
               </div>
@@ -358,22 +411,26 @@
                 aria-expanded="false"
                 aria-controls="why-source-panel"
               >
-                <span>研发背景原页</span
+                <span>Background slide</span
                 ><span class="why-source-symbol" aria-hidden="true"
                   >＋</span
                 ></button
               ><a class="why-pdf-link" hidden target="_blank" rel="noopener"
-                >平台介绍 PDF（英文） ↗</a
+                >Platform overview PDF ↗</a
               >
             </div>
             <a class="why-cta" href="#tracks"
-              ><span>探索四个开发方向</span><span aria-hidden="true">↗</span></a
+              ><span>Explore Four Development Tracks</span
+              ><span aria-hidden="true">↗</span></a
             >
           </div>
           <div class="why-source-panel" id="why-source-panel" hidden>
-            <p>参考原页：自动驾驶算法的研发现状与开发闭环</p>
+            <p>
+              Source slide (Chinese): development challenges and the iterative
+              workflow
+            </p>
             <img
-              alt="中文参考页：研发挑战、CBDES 与应用建模到优化迭代的流程"
+              alt="Chinese source slide showing development challenges, CBDES, and the modeling-to-refinement loop"
               loading="lazy"
             />
           </div>
@@ -386,17 +443,19 @@
       >
         <div class="section-heading">
           <div class="section-title-group">
-            <h2 id="tracks-title">四个开发方向</h2>
-            <span class="section-english">FOUR DEVELOPMENT TRACKS</span>
+            <h2 id="tracks-title">Four development tracks</h2>
+            <span class="section-english">MODELING TO DEPLOYMENT</span>
           </div>
           <p class="section-hint">
-            选择模块，查看完整演示 <span aria-hidden="true">↗</span>
+            Select a track to watch the full demo
+            <span aria-hidden="true">↗</span>
           </p>
         </div>
         <div class="track-grid" id="track-grid"></div>
         <noscript
           ><p class="noscript-message">
-            请启用 JavaScript 以浏览四个开发方向并播放视频。
+            Enable JavaScript to explore the four development tracks and play
+            videos.
           </p></noscript
         >
       </section>
@@ -412,7 +471,7 @@
         </p>
       </div>
       <div class="container privacy-footer">
-        <a href="/privacy.html">访问与播放统计说明</a>
+        <a href="/en/privacy.html">Privacy &amp; analytics</a>
         <div class="footer-records">
           <a
             href="https://beian.miit.gov.cn/"
@@ -437,23 +496,24 @@
         </div>
       </div>
     </footer>
-    <dialog class="menu-dialog" id="mobile-menu" aria-label="移动导航">
+    <dialog class="menu-dialog" id="mobile-menu" aria-label="Mobile navigation">
       <div class="menu-heading">
-        <span>导航</span
+        <span>Navigation</span
         ><button
           class="icon-button menu-close"
           type="button"
-          aria-label="关闭导航菜单"
+          aria-label="Close navigation menu"
         >
           ×
         </button>
       </div>
-      <nav aria-label="移动端主导航">
-        <a href="#overview">概览 <span aria-hidden="true">↗</span></a
-        ><a href="#why-cbdes">为何 CBDES</a
-        ><a href="#tracks">开发方向 <span aria-hidden="true">↗</span></a
-        ><a href="#capabilities">核心能力 <span aria-hidden="true">↗</span></a
-        ><a href="#about">关于 <span aria-hidden="true">↗</span></a>
+      <nav aria-label="Mobile primary navigation">
+        <a href="#overview">Overview <span aria-hidden="true">↗</span></a
+        ><a href="#why-cbdes">Why CBDES</a
+        ><a href="#tracks">Tracks <span aria-hidden="true">↗</span></a
+        ><a href="#capabilities"
+          >Capabilities <span aria-hidden="true">↗</span></a
+        ><a href="#about">About <span aria-hidden="true">↗</span></a>
       </nav>
     </dialog>
     <dialog
@@ -464,13 +524,13 @@
       <div class="media-panel">
         <div class="media-heading">
           <div>
-            <span class="media-eyebrow">GAASD / 演示</span>
-            <h2 id="media-title">GAASD 总览</h2>
+            <span class="media-eyebrow">GAASD / DEMO</span>
+            <h2 id="media-title">GAASD Overview</h2>
           </div>
           <button
             class="icon-button media-close"
             type="button"
-            aria-label="关闭视频"
+            aria-label="Close video"
           >
             ×
           </button>
@@ -481,18 +541,20 @@
             controls
             playsinline
             preload="none"
-            aria-label="GAASD 演示视频"
+            aria-label="GAASD demo video"
           ></video>
           <div class="media-state" hidden>
             <p class="media-message" role="status" aria-live="polite"></p>
-            <button class="retry-button" type="button" hidden>重试播放</button>
+            <button class="retry-button" type="button" hidden>
+              Retry playback
+            </button>
           </div>
         </div>
         <div
           class="media-switcher"
           id="media-switcher"
           role="group"
-          aria-label="切换演示视频"
+          aria-label="Switch demo video"
         ></div>
       </div>
     </dialog>

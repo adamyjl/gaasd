@@ -23,7 +23,7 @@ for (const language of ["en", "cn"]) {
     await page.addInitScript(() =>
       Object.defineProperty(navigator, "webdriver", { get: () => false }),
     );
-    const relative = language === "cn" ? "cn/" : "./";
+    const relative = language === "cn" ? "./" : "en/";
     await page.goto(relative);
     await page.reload();
     await expect(page.locator(".track-card")).toHaveCount(4);
@@ -213,7 +213,7 @@ for (const language of ["en", "cn"]) {
       languageLink.y + languageLink.height / 2,
     );
     await expect(page).toHaveURL(
-      language === "en" ? /\/cn\/#why-cbdes$/ : /why-cbdes\/#why-cbdes$/,
+      language === "en" ? /why-cbdes\/#why-cbdes$/ : /\/en\/#why-cbdes$/,
     );
     await expect(page.locator("html")).toHaveAttribute(
       "lang",
@@ -239,7 +239,7 @@ for (const language of ["en", "cn"]) {
     await page.addInitScript(() =>
       Object.defineProperty(navigator, "webdriver", { get: () => false }),
     );
-    await page.goto(language === "cn" ? "cn/" : "./");
+    await page.goto(language === "cn" ? "./" : "en/");
     // Dynamic imports finish wiring the player after the document load event.
     await expect(page.locator(".track-card")).toHaveCount(4);
     await page.locator(".overview-video").click();

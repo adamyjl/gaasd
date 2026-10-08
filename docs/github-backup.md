@@ -2,6 +2,8 @@
 
 仓库：<https://github.com/adamyjl/gaasd>。首次代码快照日期：2026-09-24。
 
+2026-10-08 起默认中文源码为 `site/index.html`，英文源码为 `site/en/index.html`；`site/cn/index.html` 保留兼容旧中文地址。发布方式和版本见 [默认语言更新记录](default-language-20261008.md)。中英文共享播放器、CSS 和媒体目录，GitHub 仍不保存媒体。
+
 ## 保存范围
 
 - `site/` 中的 HTML、CSS、JavaScript 与文本 SVG 图标：英文首页、中文首页、隐私页、播放器和统计采集。
