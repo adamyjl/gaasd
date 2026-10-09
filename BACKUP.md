@@ -111,6 +111,10 @@ sudo tar -xzf /var/backups/gaasd-web/full/实际时间戳/GAASD-Runtime-实际�
 
 ### 4.3 恢复后端与数据
 
+2026-10-09 起还需保护内网 GPU 长期统计库 `/var/lib/gaasd-analytics/status/intranet/gpu-usage.sqlite3`。每日一致性备份保存在 `backups/gpu-usage-YYYYMMDD.sqlite3`，保留 14 份。新版 `backup_server.py` 会跳过运行中的 GPU SQLite/WAL/SHM 文件，通过 SQLite 在线备份 API 生成 `runtime/data/status/intranet/gpu-usage.sqlite3`，并将完整性和样本数量记入 `runtime-info.json`。以前的备份不含后来积累的 GPU 历史。
+
+恢复 GPU 库前另行停止 `gaasd-status-intranet.service` 和状态后台，保留原库及配套 WAL/SHM，安装校验后的独立快照，不能混用旧 WAL/SHM；按下述属主/权限设置并启动原服务。仅回退代码时应保留当前统计库，无需覆盖数据。
+
 1. 记录当前前后端链接，先创建当前状态的独立备份。
 2. 停止 `gaasd-analytics.service`、`gaasd-status-collector.service` 和 `gaasd-analytics-backup.timer`；确认备份 service 不在运行。
 3. 把 `runtime/backend/` 复制为 `/opt/gaasd-analytics/releases/restore-<时间戳>/`。重建 `/opt/gaasd-analytics/venv`，用保存的 `pip-freeze.txt` 安装依赖；已有兼容环境也可使用。

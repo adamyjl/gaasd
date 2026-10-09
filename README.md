@@ -1,31 +1,34 @@
 # GAASD 网站：技术实现、代码与维护
 
-GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计、服务器状态后台。本地源码为 `D:\Code\GAASD-Web`，线上运行于腾讯云轻量应用服务器 `49.232.60.144`。网站、视频、统计和采集均在服务器运行，本机关机不影响线上服务。
+GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计、服务器状态后台。当前发布源码位于 `D:\Code\GAASD-Web-Review`（`feature/why-cbdes-review`），原 `D:\Code\GAASD-Web` 的 main 检出保留，线上运行于腾讯云轻量应用服务器 `49.232.60.144`。网站、视频、统计和采集均在服务器运行，本机关机不影响线上服务。
 
-本文按 **2026-09-24 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，状态指标详见 [STATUS.md](STATUS.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
+本文按 **2026-10-09 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，双服务器状态与 GPU 日 / 周统计详见 [STATUS.md](STATUS.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
 
 代码备份仓库：[adamyjl/gaasd](https://github.com/adamyjl/gaasd)。**GitHub 仅保存源码、测试、构建/部署脚本、依赖清单和说明文件**，不上传视频、图片、PDF、地区数据库、访问数据、生产凭据或完整备份包。下文的目录结构描述完整本地项目；克隆仓库后须先恢复外部资源才能完整预览、构建和部署。具体步骤及资源校验清单见 [GitHub 代码备份说明](docs/github-backup.md)。
 
 ## 1. 入口与当前版本
 
+当前双语 CBDES 页面已发布至正式域名，见 [2026-09-28 发布记录](docs/production-20260928.md)；方向 01 于 2026-09-29 更新两段视频，见 [方向 01 更新记录](docs/platform-20260929.md)。独立 Pages 预览及维护方式见 [设计评审说明](docs/why-cbdes-review.md)。源码仍在功能分支；正式发布不自动合并 main。
+
 | 地址                                | 内容                                                           | 权限       |
 | ----------------------------------- | -------------------------------------------------------------- | ---------- |
-| `https://gaasd.com/`                | 英文文案和封面；英文配音、上英下日字幕的总览；四个英文模块视频 | 公开       |
-| `https://gaasd.com/cn/`             | 相同布局；中文文案、原封面、中文总览及四个中文模块视频         | 公开       |
-| `https://gaasd.com/privacy.html`    | 英文数据用途说明、当前浏览器统计开关                           | 公开       |
-| `https://gaasd.com/cn/privacy.html` | 中文数据用途说明、共用当前浏览器统计偏好                       | 公开       |
+| `https://gaasd.com/`                | 默认中文首页、中文封面、中文总览及四个中文模块视频 | 公开       |
+| `https://gaasd.com/en/`             | 英文首页、英文封面、英文配音总览及四个英文模块视频 | 公开       |
+| `https://gaasd.com/cn/`             | 原中文地址保留，与默认首页相同内容         | 公开       |
+| `https://gaasd.com/privacy.html`    | 中文数据用途说明、当前浏览器统计开关                           | 公开       |
+| `https://gaasd.com/en/privacy.html` | 英文数据用途说明、共用当前浏览器统计偏好                       | 公开       |
 | `https://gaasd.com/statistics`      | 访问、IP 归属地、浏览器、视频播放报表与 CSV                    | 管理员     |
-| `https://gaasd.com/status`          | CPU 各核心、内存、Swap、磁盘、网络、服务及趋势                 | 同一管理员 |
+| `https://gaasd.com/status`          | 腾讯云 / 内网切换；CPU、内存、Swap、磁盘、网络、服务、趋势及内网 8 GPU | 同一管理员 |
 | `https://gaasd.com/healthz`         | Nginx 存活响应                                                 | 公开       |
 
-HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn` 以 301 跳转至 `/cn/`。`http://49.232.60.144/gaasd-test/` 保留兼容预览，正式访问使用域名 HTTPS。主站文案、操作提示、无障碍标签及五张封面均为英文，备案号保留中文；中文站使用独立中文入口。
+HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分别以 301 跳转至 `/cn/`、`/en/`。`http://49.232.60.144/gaasd-test/` 保留兼容预览，正式访问使用域名 HTTPS。主站默认中文，顶部 EN 可切换到 `/en/`；英文文案、封面和对应视频保留，备案号仍为中文。旧 `/cn/` 地址可继续访问，其 canonical 指向主站。
 
 | 项目         | 当前值                                               |
 | ------------ | ---------------------------------------------------- |
 | SSH          | `ssh ubuntu@49.232.60.144`，使用已有 SSH 密钥        |
-| 前端版本     | `/var/www/gaasd-test/releases/20260923T002235`       |
+| 前端版本     | `/var/www/gaasd-test/releases/20261008T095600`       |
 | 前端活动链接 | `/var/www/gaasd-test/public`                         |
-| 后端版本     | `/opt/gaasd-analytics/releases/20260914T201120`      |
+| 后端版本     | `/opt/gaasd-analytics/releases/20261009T120100`      |
 | 后端活动链接 | `/opt/gaasd-analytics/current`                       |
 | Python 环境  | `/opt/gaasd-analytics/venv`，Python 3.12.3           |
 | 系统         | Ubuntu 24.04、Nginx、systemd                         |
@@ -33,9 +36,15 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn` 以 301 跳�
 | ICP 页脚     | `京ICP备2026057773号`，链接至工信部备案查询网站      |
 | 公安备案页脚 | `京公网安备11010802050298号`，链接至公安备案查询页面 |
 
-前后端版本可以不同：最近一次优化英文首屏的三行主标题、产品名称颜色层级及功能短语换行；延续英文文案和五张英文封面，四个模块标题与视频片头英文名称一致。十段中英文视频、中文站正文及后端保持原样。实际版本以 `readlink -f` 为准；`/healthz` 中的旧 `release` 字符串不是部署版本号。源码通过 Git 和 GitHub 备份；线上发布继续使用时间戳版本目录和 SHA-256 清单管理，推送 GitHub 不会自动部署。
+前后端版本可以不同：本次上线双语 Why CBDES、当前首屏及缩写说明、桌面 2×2 / 手机 1×4 开发方向、中英文切换，以及方向 02/04 四个新视频。方向 01 视频于 2026-09-29 另行更新；总览、方向 03、封面、备案信息及后端保持原样。实际版本以 `readlink -f` 为准；`/healthz` 中的旧 `release` 字符串不是部署版本号。源码通过 Git 和 GitHub 备份；线上发布继续使用时间戳版本目录和 SHA-256 清单管理，推送 GitHub 不会自动部署。
 
 公安备案链接为 `https://beian.mps.gov.cn/#/query/webSearch?code=11010802050298`，使用新窗口打开及 `noopener noreferrer`。备案图标保存在 `site/images/public-security-beian.png`，来源为备案平台自身使用的 `https://beian.mps.gov.cn/img/logo01.dd7ff50e.png`，网页从本站加载图片。电脑端备案号并排、手机端分行；发布和校验记录保存在 `work/public-security-20260915/`。
+
+2026-10-01 单独更新状态后端：加入腾讯云 / 内网切换、内网 8 张 GPU 指标，默认刷新改为 30 秒，提供 30 / 60 / 600 秒选项。此次宣传网站和视频版本不变，详见 [发布与回退记录](docs/status-20261001.md)。
+
+2026-10-08 主站默认改为中文，英文版迁移至 `/en/`。仅更新页面入口、语言/隐私链接、SEO 语言标记及英文路径的统计白名单；媒体文件保持原字节。详见 [默认语言发布记录](docs/default-language-20261008.md)。
+
+2026-10-09 状态后台新增 8 卡 A100 整体计算 / 显存实时指标，按天和按周查看均值、峰值、趋势、采样覆盖率。每 30 秒持久化，保存 400 天并加入每日备份；长期历史从此次部署开始积累。入口 `/status?server=intranet`，沿用管理员登录。详见 [部署与检查记录](docs/status-gpu-usage-20261009.md)。
 
 ## 2. 整体架构
 
@@ -49,7 +58,12 @@ flowchart LR
   Flask --> DB[(SQLite WAL)]
   Flask --> Geo[离线 IP 地区库]
   Flask --> Snapshot[状态 JSON 与 24 小时趋势]
-  Collector[systemd 独立采样进程] -->|每 5 秒| Snapshot
+  Collector[腾讯云 systemd 独立采样进程] -->|每 30 秒| Snapshot
+  Remote[腾讯云内网轮询服务] -->|每 30 秒| Snapshot
+  Remote -->|完整 8 卡采样| GPUDB[(GPU 使用统计 SQLite)]
+  Flask -->|只读日 / 周统计| GPUDB
+  GPUDB --> Backup
+  Remote -->|OpenVPN 与受限 SSH| Probe[内网 CPU / 内存 / 磁盘 / 8 GPU 探针]
   DB --> Backup[每日 SQLite 一致性备份]
 ```
 
@@ -65,8 +79,10 @@ flowchart LR
 ```text
 GAASD-Web/
 ├─ site/                         前端源码与运行媒体
-│  ├─ index.html                 英文主站入口源码
-│  ├─ cn/index.html              独立的中文入口源码，build 不覆盖
+│  ├─ index.html                 默认中文首页
+│  ├─ en/index.html              英文首页与英文媒体入口
+│  ├─ en/privacy.html            英文隐私与统计偏好页面
+│  ├─ cn/index.html              保留旧中文访问地址，build 不覆盖
 │  ├─ cn/privacy.html            中文数据说明及统计偏好入口
 │  ├─ app.js                     初始化、传递媒体目录缓存版本
 │  ├─ video-catalog.js           两种语言的五段视频及封面、时长、说明
@@ -75,7 +91,7 @@ GAASD-Web/
 │  ├─ player.js                  单一 video + dialog 播放器
 │  ├─ analytics.js               第一方访问和播放事件采集
 │  ├─ style.css                  响应式布局、主题、页脚
-│  ├─ privacy.*                  英文数据说明和双语浏览器采集偏好逻辑
+│  ├─ privacy.*                  中文数据说明和双语浏览器采集偏好逻辑
 │  ├─ images/                    原中文封面、en/ 英文封面及公安备案图标
 │  └─ media/                     原路径兼容媒体、present2 中英文媒体
 ├─ backend/
@@ -83,6 +99,10 @@ GAASD-Web/
 │  ├─ database.py                表结构、事务、连接、初始化
 │  ├─ geo.py / geo-data/         IPv4/IPv6 地区库、版本和许可证
 │  ├─ status_collector.py        独立采样进程
+│  ├─ status_remote.py           固定内网服务器的 SSH 轮询
+│  ├─ status_probe.py            内网只读状态探针
+│  ├─ gpu_metrics.py             NVIDIA GPU 和计算进程指标
+│  ├─ gpu_usage.py               8 卡长期采样及北京时间日 / 周汇总
 │  ├─ backup.py                  每日数据库备份，保留最近 14 份
 │  ├─ import_logs.py             一次性历史日志导入
 │  ├─ refresh_agents.py          重新解析已有 User-Agent
@@ -114,13 +134,13 @@ GAASD-Web/
 └─ work/                         临时发布包、测试数据、视频制作过程
 ```
 
-模块桌面四列、平板两列、手机单列；390px 为左右卡片，320px 为上图下文。播放器切换时暂停旧视频，记录当前会话中的进度；关闭时释放请求、恢复焦点。封面灰度来自 CSS，视频本身保留彩色画面。
+模块分为 01/02“规则驱动的代码”和 03/04“数据驱动的模型”。桌面和平板（宽度 ≥768px）两组纵向排列、每组双列，四张卡片形成 2×2；小屏（宽度 <768px）分组与卡片均纵向排列，形成 1×4。卡片内部在 390px 为左图右文，320px 为上图下文。播放器切换时暂停旧视频，记录当前会话中的进度；关闭时释放请求、恢复焦点。封面灰度来自 CSS，视频本身保留彩色画面。
 
 `site/index.html` 与 `site/cn/index.html` 分别维护两种语言的正文，共享 CSS 和 JavaScript。公共结构调整须同步两份入口；构建不会从英文页生成中文页。英文专用字体、字号和长标题换行通过 `html:lang(en)` 选择器处理，保留既有内容顺序和断点。
 
-英文首屏使用一个 H1 和三个独立句子：`Decouple Software Layers`、`Reuse Proven Components`、`Refactor Visually With AI`。大小写直接写入文案，无句末标点。桌面文字/视频列比例为 47:53、列间距 40px，视频保持 16:9；1440px 标题约 48px，宽屏上限 49px，行高 1.16。宽屏桌面（1200px 起）及手机（767px 以下）的 H1 使用 `width: max-content` 和 `max-width: 100%`，以最长句的实际字宽限定共同宽度；每个块级 span 单独使用 `text-align: justify`、`text-align-last: justify` 和 `text-justify: inter-word`。三行字号、字重、字距相同，不缩放字形。768～1199px 保持原有左对齐。手机端使用 `clamp(22px, calc(8vw - 3.2px), 44px)`，将两侧各 20px 留白纳入字号计算；320px 及以上保持每句一行、三行两端对齐。
+当前正式版的英文首屏使用一个 H1 和三个独立陈述：`Layered Software Decoupling.`、`Cross-Domain Reuse & Refactoring.`、`AI-Augmented Visual Development.`。中文对应“分层解耦拆解 / 跨域共用重构 / 图形化AI赋能”。英文大小写和句末标点直接写入 HTML；宽屏文字/视频列比例为 54:46，视频保持 16:9，标题使用 `clamp(32px, 2.95vw, 42px)`、行高 1.16。1200px 起按最长一句的实际宽度逐行两端对齐，字体、字号、字重和字距相同。平板保持左对齐；手机保留 `clamp(22px, calc(8vw - 3.2px), 44px)` 的可读字号，长句自然换行、左对齐，不强制挤成三行。完整修改对照见 [PDF 评审建议落实说明](docs/pdf-feedback-20260928.md)。
 
-产品名称、斜杠、定位分别着色，功能短语使用两组可换行列表。每个短语保持完整，通过列表的负向前导间距和父级裁去装饰性行首分隔点，文字本身不裁切；不要把分隔点写进短语文本。新规则限定于英文 `.hero`，中文源码不变。主站 CSS 缓存版本为 `20260923-mobile-headline`。桌面标题对齐记录位于 `work/headline-align-20260923/`；后续手机两端对齐记录与截图位于 `work/mobile-headline-20260923/`，通过 320、360、375、390、414、430px 等 14 种视口检查及线上手机视频播放检查。当前回滚版本为 `/var/www/gaasd-test/releases/20260923T001628`。
+产品名称、斜杠、定位分别着色，中英文功能短语使用两组可换行列表。每个短语保持完整，通过列表的负向前导间距和父级裁去装饰性行首分隔点，文字本身不裁切。首页的 CBB 能力强调预制功能模块、跨域共用与应用重构。两种语言应用入口使用 `platform-20260929`，CSS 和共享语言切换沿用 `production-20260928`，Why CBDES 模块使用 `review-feedback-20260928` 缓存版本。
 
 首屏补充三个可直接阅读的缩写全称：顶部公式下方为 CBDES（Computing Base Brain & Development System）；两组产品标题下分别为 CBB（Computing Base Brain）和 GAASD（Graphic AI-Augmented Software Developer）。名称核对自 `GAASD-Develop.pdf` 第 1 页，GAASD 沿用已确认的 AI-Augmented 版本。全称使用 13px 次级灰色文字，手机端同样显示，不依赖悬停提示。更新记录、八种视口截图和检查结果位于 `work/acronyms-20260923/`；仅部署 `index.html` 和 `style.css`，回滚版本为 `/var/www/gaasd-test/releases/20260922T235627`。
 
@@ -128,19 +148,21 @@ GAASD-Web/
 
 路径相对于 `site/`，上线后相对于站点根目录。
 
-| 视频             | 主站 `/`                                        | 中文站 `/cn/`                             | 时长               |
+| 视频             | 英文站 `/en/`                                        | 中文主站 `/`（兼容 `/cn/`）                             | 时长               |
 | ---------------- | ----------------------------------------------- | ----------------------------------------- | ------------------ |
 | 总览             | `media/present2/en/overview-en-ja-20260914.mp4` | `media/overview.mp4`                      | 28.44 秒           |
-| 1 平台与功能软件 | `media/present2/en/platform-20260915.mp4`       | `media/present2/cn/platform-20260915.mp4` | 03:27              |
-| 2 AI 辅助开发    | `media/present2/en/ai-assist.mp4`               | `media/present2/cn/ai-assist.mp4`         | 03:14              |
+| 1 平台与功能软件 | `media/present2/en/platform-20260929.mp4`       | `media/present2/cn/platform-20260929.mp4` | 02:05              |
+| 2 AI 辅助开发    | `media/present2/en/ai-assist-20260928.mp4`      | `media/present2/cn/ai-assist-20260928.mp4` | 03:59              |
 | 3 神经网络开发   | `media/present2/en/nnide-20260916.mp4`          | `media/present2/cn/nnide-20260916.mp4`    | 英 04:56；中 04:43 |
-| 4 VLM / VLA      | `media/present2/en/vla-20260916.mp4`            | `media/present2/cn/vla-20260916.mp4`      | 04:35              |
+| 4 VLM / VLA      | `media/present2/en/vla-20260928.mp4`            | `media/present2/cn/vla-20260928.mp4`      | 04:35              |
 
 主站总览为 1080p / 50 fps、英文配音及上英下日字幕，SHA-256：`a228568afc631272e8d0b0ec283cf8331bb73f219cfc3bd5c01308c0a9f70b59`。中文总览 SHA-256：`7b64db3b60a0fbf4a19e1e666f5b90fefddd973db3032c80e47d185cf6b08a1a`。
 
-模块 02 来自 `C:\Users\LG-NB\Downloads\present2`；模块 01 于 2026-09-15 更新为 Downloads 中的 `1. gaasd eng.mp4`（主站）和 `1. gaasd chn.mp4`（中文站）。模块 03、04 于 2026-09-16 更新为 `C:\Users\LG-NB\Downloads\gaasd0916` 中的四个新视频。仅做 H.264/AAC 校验及 fast-start 无损重封装，保留视频画面和配音。部署和恢复使用项目内媒体，不依赖 Downloads。旧的媒体地址保留兼容；替换主站总览时不要覆盖中文站仍在使用的 `media/overview.mp4`。
+模块 02 最初来自 `C:\Users\LG-NB\Downloads\present2`；模块 01 于 2026-09-15 更新为 Downloads 中的 `1. gaasd eng.mp4`（主站）和 `1. gaasd chn.mp4`（中文站）。模块 03、04 于 2026-09-16 更新为 `C:\Users\LG-NB\Downloads\gaasd0916` 中的四个新视频。仅做 H.264/AAC 校验及 fast-start 无损重封装，保留视频画面和配音。部署和恢复使用项目内媒体，不依赖 Downloads。旧的媒体地址保留兼容；替换主站总览时不要覆盖中文站仍在使用的 `media/overview.mp4`。
 
-模块 01 的版本为 1920×1080、30 fps、207.04 秒，使用 `platform` 统计 ID；其发布记录保存在 `work/platform-20260915/`。
+2026-09-28：方向 02/04 更新为 Downloads 中的 `gaasd-ai-en/cn.mp4` 和 `gaasd-vla-en/cn.mp4`，分别为 239.30 秒及 274.77 秒。四个文件已是 fast-start，逐字节复制而不转码；新路径和 SHA-256 见 [发布记录](docs/production-20260928.md) 及外部资源清单。旧地址与其他媒体保留。
+
+模块 01 当前为 1920×1080、30 fps、124.57 秒，使用 `platform` 统计 ID；来源为 `1. gaasd eng2.mp4` / `1. gaasd chn2.mp4`，记录位于 `work/platform-20260929/`。2026-09-15 的 207.04 秒旧视频地址仍保留。
 
 本次文件名中的“2. nnide”经确认对应网站 **03 神经网络开发**，不替换 02 AI 辅助开发。`2. nnide 英.mp4` 用于主站，`2. nnide 中.mp4` 用于中文站；`4. GAASD-VLA-English-Voice-EN-JA-Subtitles-Template-v2-Sound-Outro.mp4` 用于主站 VLA，`4. gaasd vla 中.mp4` 用于中文站 VLA。四段新视频均为 1920×1080、30 fps；NNIDE 英文 296.34 秒、中文 282.64 秒，VLA 两种语言均 274.81 秒。
 
@@ -176,6 +198,7 @@ npm run build
 | `GET /statistics/api/export.csv`            | 管理员 CSV，UTF-8 BOM，每次最多 10,000 条                   |
 | `GET /status/api/snapshot`                  | 管理员读取最新系统快照                                      |
 | `GET /status/api/history`                   | 管理员读取 24 小时趋势                                      |
+| `GET /status/api/gpu-usage`                 | 管理员读取 8 卡日 / 周统计；group、count、through 筛选 |
 | `GET http://127.0.0.1:4180/internal/health` | 后端内部数据库、地区库健康检查                              |
 
 Nginx 事件接口限流 10 次/秒、burst 60，管理接口 5 次/秒、burst 30。后端仅对本机受信代理读取 Nginx 覆盖的真实 IP 请求头，不采用客户端填写的 IP。后台禁用缓存和搜索引擎索引。
@@ -186,7 +209,7 @@ SQLite 使用 WAL 和事务。`visits` 保存访问、IP、地区、浏览器、
 
 前端尊重 Do Not Track 和隐私页开关，自动化浏览器默认不采集；Nginx 基本访问日志仍保留。`/` 与 `/cn/` 按访问路径区分，视频 ID 共用，汇总包含历史记录。更完整的口径和历史回填说明见 [STATISTICS.md](STATISTICS.md)。
 
-状态独立进程每 5 秒采样，网页仅读取 JSON；每分钟聚合趋势，保留 24 小时。快照超过 20 秒提示过期。后台不提供重启或修改服务器的功能。整机或公网不可用时此页也可能不可达，不能替代外部监控。详见 [STATUS.md](STATUS.md)。
+两台服务器每 30 秒独立采样，网页默认 30 秒刷新，可选 30 / 60 / 600 秒；接口仅读取 JSON 或固定 GPU 统计库。`server=cloud` / `server=intranet` 选择数据源，分别保存每分钟聚合的 24 小时趋势。内网显示 8 张 A100 GPU，并保存 400 天完整聚合采样用于日 / 周汇总（计算取均值，显存取合计，缺测不计为 0）；快照超过 90 秒或内网采集失败时提示异常。后台不提供重启或修改服务器的功能。整机或公网不可用时此页也可能不可达，不能替代外部监控。详见 [STATUS.md](STATUS.md) 和 [本次发布记录](docs/status-20261001.md)。
 
 ## 6. 本地开发与检查
 
@@ -270,12 +293,13 @@ Remove-Item Env:GAASD_TEST_URL
 | `/etc/gaasd-analytics/config.json`            | 数据路径、账号哈希、来源和代理设置   |
 | `/etc/gaasd-analytics/admin-credentials.json` | 初始管理员登录信息，root-only        |
 | `/var/lib/gaasd-analytics/analytics.sqlite3`  | 持久统计数据库                       |
-| `/var/lib/gaasd-analytics/status/`            | latest.json、history.json            |
+| `/var/lib/gaasd-analytics/status/`            | 腾讯云 latest.json、history.json；intranet/ 保存内网快照、历史、连接状态 |
 | `/var/lib/gaasd-analytics/backups/`           | 最近 14 份每日数据库备份             |
 | `/etc/letsencrypt/live/gaasd.com/`            | HTTPS 证书链接                       |
 | `/var/log/nginx/gaasd-test.access.log*`       | 请求日志，每日轮换、保留 14 份       |
 | `gaasd-analytics.service`                     | Flask/Gunicorn，非特权用户运行       |
 | `gaasd-status-collector.service`              | 独立采样，192 MiB 内存、20% CPU 配额 |
+| `gaasd-status-intranet.service`               | 内网 SSH 轮询，30 秒间隔，开机自启 |
 | `gaasd-analytics-backup.timer`                | 每天服务器北京时间 03:15 数据库备份  |
 | `certbot.timer`                               | 证书续期                             |
 
@@ -294,7 +318,9 @@ sudo systemctl list-timers gaasd-analytics-backup.timer certbot.timer
 
 ## 9. 完整备份
 
-2026-09-24 当前网站的完整备份集为 **`20260924T102025`**，本地目录 **`D:\Code\GAASD-Web-Backups\20260924T102025\`**，服务器目录 **`/var/backups/gaasd-web/full/20260924T102025/`**。两端保存同一组源码包、运行快照包及 SHA-256 校验文件，不放入网站公开目录。本次覆盖英文文案和封面、中英文最新视频、桌面与手机标题两端对齐，以及统计和状态后台；前端版本为 `20260923T002235`，后端版本为 `20260914T201120`。备份目录中的 `backup-set.json` 记录实际校验结果及快照时间。
+2026-09-28 发布另存了发布前完整静态站和本次源码/媒体增量，地址及恢复关系见 [发布记录](docs/production-20260928.md)。下述 09-24 完整运行快照属于历史基线，不包含本次新增四段视频。
+
+最近一次包含数据库和系统配置的完整运行备份为 2026-09-24 的备份集 **`20260924T102025`**，本地目录 **`D:\Code\GAASD-Web-Backups\20260924T102025\`**，服务器目录 **`/var/backups/gaasd-web/full/20260924T102025/`**。两端保存同一组源码包、运行快照包及 SHA-256 校验文件，不放入网站公开目录。本次覆盖英文文案和封面、中英文最新视频、桌面与手机标题两端对齐，以及统计和状态后台；前端版本为 `20260923T002235`，后端版本为 `20260914T201120`。备份目录中的 `backup-set.json` 记录实际校验结果及快照时间。
 
 历史完整备份 **`20260914T213529`** 继续保留在两端原目录，不覆盖。这是模块 01 于 2026-09-15 更新前的旧快照；恢复当前网站应使用最新备份集。
 

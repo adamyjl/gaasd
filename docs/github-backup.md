@@ -2,6 +2,8 @@
 
 仓库：<https://github.com/adamyjl/gaasd>。首次代码快照日期：2026-09-24。
 
+2026-10-08 起默认中文源码为 `site/index.html`，英文源码为 `site/en/index.html`；`site/cn/index.html` 保留兼容旧中文地址。发布方式和版本见 [默认语言更新记录](default-language-20261008.md)。中英文共享播放器、CSS 和媒体目录，GitHub 仍不保存媒体。
+
 ## 保存范围
 
 - `site/` 中的 HTML、CSS、JavaScript 与文本 SVG 图标：英文首页、中文首页、隐私页、播放器和统计采集。
@@ -28,7 +30,9 @@ npm ci
 3. 用 `external-assets.json` 的字节数与 SHA-256 核对资源。清单包含旧地址兼容媒体，不仅是当前播放的十段视频。
 4. 按主 README 建立 Python 环境、安装依赖，然后运行构建和所需检查。
 
-当前配套完整备份为 `20260924T102025`：
+基础完整备份为 `20260924T102025`；2026-09-28 新增的四段视频另见 [正式发布记录](production-20260928.md) 和其中的增量备份。方向 01 的 2026-09-29 增量另见 [更新记录](platform-20260929.md)。恢复最新媒体时须一并恢复这些新文件，当前 `external-assets.json` 已包含其哈希。
+
+基础完整备份地址：
 
 - 本地：`D:/Code/GAASD-Web-Backups/20260924T102025/GAASD-Project-20260924T102025.tar.gz`。
 - 服务器：`/var/backups/gaasd-web/full/20260924T102025/GAASD-Project-20260924T102025.tar.gz`，通过已有 SSH 权限访问。

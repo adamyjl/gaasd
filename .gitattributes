@@ -1,0 +1,2 @@
+# Keep text portable and make a Windows checkout pass the existing formatter.
+* text=auto eol=lf

@@ -2,6 +2,207 @@
   display: grid;
   gap: 24px;
 }
+#server-data {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+.status-dashboard [hidden] {
+  display: none !important;
+}
+#cpu-cores {
+  max-height: 440px;
+  overflow-y: auto;
+  scrollbar-color: var(--line) transparent;
+}
+.gpu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.gpu-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+}
+.gpu-card h3 {
+  color: var(--accent);
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+.gpu-card > p {
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.gpu-card .resource-title {
+  margin-top: 18px;
+  font-size: 13px;
+}
+.gpu-card .usage-track {
+  margin-block: 10px 16px;
+}
+.gpu-card .detail-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.gpu-card .detail-item dd {
+  font-size: 14px;
+}
+.gpu-card details {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.gpu-card summary {
+  cursor: pointer;
+}
+.gpu-panel .table-wrap {
+  margin-top: 18px;
+}
+.gpu-rollup {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.gpu-rollup .status-metric strong {
+  font-size: clamp(20px, 2.1vw, 30px);
+}
+.usage-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.usage-controls input,
+.usage-controls select {
+  max-width: 100%;
+  min-width: 0;
+}
+.usage-controls input {
+  color-scheme: dark;
+}
+.usage-controls label {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.usage-definition {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+.usage-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  color: var(--muted);
+  font-size: 12px;
+  margin-block: 24px 12px;
+}
+.usage-legend span::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 7px;
+  background: var(--accent);
+}
+.usage-legend span:nth-child(2)::before {
+  background: #80bcff;
+}
+.usage-chart-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  margin-bottom: 24px;
+}
+.usage-chart {
+  display: flex;
+  gap: 10px;
+  min-width: 100%;
+  width: max-content;
+  padding: 12px 0;
+}
+.usage-column {
+  flex: 1 0 60px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+.usage-column > span,
+.usage-column > small {
+  display: block;
+  margin-top: 6px;
+}
+.usage-column > small {
+  font-size: 10px;
+}
+.usage-bars {
+  height: 140px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+  border-bottom: 1px solid var(--line);
+  background: repeating-linear-gradient(
+    to top,
+    transparent 0,
+    transparent calc(25% - 1px),
+    #ffffff0a calc(25% - 1px),
+    #ffffff0a 25%
+  );
+}
+.usage-bars small {
+  align-self: center;
+  color: var(--muted);
+  font-size: 10px;
+}
+.usage-bar {
+  width: 15px;
+  min-height: 1px;
+  background: var(--accent);
+}
+.usage-memory {
+  background: #80bcff;
+}
+.gpu-usage-panel {
+  min-width: 0;
+}
+.gpu-usage-panel .table-wrap {
+  max-height: 380px;
+  overflow: auto;
+}
+#gpu-usage-recording {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1050px) {
+  .gpu-rollup {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .usage-controls {
+    align-items: stretch;
+    gap: 12px;
+  }
+  .usage-controls label {
+    flex: 1 1 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .usage-controls label input,
+  .usage-controls label select {
+    width: 65%;
+  }
+  .gpu-rollup .status-metric {
+    padding: 12px;
+  }
+  .gpu-rollup .status-metric strong {
+    font-size: 21px;
+  }
+}
 .status-dashboard .page-heading {
   margin-bottom: 0;
 }
@@ -376,6 +577,9 @@ dl {
   margin-top: 4px;
 }
 @media (max-width: 1199px) {
+  .gpu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .status-metrics {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -384,6 +588,15 @@ dl {
   }
 }
 @media (max-width: 767px) {
+  #server-data {
+    gap: 18px;
+  }
+  .gpu-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #cpu-cores {
+    max-height: 360px;
+  }
   .status-dashboard {
     gap: 18px;
     padding-inline: 18px;

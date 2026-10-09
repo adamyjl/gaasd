@@ -9,6 +9,7 @@ import json
 import math
 import os
 import re
+import sqlite3
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -17,6 +18,7 @@ from urllib.parse import urlsplit
 from database import connect, initialize, insert_visit
 from flask import Flask, Response, abort, jsonify, request, send_from_directory
 from geo import GeoLookup, browser_info
+from gpu_usage import report as gpu_usage_report
 from werkzeug.security import check_password_hash
 
 SHANGHAI = timezone(timedelta(hours=8))
@@ -129,6 +131,9 @@ def create_app(overrides=None):
             "/cn",
             "/cn/",
             "/cn/index.html",
+            "/en",
+            "/en/",
+            "/en/index.html",
         }:
             abort(400)
         if body["kind"] == "video":
@@ -242,23 +247,68 @@ def create_app(overrides=None):
 
     @app.get("/status/assets/<path:filename>")
     def status_asset(filename):
-        if filename not in {"status.js", "status.css", "dashboard.css"}:
+        if filename not in {"status.js", "status-gpu-usage.js", "status.css", "dashboard.css"}:
             abort(404)
         return send_from_directory(ui, filename)
+
+    @app.get("/status/api/gpu-usage")
+    def gpu_usage_data():
+        directory = Path(config.get("status_directory", "/var/lib/gaasd-analytics/status"))
+        group = request.args.get("group", "day")
+        try:
+            data = gpu_usage_report(
+                directory / "intranet" / "gpu-usage.sqlite3",
+                group,
+                request.args.get("count", 14 if group == "day" else 12),
+                request.args.get("through"),
+            )
+        except (ValueError, TypeError, OverflowError):
+            abort(400)
+        except (OSError, sqlite3.Error):
+            return jsonify(error="GPU 使用统计暂时无法读取，请稍后重试。"), 503
+        return jsonify(data)
 
     @app.get("/status/api/snapshot")
     @app.get("/status/api/history")
     def status_data():
+        servers = {
+            "cloud": dict(id="cloud", name="腾讯云服务器", address="49.232.60.144"),
+            "intranet": dict(
+                id="intranet", name="内网服务器", address="192.168.2.201", expected_gpus=8
+            ),
+        }
+        selected = request.args.get("server", "cloud")
+        if selected not in servers:
+            abort(400)
         directory = Path(config.get("status_directory", "/var/lib/gaasd-analytics/status"))
+        if selected == "intranet":
+            directory = directory / "intranet"
         name = "history.json" if request.path.endswith("/history") else "latest.json"
         try:
             data = json.loads((directory / name).read_text(encoding="utf-8"))
             age = max(0, time.time() - data["generated_at"])
         except (OSError, ValueError, KeyError, TypeError):
-            return jsonify(error="状态采集尚未就绪，请稍后刷新。", stale=True), 503
-        return jsonify(
-            **data, age_seconds=round(age, 1), stale=age > (150 if name == "history.json" else 20)
+            return jsonify(
+                error="该服务器的状态采集尚未就绪，请稍后刷新。",
+                stale=True,
+                server=servers[selected],
+            ), 503
+        connection = None
+        if selected == "intranet":
+            try:
+                connection = json.loads((directory / "connection.json").read_text(encoding="utf-8"))
+                if not isinstance(connection, dict):
+                    connection = None
+            except (OSError, ValueError):
+                pass
+        data.update(
+            server=servers[selected],
+            age_seconds=round(age, 1),
+            stale=age > (180 if name == "history.json" else 90)
+            or bool(connection and not connection.get("ok")),
+            connection=connection,
         )
+        return jsonify(data)
 
     def filters():
         today = datetime.now(SHANGHAI).date()

@@ -17,25 +17,24 @@ const dist = path.join(root, "dist");
 // Each locale owns its HTML copy; shared CSS and JS retain the same layout.
 for (const [entry, language, lines] of [
   [
-    "index.html",
+    "en/index.html",
     "en",
     [
-      "Decouple Software Layers",
-      "Reuse Proven Components",
-      "Refactor Visually With AI",
+      "Layered Software Decoupling.",
+      "Cross-Domain Reuse & Refactoring.",
+      "AI-Augmented Visual Development.",
     ],
   ],
-  [
-    "cn/index.html",
-    "zh-CN",
-    ["功能软件分层解耦", "优质模块沉淀复用", "智能赋能图形重构"],
-  ],
+  ["index.html", "zh-CN", ["分层解耦拆解", "跨域共用重构", "图形化AI赋能"]],
+  ["cn/index.html", "zh-CN", ["分层解耦拆解", "跨域共用重构", "图形化AI赋能"]],
 ]) {
   const html = await readFile(path.join(site, entry), "utf8");
   if (!html.includes(`lang="${language}"`))
     throw new Error(`Wrong page language: ${entry}`);
   for (const line of lines) {
-    const literal = line.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const literal = line
+      .replaceAll("&", "&amp;")
+      .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     if (!new RegExp(`<span>\\s*${literal}\\s*</span\\s*>`).test(html))
       throw new Error(`Missing headline in ${entry}: ${line}`);
   }
@@ -63,7 +62,9 @@ async function files(directory) {
   return results;
 }
 const manifest = {};
-for (const filename of await files(dist)) {
+// Describe only current source files, not stale output left by a renamed module.
+for (const source of await files(site)) {
+  const filename = path.join(dist, path.relative(site, source));
   const bytes = await readFile(filename);
   manifest[path.relative(dist, filename).split(path.sep).join("/")] = {
     bytes: bytes.length,

@@ -3,16 +3,16 @@ import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
 const expectedTitles = [
-  "Decouple Software Layers",
-  "Reuse Proven Components",
-  "Refactor Visually With AI",
+  "Layered Software Decoupling.",
+  "Cross-Domain Reuse & Refactoring.",
+  "AI-Augmented Visual Development.",
 ];
 const sources = {
   overview: "media/present2/en/overview-en-ja-20260914.mp4",
-  platform: "media/present2/en/platform-20260915.mp4",
-  "ai-assist": "media/present2/en/ai-assist.mp4",
+  platform: "media/present2/en/platform-20260929.mp4",
+  "ai-assist": "media/present2/en/ai-assist-20260928.mp4",
   nnide: "media/present2/en/nnide-20260916.mp4",
-  vla: "media/present2/en/vla-20260916.mp4",
+  vla: "media/present2/en/vla-20260928.mp4",
 };
 const screenshots = path.resolve("work/screenshots");
 
@@ -20,7 +20,7 @@ test("breakpoint edges keep navigation, headings and cards inside the viewport",
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "Run the width sweep once.");
-  await page.goto("/");
+  await page.goto("/en/");
   for (const width of [340, 360, 600, 767, 768, 820, 1199, 1200, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     const overflow = await page.evaluate(() => {
@@ -56,7 +56,7 @@ test("responsive layout, content, real images and screenshots", async ({
   page.on("request", (request) => {
     if (request.url().includes("/media/")) mediaRequests.push(request.url());
   });
-  await page.goto("/");
+  await page.goto("/en/");
   await expect(page.locator(".track-card")).toHaveCount(4);
   await expect(page.locator("h1 span")).toHaveText(expectedTitles);
   await expect(page.locator(".metric")).toHaveCount(2);
@@ -111,8 +111,7 @@ test("responsive layout, content, real images and screenshots", async ({
       expect(line.height).toBeCloseTo(layout.titles[0].height, 0);
   }
   expect(layout.metrics[0].width).toBeCloseTo(layout.metrics[1].width, 0);
-  const expectedColumns =
-    layout.width >= 1200 ? 4 : layout.width >= 768 ? 2 : 1;
+  const expectedColumns = layout.width >= 768 ? 2 : 1;
   expect(
     layout.cards.filter((box) => Math.abs(box.y - layout.cards[0].y) < 2),
   ).toHaveLength(expectedColumns);
@@ -158,7 +157,7 @@ test("responsive layout, content, real images and screenshots", async ({
 });
 
 test("navigation, keyboard focus and mobile menu", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/en/");
   const mobile = page.viewportSize().width < 768;
   if (mobile) {
     const toggle = page.locator(".menu-toggle");
@@ -198,20 +197,20 @@ test("all five videos play, seek, switch and release on close", async ({
   page,
 }, testInfo) => {
   test.setTimeout(150000);
-  await page.goto("/");
+  await page.goto("/en/");
   await page.locator(".overview-video").click();
   const video = page.locator("#media-video");
   const items = [
     ["overview", 28],
-    ["platform", 207],
-    ["ai-assist", 194],
+    ["platform", 125],
+    ["ai-assist", 239],
     ["nnide", 296],
     ["vla", 275],
   ];
   for (const [id, duration] of items) {
     if (id !== "overview")
       await page.locator(`.media-switcher [data-video-id="${id}"]`).click();
-    await expect(video).toHaveAttribute("src", sources[id]);
+    await expect(video).toHaveAttribute("src", `/${sources[id]}`);
     await expect
       .poll(
         () =>
@@ -266,7 +265,7 @@ test("all five videos play, seek, switch and release on close", async ({
   await expect(page.locator(".overview-video")).toBeFocused();
   for (const [id] of items.slice(1)) {
     await page.locator(`.track-card[data-video-id="${id}"]`).click();
-    await expect(video).toHaveAttribute("src", sources[id]);
+    await expect(video).toHaveAttribute("src", `/${sources[id]}`);
     await page.keyboard.press("Escape");
   }
 });
@@ -279,7 +278,7 @@ test("video failure shows a working retry action", async ({
     "One browser network failure check is sufficient.",
   );
   await page.route(`**/${sources.overview}`, (route) => route.abort("failed"));
-  await page.goto("/");
+  await page.goto("/en/");
   await page.locator(".overview-video").click();
   await expect(page.locator(".retry-button")).toBeVisible();
   await expect(page.locator(".media-message")).toHaveText(

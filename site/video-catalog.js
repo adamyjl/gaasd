@@ -19,7 +19,7 @@ const templates = [
     id: "platform",
     number: "01",
     title: "平台与功能软件",
-    duration: "03:27",
+    duration: "02:05",
     desktopDescription: "Graphical Modeling & Component Reuse",
     mobileDescription: "图形化建模与功能软件复用",
     src: "media/platform.mp4",
@@ -29,7 +29,7 @@ const templates = [
     id: "ai-assist",
     number: "02",
     title: "AI 辅助开发",
-    duration: "03:14",
+    duration: "03:59",
     desktopDescription: "Context-Aware Generation & Validation",
     mobileDescription: "图模型理解与生成修改",
     src: "media/ai-assist.mp4",
@@ -89,10 +89,10 @@ export function getVideos(language = "en", prefix = "") {
           ? `${prefix}media/overview.mp4`
           : `${prefix}media/present2/en/overview-en-ja-20260914.mp4`
         : item.id === "platform"
-          ? `${prefix}media/present2/${language}/platform-20260915.mp4`
-          : item.id === "nnide" || item.id === "vla"
-            ? `${prefix}media/present2/${language}/${item.id}-20260916.mp4`
-            : `${prefix}media/present2/${language}/${item.id}.mp4`,
+          ? `${prefix}media/present2/${language}/platform-20260929.mp4`
+          : item.id === "nnide"
+            ? `${prefix}media/present2/${language}/nnide-20260916.mp4`
+            : `${prefix}media/present2/${language}/${item.id}-20260928.mp4`,
     poster:
       language === "en"
         ? `${prefix}images/en/${item.id}-20260922.webp`

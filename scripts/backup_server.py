@@ -7,6 +7,7 @@ import re
 import shutil
 import sqlite3
 import subprocess
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -33,6 +34,26 @@ def copy(source, destination):
 
 def command(args):
     return subprocess.check_output(args, text=True).strip()
+
+
+def copy_status(source, destination):
+    """Copy JSON caches, but snapshot the new live GPU database through SQLite."""
+    shutil.copytree(source, destination, ignore=shutil.ignore_patterns("*.sqlite3*"))
+    gpu_database = Path(source) / "intranet/gpu-usage.sqlite3"
+    if not gpu_database.is_file():
+        return None
+    target = Path(destination) / "intranet/gpu-usage.sqlite3"
+    with (
+        closing(sqlite3.connect(gpu_database.resolve().as_uri() + "?mode=ro", uri=True)) as live,
+        closing(sqlite3.connect(target)) as out,
+    ):
+        live.backup(out)
+        integrity = out.execute("PRAGMA integrity_check").fetchone()[0]
+        if integrity != "ok":
+            raise RuntimeError("GPU usage backup failed integrity_check")
+        count = out.execute("SELECT COUNT(*) FROM samples").fetchone()[0]
+    target.chmod(0o600)
+    return dict(integrity=integrity, samples=count)
 
 
 def main():
@@ -93,7 +114,7 @@ def main():
             for table in ("visits", "plays", "legacy_media", "meta")
         }
     snapshot.chmod(0o600)
-    copy("/var/lib/gaasd-analytics/status", data / "status")
+    gpu_backup = copy_status("/var/lib/gaasd-analytics/status", data / "status")
     copy("/var/lib/gaasd-analytics/backups", data / "daily-backups")
     for p in (data / "status").glob("*.json"):
         json.loads(p.read_text())
@@ -138,6 +159,7 @@ def main():
         "frontend_release": str(public),
         "backend_release": str(backend),
         "sqlite_integrity": integrity,
+        "gpu_usage_backup": gpu_backup,
         "database_rows": counts,
         "frontend_manifest_sha256": digest(public / "asset-manifest.json"),
         "sensitive": "Includes administrator credentials, IP analytics, ACME account keys and TLS private keys. Keep outside public web roots.",

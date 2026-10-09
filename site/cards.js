@@ -4,6 +4,33 @@ export function renderVideoCards(videos, language = "en") {
   const switcher = document.querySelector("#media-switcher");
   if (!(grid instanceof HTMLElement) || !(switcher instanceof HTMLElement))
     return;
+  const groups = [
+    {
+      id: "rule",
+      range: "01 / 02",
+      title: language === "cn" ? "规则驱动的代码" : "Rule-Driven Code",
+    },
+    {
+      id: "data",
+      range: "03 / 04",
+      title: language === "cn" ? "数据驱动的模型" : "Data-Driven Models",
+    },
+  ].map((group) => {
+    const section = document.createElement("section");
+    section.className = "track-group";
+    section.dataset.trackGroup = group.id;
+    const headingId = `track-group-${group.id}`;
+    section.setAttribute("aria-labelledby", headingId);
+    const header = document.createElement("div");
+    header.className = "track-group-heading";
+    const title = document.createElement("h3");
+    title.id = headingId;
+    title.textContent = group.title;
+    header.append(textSpan("track-group-range", group.range), title);
+    section.append(header);
+    grid.append(section);
+    return section;
+  });
   for (const item of videos) {
     const switchButton = document.createElement("button");
     switchButton.type = "button";
@@ -57,7 +84,9 @@ export function renderVideoCards(videos, language = "en") {
       actions,
     );
     card.append(image, copy);
-    grid.append(card);
+    const group =
+      item.id === "platform" || item.id === "ai-assist" ? groups[0] : groups[1];
+    group.append(card);
   }
 }
 /** @param {string} className @param {string} text */
