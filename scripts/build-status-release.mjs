@@ -10,6 +10,8 @@ await mkdir(stage);
 const manifest = {};
 for (const name of [
   "app.py",
+  "backup.py",
+  "gpu_usage.py",
   "status_collector.py",
   "gpu_metrics.py",
   "status_remote.py",
@@ -17,6 +19,7 @@ for (const name of [
   "ui/status.html",
   "ui/status.css",
   "ui/status.js",
+  "ui/status-gpu-usage.js",
 ]) {
   const content = await readFile(path.join("backend", name));
   await mkdir(path.dirname(path.join(stage, name)), { recursive: true });

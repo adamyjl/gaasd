@@ -37,6 +37,7 @@ for (const name of [
   "backup.py",
   "status_collector.py",
   "gpu_metrics.py",
+  "gpu_usage.py",
   "status_probe.py",
   "status_remote.py",
   "requirements.txt",

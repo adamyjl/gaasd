@@ -2,7 +2,7 @@
 
 GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计、服务器状态后台。当前发布源码位于 `D:\Code\GAASD-Web-Review`（`feature/why-cbdes-review`），原 `D:\Code\GAASD-Web` 的 main 检出保留，线上运行于腾讯云轻量应用服务器 `49.232.60.144`。网站、视频、统计和采集均在服务器运行，本机关机不影响线上服务。
 
-本文按 **2026-10-08 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，双服务器状态与 GPU 指标详见 [STATUS.md](STATUS.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
+本文按 **2026-10-09 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，双服务器状态与 GPU 日 / 周统计详见 [STATUS.md](STATUS.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
 
 代码备份仓库：[adamyjl/gaasd](https://github.com/adamyjl/gaasd)。**GitHub 仅保存源码、测试、构建/部署脚本、依赖清单和说明文件**，不上传视频、图片、PDF、地区数据库、访问数据、生产凭据或完整备份包。下文的目录结构描述完整本地项目；克隆仓库后须先恢复外部资源才能完整预览、构建和部署。具体步骤及资源校验清单见 [GitHub 代码备份说明](docs/github-backup.md)。
 
@@ -28,7 +28,7 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分�
 | SSH          | `ssh ubuntu@49.232.60.144`，使用已有 SSH 密钥        |
 | 前端版本     | `/var/www/gaasd-test/releases/20261008T095600`       |
 | 前端活动链接 | `/var/www/gaasd-test/public`                         |
-| 后端版本     | `/opt/gaasd-analytics/releases/20261008T095600`      |
+| 后端版本     | `/opt/gaasd-analytics/releases/20261009T120100`      |
 | 后端活动链接 | `/opt/gaasd-analytics/current`                       |
 | Python 环境  | `/opt/gaasd-analytics/venv`，Python 3.12.3           |
 | 系统         | Ubuntu 24.04、Nginx、systemd                         |
@@ -44,6 +44,8 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分�
 
 2026-10-08 主站默认改为中文，英文版迁移至 `/en/`。仅更新页面入口、语言/隐私链接、SEO 语言标记及英文路径的统计白名单；媒体文件保持原字节。详见 [默认语言发布记录](docs/default-language-20261008.md)。
 
+2026-10-09 状态后台新增 8 卡 A100 整体计算 / 显存实时指标，按天和按周查看均值、峰值、趋势、采样覆盖率。每 30 秒持久化，保存 400 天并加入每日备份；长期历史从此次部署开始积累。入口 `/status?server=intranet`，沿用管理员登录。详见 [部署与检查记录](docs/status-gpu-usage-20261009.md)。
+
 ## 2. 整体架构
 
 ```mermaid
@@ -58,6 +60,9 @@ flowchart LR
   Flask --> Snapshot[状态 JSON 与 24 小时趋势]
   Collector[腾讯云 systemd 独立采样进程] -->|每 30 秒| Snapshot
   Remote[腾讯云内网轮询服务] -->|每 30 秒| Snapshot
+  Remote -->|完整 8 卡采样| GPUDB[(GPU 使用统计 SQLite)]
+  Flask -->|只读日 / 周统计| GPUDB
+  GPUDB --> Backup
   Remote -->|OpenVPN 与受限 SSH| Probe[内网 CPU / 内存 / 磁盘 / 8 GPU 探针]
   DB --> Backup[每日 SQLite 一致性备份]
 ```
@@ -97,6 +102,7 @@ GAASD-Web/
 │  ├─ status_remote.py           固定内网服务器的 SSH 轮询
 │  ├─ status_probe.py            内网只读状态探针
 │  ├─ gpu_metrics.py             NVIDIA GPU 和计算进程指标
+│  ├─ gpu_usage.py               8 卡长期采样及北京时间日 / 周汇总
 │  ├─ backup.py                  每日数据库备份，保留最近 14 份
 │  ├─ import_logs.py             一次性历史日志导入
 │  ├─ refresh_agents.py          重新解析已有 User-Agent
@@ -192,6 +198,7 @@ npm run build
 | `GET /statistics/api/export.csv`            | 管理员 CSV，UTF-8 BOM，每次最多 10,000 条                   |
 | `GET /status/api/snapshot`                  | 管理员读取最新系统快照                                      |
 | `GET /status/api/history`                   | 管理员读取 24 小时趋势                                      |
+| `GET /status/api/gpu-usage`                 | 管理员读取 8 卡日 / 周统计；group、count、through 筛选 |
 | `GET http://127.0.0.1:4180/internal/health` | 后端内部数据库、地区库健康检查                              |
 
 Nginx 事件接口限流 10 次/秒、burst 60，管理接口 5 次/秒、burst 30。后端仅对本机受信代理读取 Nginx 覆盖的真实 IP 请求头，不采用客户端填写的 IP。后台禁用缓存和搜索引擎索引。
@@ -202,7 +209,7 @@ SQLite 使用 WAL 和事务。`visits` 保存访问、IP、地区、浏览器、
 
 前端尊重 Do Not Track 和隐私页开关，自动化浏览器默认不采集；Nginx 基本访问日志仍保留。`/` 与 `/cn/` 按访问路径区分，视频 ID 共用，汇总包含历史记录。更完整的口径和历史回填说明见 [STATISTICS.md](STATISTICS.md)。
 
-两台服务器每 30 秒独立采样，网页默认 30 秒刷新，可选 30 / 60 / 600 秒；接口仅读取 JSON。`server=cloud` / `server=intranet` 选择数据源，分别保存每分钟聚合的 24 小时趋势。内网显示 8 张 A100 GPU；快照超过 90 秒或内网采集失败时提示异常。后台不提供重启或修改服务器的功能。整机或公网不可用时此页也可能不可达，不能替代外部监控。详见 [STATUS.md](STATUS.md) 和 [本次发布记录](docs/status-20261001.md)。
+两台服务器每 30 秒独立采样，网页默认 30 秒刷新，可选 30 / 60 / 600 秒；接口仅读取 JSON 或固定 GPU 统计库。`server=cloud` / `server=intranet` 选择数据源，分别保存每分钟聚合的 24 小时趋势。内网显示 8 张 A100 GPU，并保存 400 天完整聚合采样用于日 / 周汇总（计算取均值，显存取合计，缺测不计为 0）；快照超过 90 秒或内网采集失败时提示异常。后台不提供重启或修改服务器的功能。整机或公网不可用时此页也可能不可达，不能替代外部监控。详见 [STATUS.md](STATUS.md) 和 [本次发布记录](docs/status-20261001.md)。
 
 ## 6. 本地开发与检查
 

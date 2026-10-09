@@ -2,10 +2,12 @@
 
 import argparse
 import json
+import sqlite3
 import subprocess
 import time
 from pathlib import Path
 
+from gpu_usage import UsageStore
 from status_collector import INTERVAL, Sampler, atomic_json
 
 
@@ -55,7 +57,7 @@ def fetch_snapshot(config):
     return data
 
 
-def poll(sampler, config):
+def poll(sampler, config, usage=None):
     try:
         data = fetch_snapshot(config)
         sampler.publish(data)
@@ -63,6 +65,12 @@ def poll(sampler, config):
             sampler.directory / "connection.json",
             dict(ok=True, checked_at=time.time(), message=None),
         )
+        if usage is not None:
+            try:
+                usage.record(data)
+            except (OSError, ValueError, TypeError, sqlite3.Error) as error:
+                # A storage fault must not misreport healthy SSH/live collection.
+                print(f"GPU usage persistence failed: {type(error).__name__}", flush=True)
         return True
     except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
         # Do not replace a valid sample with fabricated zeros or reset its timestamp.
@@ -85,9 +93,10 @@ def main():
     args = parser.parse_args()
     config = json.loads(Path(args.config).read_text())
     sampler = Sampler(config["directory"], profile="intranet")
+    usage = UsageStore(sampler.directory / "gpu-usage.sqlite3")
     while True:
         started = time.monotonic()
-        ok = poll(sampler, config)
+        ok = poll(sampler, config, usage)
         if args.once:
             raise SystemExit(0 if ok else 1)
         time.sleep(max(1, INTERVAL - (time.monotonic() - started)))

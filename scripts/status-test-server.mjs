@@ -1,6 +1,6 @@
 import { mkdir, writeFile, rename } from "node:fs/promises";
 import { resolve, join } from "node:path";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { setInterval, clearInterval } from "node:timers";
 import { sample } from "../tests/status-fixtures.mjs";
 
@@ -35,6 +35,15 @@ async function update() {
   }
 }
 await update();
+const seed = spawnSync(
+  process.env.GAASD_PYTHON ||
+    (process.platform === "win32"
+      ? resolve(".tools/analytics-venv/Scripts/python.exe")
+      : "python3"),
+  ["backend/tests/seed_gpu_usage.py"],
+  { stdio: "inherit", windowsHide: true },
+);
+if (seed.status !== 0) throw new Error("GPU usage fixture setup failed");
 const timer = setInterval(
   () =>
     update().catch((error) => {

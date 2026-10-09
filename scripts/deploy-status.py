@@ -10,6 +10,7 @@ import json
 import os
 import re
 import shutil
+import sqlite3
 import subprocess
 import sys
 import tarfile
@@ -44,6 +45,8 @@ def main():
     frontend = Path("/var/www/gaasd-test/public").resolve(strict=True)
     expected = {
         "app.py",
+        "backup.py",
+        "gpu_usage.py",
         "status_collector.py",
         "gpu_metrics.py",
         "status_remote.py",
@@ -51,6 +54,7 @@ def main():
         "ui/status.html",
         "ui/status.css",
         "ui/status.js",
+        "ui/status-gpu-usage.js",
     }
     stage = Path(f"/tmp/gaasd-status-stage-{release_id}")
     stage.mkdir(mode=0o700)
@@ -148,8 +152,13 @@ WantedBy=multi-user.target
                     Path("/var/lib/gaasd-analytics/status/intranet/connection.json").read_text()
                 )
                 assert connection["ok"] is True
+                with sqlite3.connect(
+                    "file:/var/lib/gaasd-analytics/status/intranet/gpu-usage.sqlite3?mode=ro",
+                    uri=True,
+                ) as db:
+                    assert db.execute("SELECT MAX(timestamp) FROM samples").fetchone()[0] > started
                 break
-            except (AssertionError, OSError, ValueError, KeyError) as error:
+            except (AssertionError, OSError, ValueError, KeyError, sqlite3.Error) as error:
                 if attempt == 14:
                     raise RuntimeError("New collector health checks failed") from error
                 time.sleep(2)

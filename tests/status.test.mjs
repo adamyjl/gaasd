@@ -28,6 +28,8 @@ test("status uses statistics login, renders real host metrics and responsive lay
     "/status/api/snapshot?server=intranet",
     "/status/api/history?server=intranet",
     "/status/assets/status.js",
+    "/status/assets/status-gpu-usage.js",
+    "/status/api/gpu-usage",
   ]) {
     const response = await publicContext.request.get(url + path);
     expect(response.status()).toBe(401);
@@ -80,6 +82,8 @@ test("status uses statistics login, renders real host metrics and responsive lay
   await page.locator("#server-select").selectOption("intranet");
   await expect(page.locator("#gpu-cards .gpu-card")).toHaveCount(8);
   await expect(page.locator("#gpu-summary")).toContainText("8 / 8");
+  await expect(page.locator("#gpu-live-summary article")).toHaveCount(4);
+  await expect(page.locator("#gpu-live-summary")).toContainText("640 GiB");
   await expect(page.locator("#cpu-cores .core-card")).toHaveCount(112);
   await expect(page.locator("#host-summary")).toContainText("192.168.2.201");
   await expect(page.locator("#maintenance")).toBeHidden();
@@ -105,6 +109,7 @@ test("status uses statistics login, renders real host metrics and responsive lay
   await page.locator("#server-select").selectOption("cloud");
   await expect(page.locator("#cpu-cores .core-card")).toHaveCount(2);
   await expect(page.locator("#gpu-panel")).toBeHidden();
+  await expect(page.locator("#gpu-usage-panel")).toBeHidden();
   await page.getByRole("link", { name: "访问统计 ↗" }).click();
   await expect(page.locator("h1")).toHaveText("访问与视频统计");
   await expect
@@ -115,6 +120,114 @@ test("status uses statistics login, renders real host metrics and responsive lay
     )
     .toBe(200);
   expect(errors).toEqual([]);
+});
+
+test("GPU daily and weekly reports show actual aggregates, missing history and responsive layout", async ({
+  page,
+}, info) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+  const dailyResponse = page.waitForResponse((response) =>
+    response.url().includes("/status/api/gpu-usage?group=day"),
+  );
+  await page.goto("/status?server=intranet");
+  const response = await dailyResponse;
+  expect(response.status()).toBe(200);
+  const data = await response.json();
+  expect(data.ready).toBe(true);
+  expect(data.summary.sample_count).toBeGreaterThan(0);
+  expect(data.summary.avg_compute).toBeGreaterThanOrEqual(0);
+  expect(data.summary.avg_compute).toBeLessThanOrEqual(100);
+  expect(data.summary.avg_capacity_bytes).toBe(640 * 1024 ** 3);
+  await expect(page.locator("#gpu-usage-results")).toBeVisible();
+  await expect(page.locator("#gpu-usage-rows tr")).toHaveCount(14);
+  await expect(page.locator("#gpu-usage-summary article")).toHaveCount(4);
+  await expect(page.locator("#gpu-usage-coverage")).toContainText("采样覆盖率");
+  await expect(page.locator("#gpu-usage-recording")).toContainText("最早采样");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    ),
+  ).toBe(false);
+  await page.locator("#pause").click();
+  await mkdir("work/gpu-usage-screenshots", { recursive: true });
+  await page.locator("#gpu-usage-panel").scrollIntoViewIfNeeded();
+  await page.locator("#gpu-usage-panel").screenshot({
+    path: `work/gpu-usage-screenshots/${info.project.name}-day.png`,
+  });
+  await page
+    .locator("#gpu-usage-panel")
+    .evaluate((node) => node.scrollIntoView({ block: "start" }));
+  await page.screenshot({
+    path: `work/gpu-usage-screenshots/${info.project.name}-viewport.png`,
+  });
+  const weekResponse = page.waitForResponse((r) =>
+    r.url().includes("/status/api/gpu-usage?group=week"),
+  );
+  await page.locator("#gpu-usage-group").selectOption("week");
+  const week = await (await weekResponse).json();
+  expect(week.summary.sample_count).toBeGreaterThanOrEqual(
+    data.summary.sample_count,
+  );
+  for (const period of week.periods)
+    expect(new Date(period.label + "T00:00:00+08:00").getUTCDay()).toBe(0); // Beijing Monday is UTC Sunday.
+  await expect(page.locator("#gpu-usage-rows tr")).toHaveCount(12);
+  await expect(page.locator("#gpu-usage-caption")).toContainText("周一");
+  await page.locator("#gpu-usage-panel").screenshot({
+    path: `work/gpu-usage-screenshots/${info.project.name}-week.png`,
+  });
+  await page.locator("#gpu-usage-count").selectOption("4");
+  await expect(page.locator("#gpu-usage-rows tr")).toHaveCount(4);
+  await page.locator("#gpu-usage-through").fill("2020-02-01");
+  await page.locator("#gpu-usage-through").blur();
+  await expect(page.locator("#gpu-usage-message")).toContainText(
+    "暂无有效采样",
+  );
+  await expect(page.locator("#gpu-usage-rows tr:first-child")).toContainText(
+    "无数据",
+  );
+  await expect(
+    page.locator("#gpu-usage-summary article:first-child strong"),
+  ).toHaveText("—");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    ),
+  ).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+test("GPU query failure hides old totals and a server switch cancels pending reports", async ({
+  page,
+}, info) => {
+  test.skip(
+    info.project.name !== "statistics-desktop" || !!process.env.GAASD_TEST_URL,
+    "Synthetic failure and race checks run locally only.",
+  );
+  await page.goto("/status?server=intranet");
+  await expect(page.locator("#gpu-usage-results")).toBeVisible();
+  await page.route("**/status/api/gpu-usage*", (route) =>
+    route.fulfill({ status: 503, json: { error: "test unavailable" } }),
+  );
+  await page.locator("#gpu-usage-query").click();
+  await expect(page.locator("#gpu-usage-message")).toContainText(
+    "暂时无法读取",
+  );
+  await expect(page.locator("#gpu-usage-results")).toBeHidden();
+  await page.unroute("**/status/api/gpu-usage*");
+  await page.route("**/status/api/gpu-usage*", async (route) => {
+    await delay(1000);
+    await route.continue().catch(() => {});
+  });
+  await page.locator("#gpu-usage-query").click();
+  await page.locator("#server-select").selectOption("cloud");
+  await expect(page.locator("#cpu-cores .core-card")).toHaveCount(2);
+  await expect(page.locator("#gpu-usage-panel")).toBeHidden();
+  await page.locator("#server-select").selectOption("intranet");
+  await expect(page.locator("#gpu-usage-results")).toBeVisible();
 });
 
 test("stale and failed samples stay visibly flagged; periodic sampling advances", async ({

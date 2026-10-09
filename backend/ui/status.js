@@ -1,3 +1,5 @@
+import { gpuUsagePanel } from "./status-gpu-usage.js";
+const usagePanel = gpuUsagePanel();
 const $ = (id) => document.getElementById(id);
 const number = (value, digits = 1) =>
   Number.isFinite(value)
@@ -115,6 +117,7 @@ function resource(title, value, entries) {
 }
 function render(data) {
   latest = data;
+  usagePanel.update($("server-select").value);
   const { host, cpu, memory, swap } = data;
   $("host-summary").textContent =
     `${data.server?.name || serverNames[$("server-select").value]} · ${data.server?.address || ""} · ${host.name} · ${host.os} · ${host.logical_cpus} 个逻辑核心 · ${bytes(memory.total)} 内存`;
@@ -450,6 +453,29 @@ function renderGpu(data) {
   const used = devices.every((g) => Number.isFinite(g.memory_used))
     ? devices.reduce((n, g) => n + g.memory_used, 0)
     : null;
+  const complete =
+    gpu.available &&
+    devices.length === 8 &&
+    total > 0 &&
+    Number.isFinite(used) &&
+    devices.every((g) => Number.isFinite(g.utilization_percent));
+  const compute = complete
+    ? devices.reduce((n, g) => n + g.utilization_percent, 0) / 8
+    : null;
+  replace("gpu-live-summary", [
+    metric("当前整体计算利用率", utilization(compute), "8 卡平均值 · 0–100%"),
+    metric("当前显存已用", complete ? bytes(used) : "未提供", "8 卡合计"),
+    metric(
+      "当前显存占用率",
+      complete ? percent((used / total) * 100) : "未提供",
+      "已用显存 / 总显存",
+    ),
+    metric(
+      "GPU / 总显存",
+      complete ? bytes(total) : "未提供",
+      `${devices.length} / 8 张 GPU`,
+    ),
+  ]);
   $("gpu-summary").textContent = gpu.available
     ? `${devices.length} / ${gpu.expected_count || 8} 张 GPU · 显存已用 ${bytes(used)} / ${bytes(total)}`
     : "GPU 状态暂不可用";
@@ -732,6 +758,7 @@ $("interval").addEventListener("change", () => {
   schedule();
 });
 $("server-select").addEventListener("change", () => {
+  usagePanel.reset();
   ++requestVersion;
   activeController?.abort();
   clearTimeout(timer);
