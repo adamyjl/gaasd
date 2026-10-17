@@ -13,6 +13,7 @@
     "test": "playwright test",
     "test:analytics": "playwright test -c playwright.analytics.config.mjs",
     "test:status": "playwright test -c playwright.status.config.mjs",
+    "test:status2": "playwright test -c playwright.status2.config.mjs",
     "dev:analytics": "node scripts/analytics-dev.mjs",
     "build": "node scripts/build.mjs",
     "build:status": "node scripts/build-status-release.mjs",
