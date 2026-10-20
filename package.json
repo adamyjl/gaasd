@@ -14,6 +14,7 @@
     "test:analytics": "playwright test -c playwright.analytics.config.mjs",
     "test:status": "playwright test -c playwright.status.config.mjs",
     "test:status2": "playwright test -c playwright.status2.config.mjs",
+    "test:relays": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File tests/windows-relays.test.ps1",
     "dev:analytics": "node scripts/analytics-dev.mjs",
     "build": "node scripts/build.mjs",
     "build:status": "node scripts/build-status-release.mjs",

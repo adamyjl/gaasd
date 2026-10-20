@@ -10,6 +10,7 @@
 - `backend/` 中的 Python、管理页面、测试、依赖清单，以及地区库的来源和许可证说明。
 - `scripts/`、`tests/`、根目录构建/检查配置、`package-lock.json` 和维护文档。
 - `ops/office-tunnel/` 中不含密钥的 SSH、systemd 和 Nginx 配置模板；专用密钥和实际授权文件留在对应服务器。
+- `ops/windows-ssh-relays/` 中苏州 Windows 两条中转的 PowerShell / Python 源码、示例配置和说明；`docs/ssh-relays.md` 统一登记现有路线。实际 ProgramData 运行目录、`.local.json`、专用密钥、日志及安装包不上传。
 - [external-assets.json](external-assets.json)：未上传的运行媒体和地区库的相对路径、字节数及 SHA-256，仅记录元数据。
 
 视频、音频、位图封面、PDF 和原始设计素材不进入 Git。`node_modules/`、`.tools/`、`dist/`、`work/`、数据库、日志、测试报告、归档、生产账号配置和证书私钥也不进入 Git。`.gitignore` 已配置相应排除规则。`site/favicon.svg` 是文本源码，随代码保存。
@@ -53,11 +54,11 @@ npm run build
 
 ```powershell
 git status --short
-git add -- .gitignore README.md BACKUP.md STATISTICS.md STATUS.md docs site backend scripts tests
+git add -- .gitignore README.md BACKUP.md STATISTICS.md STATUS.md docs site backend scripts tests ops
 git diff --cached --stat
 git diff --cached --name-only
 git commit -m "Describe the website change"
-git push origin main
+git push origin feature/why-cbdes-review
 ```
 
 提交前确认暂存区只有源码和说明文件，不要用 `git add -f` 绕过媒体、数据或凭据排除规则。新增根目录构建配置时单独 `git add` 对应文件。更新视频只需提交对应路径/文案及新的资源校验清单，视频文件继续通过原服务器部署流程传输。详细技术实现、部署和恢复步骤见 [README.md](../README.md)。

@@ -2,7 +2,7 @@
 
 GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计、服务器状态后台。当前发布源码位于 `D:\Code\GAASD-Web-Review`（`feature/why-cbdes-review`），原 `D:\Code\GAASD-Web` 的 main 检出保留，线上运行于腾讯云轻量应用服务器 `49.232.60.144`。网站、视频、统计和采集均在服务器运行，本机关机不影响线上服务。
 
-本文按 **2026-10-17 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，双服务器状态与 GPU 日 / 周统计详见 [STATUS.md](STATUS.md)，办公室开发机直连隧道及 `/status2` 详见 [运维记录](docs/office-tunnel-20261017.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
+本文按 **2026-10-20 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，双服务器状态与 GPU 日 / 周统计详见 [STATUS.md](STATUS.md)，全部 SSH 中转入口及端口分配见 [中转总览](docs/ssh-relays.md)，办公室开发机直连隧道及 `/status2` 详见 [运维记录](docs/office-tunnel-20261017.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
 
 代码备份仓库：[adamyjl/gaasd](https://github.com/adamyjl/gaasd)。**GitHub 仅保存源码、测试、构建/部署脚本、依赖清单和说明文件**，不上传视频、图片、PDF、地区数据库、访问数据、生产凭据或完整备份包。下文的目录结构描述完整本地项目；克隆仓库后须先恢复外部资源才能完整预览、构建和部署。具体步骤及资源校验清单见 [GitHub 代码备份说明](docs/github-backup.md)。
 
@@ -48,6 +48,8 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分�
 2026-10-09 状态后台新增 8 卡 A100 整体计算 / 显存实时指标，按天和按周查看均值、峰值、趋势、采样覆盖率。每 30 秒持久化，保存 400 天并加入每日备份；长期历史从此次部署开始积累。入口 `/status?server=intranet`，沿用管理员登录。详见 [部署与检查记录](docs/status-gpu-usage-20261009.md)。
 
 ## 2. 整体架构
+
+2026-10-20 合并苏州汽车研究院 Windows 中转源码：云端 `127.0.0.1:2223` 转发至内网 `192.168.1.111:22`，`127.0.0.1:2224` 转发至 Windows 自身 SSH。实际 GPU 型号为 8 张 RTX 5090。两条路线依赖该 Windows 中转机的 SYSTEM 开机任务，源码独立存放于 `ops/windows-ssh-relays/`，与原 Ubuntu / A100 路线分开；仅合并代码与文档，不重启或替换正在运行的任务。入口、验证及维护见 [中转总览](docs/ssh-relays.md)。
 
 2026-10-17 新增办公室开发机反向 SSH 隧道：开发机以专用受限密钥主动连接腾讯云，systemd 开机自启、断线重连。`/status2/` 由 Nginx 复用原管理员认证后转发到开发机监控；`ssh -J ubuntu@49.232.60.144 -p 2222 tsari@127.0.0.1` 可跳转登录开发机。两个隧道端口仅监听云端回环地址，不依赖本机 Windows。配置模板位于 `ops/office-tunnel/`，安装脚本为 `scripts/setup-office-tunnel.py`；权限、验证和回退见 [详细说明](docs/office-tunnel-20261017.md)。
 
