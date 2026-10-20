@@ -8,13 +8,14 @@
 | --- | --- | --- | --- | --- |
 | 原办公室 Ubuntu 3060 Ti | `127.0.0.1:2222` → 开发机 `192.168.0.37:22` | `tsari` | Ubuntu 主动连接 / `gaasd-office-tunnel` | `ops/office-tunnel/` |
 | 原办公室硬件监控 | `127.0.0.1:18765` → 同机 `127.0.0.1:8765` | 网页管理员 | 与上一条共用 Ubuntu 隧道 | `ops/office-tunnel/nginx-status2.conf` |
-| 苏州内网 8 卡 GPU 服务器 | `127.0.0.1:2223` → `192.168.1.111:22` | `user001` | 苏州 Windows 主动连接 / `gaasd-tsari-relay` | `ops/windows-ssh-relays/` |
+| 苏州内网 8 卡 RTX 5090 | `127.0.0.1:2223` → `192.168.1.111:22` | `user001` | 苏州 Windows 主动连接 / `gaasd-tsari-relay` | `ops/windows-ssh-relays/` |
 | 苏州 Windows 中转机 | `127.0.0.1:2224` → 中转机 `127.0.0.1:22` | `tsari` | 同一 Windows 独立连接 / `gaasd-windows-relay` | `ops/windows-ssh-relays/` |
+| 苏州内网 8 卡 RTX 4090 | `127.0.0.1:2225` → `192.168.1.19:22` | `centos` | 同一 Windows 独立连接 / `gaasd-4090-relay` | `ops/windows-ssh-relays/` |
 | 清华内网 8 卡 A100 | 云端 OpenVPN → `192.168.2.201:2202` | `aiusr` | 原 OpenVPN 路线，无新增云端回环端口 | 原部署及 `STATUS.md` |
 
-2222、2223、2224、18765 均只监听云端回环地址。`/status2/` 仍是原 3060 Ti 监控，`/status` 的内网选择仍是 A100；本次没有增加苏州 GPU 服务器的网页监控。
+2222、2223、2224、2225、18765 均只监听云端回环地址。`/status2/` 仍是原 3060 Ti 监控，`/status` 的内网选择仍是 A100；没有增加苏州 GPU 服务器的网页监控。
 
-**型号核对：** 苏州 `tsari-server` 实际 `nvidia-smi` 返回 8 张 **NVIDIA GeForce RTX 5090**，索引 0–7，每张总显存报告 32607 MiB。用户最初描述为“8 卡 4090”，本文采用实测结果。
+**型号核对：** `192.168.1.111` / `tsari-server` 实测 8 张 **RTX 5090**，每张 32607 MiB。用户随后指定的 `192.168.1.19` / `localhost.localdomain` 是另一台机器，实测 8 张 **RTX 4090**，每张 24564 MiB。两台机器和入口分别保留，不把原 2223 改指向新机器。
 
 ## 登录命令
 
@@ -22,8 +23,11 @@
 # 苏州 Windows 中转电脑
 ssh -J ubuntu@49.232.60.144 -p 2224 tsari@127.0.0.1
 
-# 苏州内网 8 卡 GPU 服务器
+# 苏州内网 8 卡 RTX 5090
 ssh -J ubuntu@49.232.60.144 -p 2223 user001@127.0.0.1
+
+# 苏州内网 8 卡 RTX 4090
+ssh -J ubuntu@49.232.60.144 -p 2225 centos@127.0.0.1
 
 # 原办公室 Ubuntu 3060 Ti
 ssh -J ubuntu@49.232.60.144 -p 2222 tsari@127.0.0.1
@@ -34,7 +38,7 @@ ssh -J ubuntu@49.232.60.144 -p 2202 aiusr@192.168.2.201
 
 每条路线的目标公钥授权彼此独立。不要把隧道专用私钥拿来当人员登录密钥，也不要因新建别名而关闭主机密钥校验。可选客户端配置见 [SSH 模板](../ops/windows-ssh-relays/config/client-ssh.example.conf)，应审阅后合并，不能覆盖个人现有 `~/.ssh/config`。
 
-原 Ubuntu 隧道由 Ubuntu 自己的 systemd 服务维持，与 Windows 无关。**苏州两条新路线依赖 `DESKTOP-9TOSVU4` 开机并联网**，由它发起反向 SSH；关闭用户用于操作的笔记本不影响，但关闭或休眠这台 Windows 中转机将中断苏州路线。内网 GPU 服务器无需直接连接公网。
+原 Ubuntu 隧道由 Ubuntu 自己的 systemd 服务维持，与 Windows 无关。**苏州三条路线依赖 `DESKTOP-9TOSVU4` 开机并联网**，由它发起反向 SSH；关闭用户用于操作的笔记本不影响，但关闭或休眠这台 Windows 中转机将中断苏州路线。内网 GPU 服务器无需直接连接公网。
 
 ## 源码与运行配置
 
@@ -43,21 +47,22 @@ ssh -J ubuntu@49.232.60.144 -p 2202 aiusr@192.168.2.201
 - 合并来源：`D:\Server\gaasd-ssh-relays` 中选定的 16 个源码、配置模板及说明文件。
 - 合并位置：总仓库 `ops/windows-ssh-relays/`，不覆盖 `ops/office-tunnel/` 和原安装器。
 - Windows 实际运行根目录：`C:\ProgramData\GAASD-SSH-Relays`，由 SYSTEM / Administrators 保护；计划任务不直接执行 D 盘发布目录的文件。
-- 私钥只留在 Windows 本机；腾讯云只接收公钥，分别授权两个 nologin 隧道账户，各密钥仅允许指定的 2223 或 2224 回环监听，并限制 shell、本地转发、Agent/X11/PTY。
+- 私钥只留在 Windows 本机；腾讯云只接收公钥，分别授权三个 nologin 隧道账户，各密钥仅允许指定的 2223、2224 或 2225 回环监听，并限制 shell、本地转发、Agent/X11/PTY。
 - `D:\Server\relay-deployment.local.json`、旧脚本目录、任务备份、运行日志、ZIP、MSI、私钥及完整授权文件没有复制到可提交目录。源包自带的 `.gitignore` / `.gitattributes` 只作用于这个独立子目录。
 
-两个计划任务：
+三个计划任务：
 
 | 名称 | 用途 | 身份与触发器 |
 | --- | --- | --- |
 | `GAASD-Tsari-SSH-Relay` | `linux` / 2223 | SYSTEM、开机延迟 15 秒、每 5 分钟补启动 |
 | `GAASD-Windows-SSH-Relay` | `windows` / 2224 | SYSTEM、开机延迟 15 秒、每 5 分钟补启动 |
+| `GAASD-RTX4090-SSH-Relay` | `rtx4090` / 2225 | SYSTEM、开机延迟 15 秒、每 5 分钟补启动 |
 
 任务重复实例策略为 IgnoreNew；监督脚本还有独占锁。SSH 保活为 15 秒 / 3 次，断线后按 5、10、20、40、60 秒退避重连。`connecting-or-running` 只表示进程存在，端到端状态须实际登录验证。
 
 合并后的源码保留原运行设计，并增加了安装前冲突检查：固定腾讯云入口、每条路线的端口、云端账户、任务名、Windows 回环目标及允许迁移的旧目录。误填 2222、18765、`gaasd-office-tunnel` 或其他任务会在变更任务和文件前拒绝。Python 文件按现有 Ruff 规范整理，公钥类型检查改为不可被 Python 优化模式跳过的显式校验。
 
-**本次仅合并及上传代码，没有部署整理后的安装器，也没有重启任务、SSH、Nginx、OpenVPN 或服务器。** 以后部署这些源码需在中转电脑本地管理员控制台操作，因为重新安装会短暂重建这两条隧道。安装器不会因 GitHub 推送而自动执行。
+首次整合仅合并源码。随后新增 4090 时，实际部署了支持 `-Name rtx4090` 的选择安装器和共享监督脚本，只注册启动新路线，原两条路线进程与配置保持不变。选择安装保留未选中的运行定义；不指定 `-Name` 将重建全部配置路线，需从中转机本地管理员控制台执行。GitHub 推送不会自动执行安装器，也不会部署网站。
 
 部署、运维及原验收记录：
 
@@ -65,8 +70,18 @@ ssh -J ubuntu@49.232.60.144 -p 2202 aiusr@192.168.2.201
 - [启停、排查与回退](../ops/windows-ssh-relays/docs/OPERATIONS.md)
 - [原部署验收记录](../ops/windows-ssh-relays/docs/VALIDATION.md)（来源材料，区别于下面的本次检查）
 - [原 Ubuntu 隧道说明](office-tunnel-20261017.md)
+- [新增 4090 的部署、授权与回退记录](rtx4090-relay-20261020.md)
 
-## 本次检查
+## 新增 4090 的检查
+
+- 2225 实际跳板登录成功，目标账户 `centos`，确认 8 张 RTX 4090。
+- 两枚指定 RSA 公钥追加到 `centos`，保留原授权并备份；本机 RSA 签名登录成功，另一枚公钥被服务器接受，配对私钥未在本机测试。
+- 新任务为 SYSTEM / session 0，已核验开机触发器。仅新路线进行断线模拟，自动重连后再次登录成功；未做整机重启。
+- 原 2223 / 2224 监督进程、SSH 进程和配置哈希不变；新端口仅监听云端回环地址。
+- `npm run test:relays` 扩展为 34 项，覆盖第三条路线的固定分配、选择安装保留旧配置、拒绝隐式删除路线及错误参数。
+- 详细备份位置、认证范围和实际测试结果见上面的 4090 部署记录。
+
+## 首次整合检查（新增 4090 之前）
 
 - 通过用户给出的两个跳板命令实际登录成功：Windows 返回 `desktop-9tosvu4\tsari`；Linux 返回 `tsari-server` / `user001`。GPU 查询确认 8 张 RTX 5090。
 - 两个任务均为 Running / SYSTEM / ServiceAccount，运行状态为 `NT AUTHORITY\SYSTEM`、session 0，动作指向受保护的 ProgramData 脚本。已核对开机与 5 分钟重复触发器；`sshd`、`WlanSvc`、`ZeroTierOneService` 为 Running / Auto，旧目录停用标记存在。

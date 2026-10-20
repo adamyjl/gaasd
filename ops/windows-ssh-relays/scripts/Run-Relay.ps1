@@ -1,4 +1,4 @@
-param([Parameter(Mandatory)][ValidateSet('linux', 'windows')][string]$Name)
+param([Parameter(Mandatory)][ValidateSet('linux', 'windows', 'rtx4090')][string]$Name)
 . (Join-Path $PSScriptRoot 'Common.ps1')
 $relay = Get-RelayDefinitions | Where-Object name -eq $Name
 if (-not $relay) { throw "No configuration for $Name" }

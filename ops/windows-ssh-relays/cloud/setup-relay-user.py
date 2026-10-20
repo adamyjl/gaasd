@@ -10,11 +10,12 @@ import sys
 from pathlib import Path
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument("relay", choices=("linux", "windows"))
+parser.add_argument("relay", choices=("linux", "windows", "rtx4090"))
 args = parser.parse_args()
 username, port = {
     "linux": ("gaasd-tsari-relay", 2223),
     "windows": ("gaasd-windows-relay", 2224),
+    "rtx4090": ("gaasd-4090-relay", 2225),
 }[args.relay]
 if os.geteuid() != 0:
     parser.error("Run as root.")

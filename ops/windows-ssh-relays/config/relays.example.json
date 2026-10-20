@@ -22,6 +22,15 @@
       "targetPort": 22,
       "privateKeySource": "C:\\Users\\YOUR_USER\\.ssh\\id_ed25519_windows_relay",
       "legacyDirectory": "D:\\Server\\windows-relay"
+    },
+    {
+      "name": "rtx4090",
+      "taskName": "GAASD-RTX4090-SSH-Relay",
+      "cloudUser": "gaasd-4090-relay",
+      "remotePort": 2225,
+      "targetHost": "192.168.1.19",
+      "targetPort": 22,
+      "privateKeySource": "C:\\Users\\YOUR_USER\\.ssh\\id_ed25519_rtx4090_relay"
     }
   ]
 }

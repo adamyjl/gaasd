@@ -17,16 +17,24 @@ function Assert-RelayDeployment($Deployment) {
             remotePort = 2224
             legacyDirectory = 'D:\Server\windows-relay'
         }
+        rtx4090 = @{
+            taskName = 'GAASD-RTX4090-SSH-Relay'
+            cloudUser = 'gaasd-4090-relay'
+            remotePort = 2225
+            legacyDirectory = $null
+        }
     }
     if ($Deployment.cloudHost -ne '49.232.60.144' -or $Deployment.cloudPort -ne 22) {
         throw 'This deployment supports only the registered Tencent SSH endpoint on port 22.'
     }
-    if (@($Deployment.relays).Count -ne 2 -or
-        @($Deployment.relays.name | Sort-Object -Unique).Count -ne 2) {
-        throw 'Expected exactly one linux and one windows relay.'
+    $names = @($Deployment.relays.name)
+    if ($names.Count -notin @(2,3) -or
+        @($names | Sort-Object -Unique).Count -ne $names.Count -or
+        'linux' -cnotin $names -or 'windows' -cnotin $names) {
+        throw 'Expected linux and windows relays, with an optional rtx4090 relay.'
     }
     foreach ($relay in $Deployment.relays) {
-        if ($relay.name -cnotin @('linux','windows')) { throw 'Unknown relay name.' }
+        if ($relay.name -cnotin @('linux','windows','rtx4090')) { throw 'Unknown relay name.' }
         $assignment = $expected[$relay.name]
         if ($relay.taskName -ne $assignment.taskName -or
             $relay.cloudUser -cne $assignment.cloudUser -or
@@ -41,11 +49,42 @@ function Assert-RelayDeployment($Deployment) {
             ($relay.targetHost -ne '127.0.0.1' -or $relay.targetPort -ne 22)) {
             throw 'The Windows relay must point to its local loopback SSH service.'
         }
+        if ($relay.name -eq 'rtx4090' -and
+            ($relay.targetHost -ne '192.168.1.19' -or $relay.targetPort -ne 22)) {
+            throw 'The RTX 4090 relay must point to 192.168.1.19:22.'
+        }
         if ($relay.legacyDirectory -and
             [IO.Path]::GetFullPath($relay.legacyDirectory).TrimEnd('\') -ne $assignment.legacyDirectory) {
             throw 'Unexpected legacy directory; refusing to stop unrelated SSH processes.'
         }
     }
+}
+
+function Get-RelayInstallPlan($Deployment, $Installed, [string[]]$Names) {
+    Assert-RelayDeployment $Deployment
+    $selected = @($Deployment.relays)
+    $preserved = @()
+    if ($Names.Count -gt 0) {
+        if (@($Names | Sort-Object -Unique).Count -ne $Names.Count) { throw 'Duplicate selected relay.' }
+        foreach ($name in $Names) {
+            if ($name -cnotin @($Deployment.relays.name)) { throw "No deployment configuration for $name" }
+        }
+        if ($null -eq $Installed) { throw 'Selective install requires an existing managed runtime.' }
+        Assert-RelayDeployment $Installed
+        $selected = @($Deployment.relays | Where-Object { $_.name -cin $Names })
+        $preserved = @($Installed.relays | Where-Object { $_.name -cnotin $Names })
+    } elseif ($null -ne $Installed) {
+        Assert-RelayDeployment $Installed
+        if (@($Installed.relays | Where-Object { $_.name -cnotin @($Deployment.relays.name) }).Count) {
+            throw 'Deployment omits an installed relay; use -Name for a selective update.'
+        }
+    }
+    $merged = [pscustomobject]@{
+        cloudHost=$Deployment.cloudHost; cloudPort=$Deployment.cloudPort
+        relays=@($preserved) + @($selected)
+    }
+    Assert-RelayDeployment $merged
+    [pscustomobject]@{ Selected=$selected; Preserved=$preserved }
 }
 
 function Assert-Administrator {

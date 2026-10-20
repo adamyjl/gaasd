@@ -10,7 +10,7 @@
 - `backend/` 中的 Python、管理页面、测试、依赖清单，以及地区库的来源和许可证说明。
 - `scripts/`、`tests/`、根目录构建/检查配置、`package-lock.json` 和维护文档。
 - `ops/office-tunnel/` 中不含密钥的 SSH、systemd 和 Nginx 配置模板；专用密钥和实际授权文件留在对应服务器。
-- `ops/windows-ssh-relays/` 中苏州 Windows 两条中转的 PowerShell / Python 源码、示例配置和说明；`docs/ssh-relays.md` 统一登记现有路线。实际 ProgramData 运行目录、`.local.json`、专用密钥、日志及安装包不上传。
+- `ops/windows-ssh-relays/` 中苏州 Windows 三条中转（5090 / Windows / 4090）的 PowerShell / Python 源码、示例配置和说明；`docs/ssh-relays.md` 统一登记现有路线，`docs/rtx4090-relay-20261020.md` 记录新增 4090 的授权与部署验证。实际 ProgramData 运行目录、`.local.json`、专用密钥、日志及安装包不上传。
 - [external-assets.json](external-assets.json)：未上传的运行媒体和地区库的相对路径、字节数及 SHA-256，仅记录元数据。
 
 视频、音频、位图封面、PDF 和原始设计素材不进入 Git。`node_modules/`、`.tools/`、`dist/`、`work/`、数据库、日志、测试报告、归档、生产账号配置和证书私钥也不进入 Git。`.gitignore` 已配置相应排除规则。`site/favicon.svg` 是文本源码，随代码保存。

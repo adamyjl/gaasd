@@ -1,4 +1,4 @@
-param([ValidateSet('all','linux','windows')][string]$Name='all')
+param([ValidateSet('all','linux','windows','rtx4090')][string]$Name='all')
 . (Join-Path $PSScriptRoot 'Common.ps1')
 Assert-Administrator
 $relays = @(Get-RelayDefinitions | Where-Object { $Name -eq 'all' -or $_.name -eq $Name })

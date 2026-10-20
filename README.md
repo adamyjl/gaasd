@@ -49,7 +49,7 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分�
 
 ## 2. 整体架构
 
-2026-10-20 合并苏州汽车研究院 Windows 中转源码：云端 `127.0.0.1:2223` 转发至内网 `192.168.1.111:22`，`127.0.0.1:2224` 转发至 Windows 自身 SSH。实际 GPU 型号为 8 张 RTX 5090。两条路线依赖该 Windows 中转机的 SYSTEM 开机任务，源码独立存放于 `ops/windows-ssh-relays/`，与原 Ubuntu / A100 路线分开；仅合并代码与文档，不重启或替换正在运行的任务。入口、验证及维护见 [中转总览](docs/ssh-relays.md)。
+2026-10-20 合并苏州汽车研究院 Windows 中转源码，并新增独立的 4090 路线：云端 `127.0.0.1:2223` → `192.168.1.111:22`（8×5090 / `user001`），`:2224` → Windows 自身 SSH（`tsari`），`:2225` → `192.168.1.19:22`（8×4090 / `centos`）。三条路线依赖该 Windows 的 SYSTEM 开机任务，源码位于 `ops/windows-ssh-relays/`，与原 Ubuntu / A100 路线分开。4090 已选择安装并通过登录、自动重连验证，原两条路线未重启。入口见 [中转总览](docs/ssh-relays.md)，授权、备份及检查见 [4090 部署记录](docs/rtx4090-relay-20261020.md)。
 
 2026-10-17 新增办公室开发机反向 SSH 隧道：开发机以专用受限密钥主动连接腾讯云，systemd 开机自启、断线重连。`/status2/` 由 Nginx 复用原管理员认证后转发到开发机监控；`ssh -J ubuntu@49.232.60.144 -p 2222 tsari@127.0.0.1` 可跳转登录开发机。两个隧道端口仅监听云端回环地址，不依赖本机 Windows。配置模板位于 `ops/office-tunnel/`，安装脚本为 `scripts/setup-office-tunnel.py`；权限、验证和回退见 [详细说明](docs/office-tunnel-20261017.md)。
 

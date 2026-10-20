@@ -1,6 +1,6 @@
 param(
     [ValidateSet('Status','Start','Stop','Restart')][string]$Action = 'Status',
-    [ValidateSet('all','linux','windows')][string]$Name = 'all'
+    [ValidateSet('all','linux','windows','rtx4090')][string]$Name = 'all'
 )
 . (Join-Path $PSScriptRoot 'Common.ps1')
 if ($Action -ne 'Status') { Assert-Administrator }

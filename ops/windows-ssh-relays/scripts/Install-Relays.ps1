@@ -1,14 +1,21 @@
 param(
     [Parameter(Mandatory)][string]$ConfigPath,
-    [switch]$MigrateLegacy
+    [switch]$MigrateLegacy,
+    [ValidateSet('linux','windows','rtx4090')][string[]]$Name
 )
 . (Join-Path $PSScriptRoot 'Common.ps1')
 Assert-Administrator
 $deployment = Get-Content -Raw -LiteralPath $ConfigPath | ConvertFrom-Json
 Assert-RelayDeployment $deployment
+$installedPath = Join-Path $script:RuntimeRoot 'relays.json'
+$previous = if (Test-Path -LiteralPath $installedPath) {
+    Get-Content -Raw -LiteralPath $installedPath | ConvertFrom-Json
+} else { $null }
+$plan = Get-RelayInstallPlan $deployment $previous $Name
+$selectedRelays = @($plan.Selected)
 $sshPath = Join-Path $env:WINDIR 'System32\OpenSSH\ssh.exe'
 $keygenPath = Join-Path $env:WINDIR 'System32\OpenSSH\ssh-keygen.exe'
-foreach ($relay in $deployment.relays) {
+foreach ($relay in $selectedRelays) {
     if (-not (Test-Path -LiteralPath $relay.privateKeySource -PathType Leaf)) { throw 'Private key source missing.' }
     $existingTask = Get-ScheduledTask -TaskName $relay.taskName -ErrorAction SilentlyContinue
     if ($existingTask) {
@@ -28,13 +35,16 @@ if ((Test-Path $script:RuntimeRoot) -and -not (Test-Path $marker)) { throw 'Runt
 New-Item -ItemType Directory -Path $script:RuntimeRoot -Force | Out-Null
 Set-ProtectedAcl $script:RuntimeRoot $true
 Set-Content -LiteralPath $marker -Value 'GAASD-SSH-Relays-v1'
-foreach ($child in @('bin','config','credentials','runtime','runtime\linux','runtime\windows','backups')) {
+foreach ($child in @('bin','config','credentials','runtime','backups') + @($selectedRelays | ForEach-Object { "runtime\$($_.name)" })) {
     $path = Join-Path $script:RuntimeRoot $child
     New-Item -ItemType Directory -Path $path -Force | Out-Null
     Set-ProtectedAcl $path ($child -notin @('credentials','backups'))
 }
-$stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-foreach ($relay in $deployment.relays) {
+$stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fffffff'
+if (Test-Path -LiteralPath $installedPath) {
+    Copy-Item -LiteralPath $installedPath -Destination (Join-Path $script:RuntimeRoot "backups\relays-$stamp.json")
+}
+foreach ($relay in $selectedRelays) {
     $existingTask = Get-ScheduledTask -TaskName $relay.taskName -ErrorAction SilentlyContinue
     if ($existingTask) {
         Export-ScheduledTask -TaskName $relay.taskName |
@@ -50,16 +60,20 @@ foreach ($relay in $deployment.relays) {
     }
     Stop-OwnedSsh (Join-Path $script:RuntimeRoot "config\$($relay.name).conf")
 }
-foreach ($name in @('Common.ps1','Run-Relay.ps1','Control-Relay.ps1','Test-RelayRecovery.ps1')) {
-    $dest = Join-Path $script:RuntimeRoot "bin\$name"
-    Copy-Item -LiteralPath (Join-Path $PSScriptRoot $name) -Destination $dest -Force
+foreach ($scriptName in @('Common.ps1','Run-Relay.ps1','Control-Relay.ps1','Test-RelayRecovery.ps1')) {
+    $dest = Join-Path $script:RuntimeRoot "bin\$scriptName"
+    if (Test-Path -LiteralPath $dest) {
+        Copy-Item -LiteralPath $dest -Destination (Join-Path $script:RuntimeRoot "backups\$scriptName-$stamp")
+    }
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot $scriptName) -Destination $dest -Force
     Set-ProtectedAcl $dest $true
 }
 $hostFile = Join-Path $script:RuntimeRoot 'credentials\cloud_known_hosts'
 [IO.File]::WriteAllLines($hostFile, $trustedHostLines, [Text.UTF8Encoding]::new($false))
 Set-ProtectedAcl $hostFile
-$installedRelays = @()
-foreach ($relay in $deployment.relays) {
+$installedRelays = @($plan.Preserved)
+$updatedRelays = @()
+foreach ($relay in $selectedRelays) {
     $keyFile = Join-Path $script:RuntimeRoot "credentials\$($relay.name)_ed25519"
     Copy-Item -LiteralPath $relay.privateKeySource -Destination $keyFile -Force
     Set-ProtectedAcl $keyFile
@@ -95,16 +109,17 @@ Host relay
     Set-ProtectedAcl $sshConfig $true
     & $sshPath -G -F $sshConfig relay | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'Generated SSH configuration is invalid.' }
-    $installedRelays += [pscustomobject]@{
+    $updatedRelays += [pscustomobject]@{
         name=$relay.name; taskName=$relay.taskName; cloudUser=$relay.cloudUser;
         remotePort=$relay.remotePort; targetHost=$relay.targetHost; targetPort=$relay.targetPort
     }
 }
+$installedRelays += $updatedRelays
 @{cloudHost=$deployment.cloudHost; cloudPort=$deployment.cloudPort; relays=$installedRelays} |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $script:RuntimeRoot 'relays.json') -Encoding UTF8
 
 $powershellPath = Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
-foreach ($relay in $installedRelays) {
+foreach ($relay in $updatedRelays) {
     $runner = Join-Path $script:RuntimeRoot 'bin\Run-Relay.ps1'
     $action = New-ScheduledTaskAction -Execute $powershellPath -WorkingDirectory $script:RuntimeRoot `
         -Argument ('-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File "{0}" -Name {1}' -f $runner,$relay.name)
@@ -122,4 +137,4 @@ foreach ($relay in $installedRelays) {
     if (Test-Path $disabled) { Remove-Item -LiteralPath $disabled }
     Start-ScheduledTask -TaskName $relay.taskName
 }
-Write-Output "Installed both SYSTEM startup tasks. Runtime: $script:RuntimeRoot"
+Write-Output "Installed $($updatedRelays.Count) selected SYSTEM task(s); preserved $($plan.Preserved.Count) other route(s). Runtime: $script:RuntimeRoot"
