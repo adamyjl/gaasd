@@ -24,7 +24,8 @@ function metric(label, value, note) {
   return node;
 }
 
-export function gpuUsagePanel() {
+export function gpuUsagePanel(base = "/status") {
+  let selectedServer = "intranet";
   let active = false,
     fetched = 0,
     version = 0,
@@ -132,6 +133,7 @@ export function gpuUsagePanel() {
     const query = new URLSearchParams({
       group: $("gpu-usage-group").value,
       count: $("gpu-usage-count").value,
+      server: selectedServer,
     });
     if ($("gpu-usage-through").value)
       query.set("through", $("gpu-usage-through").value);
@@ -139,7 +141,7 @@ export function gpuUsagePanel() {
       timeZone: "Asia/Shanghai",
     });
     try {
-      const response = await fetch(`/status/api/gpu-usage?${query}`, {
+      const response = await fetch(`${base}/api/gpu-usage?${query}`, {
         credentials: "same-origin",
         cache: "no-store",
         signal: pending.signal,
@@ -185,7 +187,13 @@ export function gpuUsagePanel() {
   });
   return {
     update(server) {
-      active = server === "intranet";
+      if (selectedServer !== server) {
+        ++version;
+        controller?.abort();
+        fetched = 0;
+      }
+      selectedServer = server;
+      active = ["intranet", "rtx4090", "rtx5090"].includes(server);
       $("gpu-usage-panel").hidden = !active;
       if (active) load();
     },

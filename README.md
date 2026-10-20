@@ -2,7 +2,7 @@
 
 GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计、服务器状态后台。当前发布源码位于 `D:\Code\GAASD-Web-Review`（`feature/why-cbdes-review`），原 `D:\Code\GAASD-Web` 的 main 检出保留，线上运行于腾讯云轻量应用服务器 `49.232.60.144`。网站、视频、统计和采集均在服务器运行，本机关机不影响线上服务。
 
-本文按 **2026-10-20 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，双服务器状态与 GPU 日 / 周统计详见 [STATUS.md](STATUS.md)，全部 SSH 中转入口及端口分配见 [中转总览](docs/ssh-relays.md)，办公室开发机直连隧道及 `/status2` 详见 [运维记录](docs/office-tunnel-20261017.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
+本文按 **2026-10-20 实际源码和服务器配置**整理。统计口径详见 [STATISTICS.md](STATISTICS.md)，服务器状态与 GPU 日 / 周统计详见 [STATUS.md](STATUS.md)，新增六机监控见 [部署与维护记录](docs/fleet-monitor-20261020.md)，全部 SSH 中转入口及端口分配见 [中转总览](docs/ssh-relays.md)，办公室开发机直连隧道及 `/status2` 详见 [运维记录](docs/office-tunnel-20261017.md)，完整备份与恢复详见 [BACKUP.md](BACKUP.md)。
 
 代码备份仓库：[adamyjl/gaasd](https://github.com/adamyjl/gaasd)。**GitHub 仅保存源码、测试、构建/部署脚本、依赖清单和说明文件**，不上传视频、图片、PDF、地区数据库、访问数据、生产凭据或完整备份包。下文的目录结构描述完整本地项目；克隆仓库后须先恢复外部资源才能完整预览、构建和部署。具体步骤及资源校验清单见 [GitHub 代码备份说明](docs/github-backup.md)。
 
@@ -19,7 +19,10 @@ GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计
 | `https://gaasd.com/en/privacy.html` | 英文数据用途说明、共用当前浏览器统计偏好                       | 公开       |
 | `https://gaasd.com/statistics`      | 访问、IP 归属地、浏览器、视频播放报表与 CSV                    | 管理员     |
 | `https://gaasd.com/status`          | 腾讯云 / 内网切换；CPU、内存、Swap、磁盘、网络、服务、趋势及内网 8 GPU | 同一管理员 |
+| `https://gaasd.com/status1`         | 六机总览：3 台 GPU 服务器及 3 台开发/中转机，资源汇总与相对腾讯云延迟 | 同一管理员 |
 | `https://gaasd.com/status2/`        | 办公室 3060 Ti 开发机现有硬件监控，独立 SSH 隧道直连腾讯云 | 同一管理员 |
+| `https://gaasd.com/status3`         | 苏州 Windows 硬件、温度、每核 CPU、GPU、软件资源及网络/磁盘监控 | 同一管理员 |
+| `https://gaasd.com/status4`         | 苏州 8×RTX 4090 / 8×RTX 5090 切换、实时指标及独立日/周历史 | 同一管理员 |
 | `https://gaasd.com/healthz`         | Nginx 存活响应                                                 | 公开       |
 
 HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分别以 301 跳转至 `/cn/`、`/en/`。`http://49.232.60.144/gaasd-test/` 保留兼容预览，正式访问使用域名 HTTPS。主站默认中文，顶部 EN 可切换到 `/en/`；英文文案、封面和对应视频保留，备案号仍为中文。旧 `/cn/` 地址可继续访问，其 canonical 指向主站。
@@ -29,7 +32,7 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分�
 | SSH          | `ssh ubuntu@49.232.60.144`，使用已有 SSH 密钥        |
 | 前端版本     | `/var/www/gaasd-test/releases/20261008T095600`       |
 | 前端活动链接 | `/var/www/gaasd-test/public`                         |
-| 后端版本     | `/opt/gaasd-analytics/releases/20261009T120100`      |
+| 后端版本     | `/opt/gaasd-analytics/releases/20261020T173725`      |
 | 后端活动链接 | `/opt/gaasd-analytics/current`                       |
 | Python 环境  | `/opt/gaasd-analytics/venv`，Python 3.12.3           |
 | 系统         | Ubuntu 24.04、Nginx、systemd                         |
@@ -46,6 +49,8 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分�
 2026-10-08 主站默认改为中文，英文版迁移至 `/en/`。仅更新页面入口、语言/隐私链接、SEO 语言标记及英文路径的统计白名单；媒体文件保持原字节。详见 [默认语言发布记录](docs/default-language-20261008.md)。
 
 2026-10-09 状态后台新增 8 卡 A100 整体计算 / 显存实时指标，按天和按周查看均值、峰值、趋势、采样覆盖率。每 30 秒持久化，保存 400 天并加入每日备份；长期历史从此次部署开始积累。入口 `/status?server=intranet`，沿用管理员登录。详见 [部署与检查记录](docs/status-gpu-usage-20261009.md)。
+
+2026-10-20 新增 `/status1` 六机总览、`/status3` Windows 详情、`/status4` 苏州双 GPU 服务器详情。腾讯云独立服务每 30 秒通过现有 SSH 路线采集，Windows 另有 SYSTEM 开机采集任务；4090 / 5090 的独立日/周历史和每日备份从当天开始积累。原 `/status`、A100 历史及 `/status2/` 保留，三台苏州主机依赖 Windows 中转持续联网。指标边界、部署及回退见 [六机监控记录](docs/fleet-monitor-20261020.md)，安装说明见 [采集组件](ops/fleet-monitor/README.md)。
 
 ## 2. 整体架构
 

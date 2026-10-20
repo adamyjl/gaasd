@@ -37,23 +37,28 @@ def command(args):
 
 
 def copy_status(source, destination):
-    """Copy JSON caches, but snapshot the new live GPU database through SQLite."""
+    """Copy JSON caches, and independently snapshot all three live GPU databases."""
     shutil.copytree(source, destination, ignore=shutil.ignore_patterns("*.sqlite3*"))
-    gpu_database = Path(source) / "intranet/gpu-usage.sqlite3"
-    if not gpu_database.is_file():
-        return None
-    target = Path(destination) / "intranet/gpu-usage.sqlite3"
-    with (
-        closing(sqlite3.connect(gpu_database.resolve().as_uri() + "?mode=ro", uri=True)) as live,
-        closing(sqlite3.connect(target)) as out,
-    ):
-        live.backup(out)
-        integrity = out.execute("PRAGMA integrity_check").fetchone()[0]
-        if integrity != "ok":
-            raise RuntimeError("GPU usage backup failed integrity_check")
-        count = out.execute("SELECT COUNT(*) FROM samples").fetchone()[0]
-    target.chmod(0o600)
-    return dict(integrity=integrity, samples=count)
+    results = {}
+    for host in ("intranet", "rtx4090", "rtx5090"):
+        gpu_database = Path(source) / host / "gpu-usage.sqlite3"
+        if not gpu_database.is_file():
+            continue
+        target = Path(destination) / host / "gpu-usage.sqlite3"
+        with (
+            closing(
+                sqlite3.connect(gpu_database.resolve().as_uri() + "?mode=ro", uri=True)
+            ) as live,
+            closing(sqlite3.connect(target)) as out,
+        ):
+            live.backup(out)
+            integrity = out.execute("PRAGMA integrity_check").fetchone()[0]
+            if integrity != "ok":
+                raise RuntimeError(f"{host} GPU usage backup failed integrity_check")
+            count = out.execute("SELECT COUNT(*) FROM samples").fetchone()[0]
+        target.chmod(0o600)
+        results[host] = dict(integrity=integrity, samples=count)
+    return results
 
 
 def main():
@@ -96,6 +101,13 @@ def main():
         "/etc/systemd/system/gaasd-analytics-backup.timer",
     ]:
         copy(source, stage / source.lstrip("/"))
+    for source in [
+        "/etc/systemd/system/gaasd-status-intranet.service",
+        "/etc/systemd/system/gaasd-status-fleet.service",
+        "/etc/sysctl.d/60-gaasd-monitor-ping.conf",
+    ]:
+        if Path(source).exists():
+            copy(source, stage / source.lstrip("/"))
     data = stage / "data"
     data.mkdir(mode=0o700)
     snapshot = data / "analytics.sqlite3"
@@ -116,7 +128,7 @@ def main():
     snapshot.chmod(0o600)
     gpu_backup = copy_status("/var/lib/gaasd-analytics/status", data / "status")
     copy("/var/lib/gaasd-analytics/backups", data / "daily-backups")
-    for p in (data / "status").glob("*.json"):
+    for p in (data / "status").rglob("*.json"):
         json.loads(p.read_text())
     logs = stage / "logs/nginx"
     logs.mkdir(parents=True, mode=0o700)
@@ -164,7 +176,7 @@ def main():
         "frontend_manifest_sha256": digest(public / "asset-manifest.json"),
         "sensitive": "Includes administrator credentials, IP analytics, ACME account keys and TLS private keys. Keep outside public web roots.",
         "consistency": "SQLite online backup API; immutable deployment copies; status and log files copied while services continue running.",
-        "excluded": "Other application source/data, SSH keys, OS image, package binaries, old deployment releases and temporary upload archives.",
+        "excluded": "Other application source/data, user SSH keys outside /etc/gaasd-analytics, remote-machine runtime, OS image, package binaries, old deployment releases and temporary upload archives.",
     }
     (stage / "runtime-info.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2))
     files = {

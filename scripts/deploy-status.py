@@ -42,6 +42,8 @@ def main():
         raise SystemExit("Unexpected backend location")
     if not Path("/etc/gaasd-analytics/status-remote.json").is_file():
         raise SystemExit("Provision restricted internal SSH collection first")
+    if not Path("/etc/gaasd-analytics/fleet.json").is_file():
+        raise SystemExit("Provision the four restricted fleet endpoints first")
     frontend = Path("/var/www/gaasd-test/public").resolve(strict=True)
     expected = {
         "app.py",
@@ -51,10 +53,16 @@ def main():
         "gpu_metrics.py",
         "status_remote.py",
         "status_probe.py",
+        "fleet.py",
+        "fleet_probe.py",
+        "fleet_collector.py",
         "ui/status.html",
         "ui/status.css",
         "ui/status.js",
         "ui/status-gpu-usage.js",
+        "ui/fleet.html",
+        "ui/fleet.js",
+        "ui/fleet.css",
     }
     stage = Path(f"/tmp/gaasd-status-stage-{release_id}")
     stage.mkdir(mode=0o700)
@@ -77,6 +85,14 @@ def main():
     backup.mkdir(mode=0o700)
     service = Path("/etc/systemd/system/gaasd-status-intranet.service")
     previous_unit = service.read_bytes() if service.exists() else None
+    fleet_service = Path("/etc/systemd/system/gaasd-status-fleet.service")
+    previous_fleet_unit = fleet_service.read_bytes() if fleet_service.exists() else None
+    fleet_was_enabled = (
+        subprocess.run(
+            ["systemctl", "is-enabled", fleet_service.name], capture_output=True
+        ).returncode
+        == 0
+    )
     was_enabled = (
         subprocess.run(["systemctl", "is-enabled", service.name], capture_output=True).returncode
         == 0
@@ -91,6 +107,8 @@ def main():
     (backup / "deployment.json").write_text(json.dumps(record, indent=2))
     if previous_unit is not None:
         (backup / service.name).write_bytes(previous_unit)
+    if previous_fleet_unit is not None:
+        (backup / fleet_service.name).write_bytes(previous_fleet_unit)
     # Previous release is retained intact; only the selected source files change.
     shutil.copytree(previous, release, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     for name in expected:
@@ -127,13 +145,43 @@ CPUQuota=20%
 WantedBy=multi-user.target
 """)
         service.chmod(0o644)
+        fleet_service.write_text("""[Unit]
+Description=GAASD six-host monitoring and Suzhou GPU history
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=gaasd-analytics
+Group=gaasd-analytics
+WorkingDirectory=/opt/gaasd-analytics/current
+ExecStart=/opt/gaasd-analytics/venv/bin/python /opt/gaasd-analytics/current/fleet_collector.py
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/gaasd-analytics/status
+CapabilityBoundingSet=
+RestrictSUIDSGID=true
+MemoryMax=256M
+CPUQuota=40%
+
+[Install]
+WantedBy=multi-user.target
+""")
+        fleet_service.chmod(0o644)
         activate(current, release)
         activated = True
         run("systemctl", "daemon-reload")
         run("systemctl", "restart", "gaasd-analytics", "gaasd-status-collector")
         run("systemctl", "enable", "--now", service.name)
         run("systemctl", "restart", service.name)
-        for attempt in range(15):
+        run("systemctl", "enable", "--now", fleet_service.name)
+        run("systemctl", "restart", fleet_service.name)
+        for attempt in range(30):
             try:
                 with urllib.request.urlopen(
                     "http://127.0.0.1:4180/internal/health", timeout=3
@@ -157,9 +205,30 @@ WantedBy=multi-user.target
                     uri=True,
                 ) as db:
                     assert db.execute("SELECT MAX(timestamp) FROM samples").fetchone()[0] > started
+                for host, expected_gpus in [
+                    ("office", 1),
+                    ("windows", 1),
+                    ("rtx5090", 8),
+                    ("rtx4090", 8),
+                ]:
+                    folder = Path("/var/lib/gaasd-analytics/status") / host
+                    sample = json.loads((folder / "latest.json").read_text())
+                    assert time.time() - sample["generated_at"] < 90
+                    assert sample["cpu"]["percent"] is not None
+                    assert len(sample["gpu"]["devices"]) == expected_gpus
+                    connection = json.loads((folder / "connection.json").read_text())
+                    assert connection["ok"] and connection["checked_at"] > started
+                    if expected_gpus == 8:
+                        with sqlite3.connect(
+                            f"file:{folder}/gpu-usage.sqlite3?mode=ro", uri=True
+                        ) as db:
+                            assert (
+                                db.execute("SELECT MAX(timestamp) FROM samples").fetchone()[0]
+                                > started - 30
+                            )
                 break
             except (AssertionError, OSError, ValueError, KeyError, sqlite3.Error) as error:
-                if attempt == 14:
+                if attempt == 29:
                     raise RuntimeError("New collector health checks failed") from error
                 time.sleep(2)
         assert Path("/var/www/gaasd-test/public").resolve() == frontend
@@ -173,6 +242,7 @@ WantedBy=multi-user.target
         print(json.dumps(record, indent=2))
     except BaseException:
         if activated:
+            run("systemctl", "stop", fleet_service.name)
             run("systemctl", "stop", service.name)
             activate(current, previous)
         if previous_unit is None:
@@ -180,10 +250,17 @@ WantedBy=multi-user.target
             service.unlink(missing_ok=True)
         else:
             service.write_bytes(previous_unit)
+        if previous_fleet_unit is None:
+            subprocess.run(["systemctl", "disable", fleet_service.name], capture_output=True)
+            fleet_service.unlink(missing_ok=True)
+        else:
+            fleet_service.write_bytes(previous_fleet_unit)
         run("systemctl", "daemon-reload")
         run("systemctl", "restart", "gaasd-analytics", "gaasd-status-collector")
         if previous_unit is not None and was_enabled:
             run("systemctl", "start", service.name)
+        if previous_fleet_unit is not None and fleet_was_enabled:
+            run("systemctl", "start", fleet_service.name)
         print("Restored previous backend and service configuration", file=sys.stderr)
         raise
 

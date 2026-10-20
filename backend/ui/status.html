@@ -16,6 +16,11 @@
       <a class="wordmark" href="/">GAASD <span>SERVER STATUS</span></a>
       <nav class="top-actions" aria-label="管理页面">
         <span class="private-badge">管理员访问</span>
+        <a href="/status1">六机总览</a>
+        <a href="/status">腾讯云 / A100</a>
+        <a href="/status2/">3060 Ti</a>
+        <a href="/status3">Windows</a>
+        <a href="/status4">4090 / 5090</a>
         <a href="/statistics">访问统计 ↗</a>
         <a href="/">宣传页 ↗</a>
       </nav>
@@ -64,6 +69,16 @@
           id="summary-metrics"
         ></section>
         <div id="alerts" class="status-notice" role="status" hidden></div>
+        <section class="panel" id="hardware-panel" hidden>
+          <div class="panel-heading">
+            <h2>硬件型号与温度</h2>
+            <span>设备清单 · 传感器</span>
+          </div>
+          <div id="hardware-summary" class="detail-grid"></div>
+          <div id="hardware-disks" class="filesystem-grid"></div>
+          <p id="hardware-note" class="table-note"></p>
+          <p id="latency-note" class="table-note"></p>
+        </section>
         <section class="panel gpu-usage-panel" id="gpu-usage-panel" hidden>
           <div class="panel-heading">
             <div>
@@ -311,6 +326,39 @@
             0–100%。仅显示进程名称，不读取命令参数或环境变量。
           </p>
         </section>
+        <section class="panel" id="software-panel" hidden>
+          <div class="panel-heading">
+            <h2>Windows 软件资源明细</h2>
+            <span>CPU / 内存 / GPU / I/O</span>
+          </div>
+          <div
+            class="table-wrap"
+            tabindex="0"
+            role="region"
+            aria-label="软件资源表，可横向滚动"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th>进程 / PID</th>
+                  <th>CPU</th>
+                  <th>内存</th>
+                  <th>GPU 活动</th>
+                  <th>GPU 专用内存*</th>
+                  <th>I/O 读取</th>
+                  <th>I/O 写入</th>
+                </tr>
+              </thead>
+              <tbody id="software-processes"></tbody>
+            </table>
+          </div>
+          <p class="table-note">
+            CPU 为整机归一化占比；GPU 活动取该进程最忙引擎，不将多引擎相加。*
+            Windows 性能计数器提供的进程专用显存可能存在偏差，以 GPU
+            整体显存为准。I/O
+            包含文件、设备等读写，并非纯磁盘流量。逐进程网络字节速率未提供，网络用量见网卡面板。缺失指标显示“未提供”。
+          </p>
+        </section>
         <section class="panel">
           <div class="panel-heading">
             <h2>系统详情</h2>
@@ -326,10 +374,10 @@
       </div>
       <footer class="notes">
         <p>
-          腾讯云每 30 秒采样；内网服务器通过 OpenVPN 和只读 SSH 每 30
-          秒采集一次，CPU 与网络速率使用两次读数间隔至少 1
-          秒的短窗口。两台服务器的最近 24
-          小时趋势分别保存在腾讯云，每分钟聚合，本机关机不影响采集。
+          各机器每 30 秒采样，最近 24 小时趋势分别保存在腾讯云，每分钟聚合。
+          Linux 远程采样的 CPU 与速率使用至少 1 秒短窗口，Windows
+          使用相邻采样计数差。 关闭浏览器或维护电脑不影响采集；苏州机器依赖
+          Windows 中转机保持开机联网。
         </p>
         <p>
           这是只读状态页；登录账号、密码与访问统计页相同。服务器或网络不可达时，本页会提示连接异常，无法替代外部可用性监控。

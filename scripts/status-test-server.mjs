@@ -7,9 +7,25 @@ import { sample } from "../tests/status-fixtures.mjs";
 const root = resolve("work/status-test-fixtures");
 await mkdir(join(root, "intranet"), { recursive: true });
 async function update() {
-  for (const internal of [false, true]) {
-    const folder = internal ? join(root, "intranet") : root;
+  for (const host of [
+    "cloud",
+    "intranet",
+    "office",
+    "windows",
+    "rtx4090",
+    "rtx5090",
+  ]) {
+    const internal = host !== "cloud";
+    const folder = host === "cloud" ? root : join(root, host);
+    await mkdir(folder, { recursive: true });
     const data = sample(internal);
+    if (["office", "windows"].includes(host)) {
+      data.gpu.devices = data.gpu.devices.slice(0, 1);
+      data.gpu.expected_count = 1;
+      data.cpu.cores = data.cpu.cores.slice(0, 8);
+      data.host.logical_cpus = 8;
+      data.hardware = { cpu_model: "Synthetic CPU", disks: [] };
+    }
     for (const [name, value] of Object.entries({
       latest: data,
       history: {

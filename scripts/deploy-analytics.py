@@ -98,6 +98,8 @@ def rollback_failed_deploy():
             subprocess.run(["systemctl", "restart", "gaasd-status-collector.service"], check=False)
         if Path("/etc/systemd/system/gaasd-status-intranet.service").exists():
             subprocess.run(["systemctl", "restart", "gaasd-status-intranet.service"], check=False)
+        if Path("/etc/systemd/system/gaasd-status-fleet.service").exists():
+            subprocess.run(["systemctl", "restart", "gaasd-status-fleet.service"], check=False)
         subprocess.run(["nginx", "-t"], check=True)
         subprocess.run(["systemctl", "reload", "nginx"], check=False)
         print("Deployment failed; restored previous site, backend and configuration.")
@@ -306,6 +308,8 @@ subprocess.run(["systemctl", "enable", "gaasd-status-collector.service"], check=
 subprocess.run(["systemctl", "restart", "gaasd-status-collector.service"], check=True)
 if Path("/etc/systemd/system/gaasd-status-intranet.service").exists():
     subprocess.run(["systemctl", "restart", "gaasd-status-intranet.service"], check=True)
+if Path("/etc/systemd/system/gaasd-status-fleet.service").exists():
+    subprocess.run(["systemctl", "restart", "gaasd-status-fleet.service"], check=True)
 for _attempt in range(20):
     try:
         with urllib.request.urlopen("http://127.0.0.1:4180/internal/health", timeout=3) as response:

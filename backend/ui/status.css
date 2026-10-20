@@ -673,3 +673,22 @@ dl {
     transition: none;
   }
 }
+.topbar {
+  flex-wrap: wrap;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.top-actions {
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+#hardware-summary {
+  display: block;
+}
+#hardware-disks {
+  margin-top: 16px;
+}
+#hardware-summary dd,
+#hardware-disks h3 {
+  overflow-wrap: anywhere;
+}

@@ -113,6 +113,10 @@ sudo tar -xzf /var/backups/gaasd-web/full/实际时间戳/GAASD-Runtime-实际�
 
 2026-10-09 起还需保护内网 GPU 长期统计库 `/var/lib/gaasd-analytics/status/intranet/gpu-usage.sqlite3`。每日一致性备份保存在 `backups/gpu-usage-YYYYMMDD.sqlite3`，保留 14 份。新版 `backup_server.py` 会跳过运行中的 GPU SQLite/WAL/SHM 文件，通过 SQLite 在线备份 API 生成 `runtime/data/status/intranet/gpu-usage.sqlite3`，并将完整性和样本数量记入 `runtime-info.json`。以前的备份不含后来积累的 GPU 历史。
 
+2026-10-20 起，`status/rtx4090/gpu-usage.sqlite3` 和 `status/rtx5090/gpu-usage.sqlite3` 同样分别保存 400 天采样并进行每日一致性备份，文件名为 `gpu-rtx4090-YYYYMMDD.sqlite3` / `gpu-rtx5090-YYYYMMDD.sqlite3`，每类 14 份。整站备份脚本现对三台 GPU 服务器逐库执行在线备份，`runtime-info.json` 的 `gpu_usage_backup` 按 `intranet` / `rtx4090` / `rtx5090` 记录；不会直接复制活跃 WAL/SHM。新增 fleet/intranet 服务单元和监控 ICMP sysctl 文件一并保存。`/etc/gaasd-analytics/` 中的采集 SSH 私钥也属于受限运行备份，不得公开。远端 Windows/Linux 探针运行目录仍需各机独立保护，源码和重建方法见 [六机监控记录](docs/fleet-monitor-20261020.md)。
+
+恢复新增两台 GPU 的库之前同时停止 `gaasd-status-fleet.service`，恢复完按原属主/权限重新启动；仅回退页面代码时保留当前数据。此更新验证了三库的 WAL 一致性备份逻辑和新库每日备份，但本次监控发布没有另做一次包含全部视频的整站归档。
+
 恢复 GPU 库前另行停止 `gaasd-status-intranet.service` 和状态后台，保留原库及配套 WAL/SHM，安装校验后的独立快照，不能混用旧 WAL/SHM；按下述属主/权限设置并启动原服务。仅回退代码时应保留当前统计库，无需覆盖数据。
 
 1. 记录当前前后端链接，先创建当前状态的独立备份。

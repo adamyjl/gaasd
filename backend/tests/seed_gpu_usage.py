@@ -24,3 +24,8 @@ for day in range(13, -1, -1):
             device["utilization_percent"] = 20 + (13 - day) * 5
             device["memory_used"] = (12 + day * 2) * 1024**3
         store.record(data)
+
+for name in ("rtx4090", "rtx5090"):
+    folder = root.parent / name
+    data = json.loads((folder / "latest.json").read_text(encoding="utf-8"))
+    UsageStore(folder / "gpu-usage.sqlite3").record(data)

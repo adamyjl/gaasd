@@ -2,6 +2,8 @@
 
 入口：[https://gaasd.com/status](https://gaasd.com/status)。与 `/statistics` 使用同一管理员账号、同一密码和同一 HTTP Basic 认证域，不新增账户。两页顶部可互相跳转，页面、静态脚本和状态接口均要求登录。
 
+2026-10-20 新增三个同认证入口：[六机总览 `/status1`](https://gaasd.com/status1)、[苏州 Windows `/status3`](https://gaasd.com/status3)、[苏州 4090 / 5090 `/status4`](https://gaasd.com/status4)。六机总览含腾讯云、A100、办公室 3060 Ti、Windows 及两台苏州 8 卡服务器，显示相对腾讯云的真实 ping 和资源摘要；GPU 日/周历史分库保存。详情见 [六机监控部署记录](docs/fleet-monitor-20261020.md)，包含指标限制、初始化、受限 SSH 探针和回退。下面涉及“双服务器”的历史说明仍专指原 `/status`。
+
 2026-10-17 新增办公室 3060 Ti 开发机入口：[https://gaasd.com/status2/](https://gaasd.com/status2/)。同样使用既有管理员账号密码，代理开发机已有硬件监控页面。开发机通过专用 SSH 密钥直接连接腾讯云，由 systemd 开机启动和断线重连，不依赖 Windows。该页面保持开发机自己的采样与展示逻辑；下面的双服务器指标和刷新说明仍针对 `/status`。SSH 跳转方式、部署文件和验证记录见 [办公室隧道说明](docs/office-tunnel-20261017.md)。
 
 2026-10-01 更新：顶部可选择腾讯云服务器 `49.232.60.144`（默认）或内网服务器 `192.168.2.201`。可用 `/status?server=cloud`、`/status?server=intranet` 直接打开对应服务器；浏览器记住上次服务器和刷新间隔。切换时先隐藏上一台数据，旧请求不会覆盖新选择；内网不可用时不会误显示腾讯云数据。
@@ -49,7 +51,7 @@
 | `/status/api/gpu-usage?group=day&count=14` | 日统计，可加 `through=YYYY-MM-DD` |
 | `/status/api/gpu-usage?group=week&count=12` | 自然周统计；API 最多 52 周 / 90 天 |
 
-新接口和脚本沿用管理员认证、no-store、CSP 和 Nginx 限流。接口只读固定 SQLite 文件，不接受文件路径或 SSH 参数。缺库返回明确的未就绪和空数据；损坏 / 读取失败返回 503，不返回伪造的 0。当前状态发布包为 11 个源码文件（增加持久化模块、统计面板和备份脚本），发布时校验首次新采样入库。部署和验证见 [GPU 统计更新记录](docs/status-gpu-usage-20261009.md)。
+新接口和脚本沿用管理员认证、no-store、CSP 和 Nginx 限流。接口只读固定 SQLite 文件，不接受文件路径或 SSH 参数。缺库返回明确的未就绪和空数据；损坏 / 读取失败返回 503，不返回伪造的 0。2026-10-09 的状态包为 11 文件；2026-10-20 扩为 17 文件，加入六机采集和总览，并校验全部新目标的新鲜采样及 GPU 入库。历史部署和验证见 [GPU 统计更新记录](docs/status-gpu-usage-20261009.md)。
 
 ## 实现与维护
 
@@ -82,7 +84,7 @@ GPU 字段参照 [NVIDIA nvidia-smi 文档](https://docs.nvidia.com/deploy/nvidi
 
 ## 发布与检查
 
-状态更新使用 `npm run build:status -- YYYYMMDDTHHMMSS` 和 `scripts/deploy-status.py`：只打包 11 个状态及备份相关后端源码文件，校验清单，复制上一后端版本后覆盖这些文件，再原子切换后端链接并重启服务。保留网站版本、视频、Nginx、统计数据库和账号配置；失败会尝试恢复前一后端及服务配置。当前部署版本和结果见 [2026-10-09 发布记录](docs/status-gpu-usage-20261009.md)。联合部署脚本也包含新采集模块，并会重启已安装的内网采集服务。
+状态更新使用 `npm run build:status -- YYYYMMDDTHHMMSS` 和 `scripts/deploy-status.py`：只打包 17 个状态及备份相关后端源码文件，校验清单，复制上一后端版本后覆盖这些文件，再原子切换后端链接并重启服务。保留网站版本、视频、Nginx、统计数据库和账号配置；失败会尝试恢复前一后端及服务配置。当前部署版本和结果见 [2026-10-20 发布记录](docs/fleet-monitor-20261020.md)。联合部署脚本也包含新采集模块，并会重启已安装的内网和六机采集服务。首次新增四个目标需先按 `ops/fleet-monitor/README.md` 安装探针、固定主机密钥和配置。
 
 首次安装需先完成内网探针 venv、三个模块（status_collector.py / gpu_metrics.py / status_probe.py）、云端专用密钥及固定目标配置。轮询配置只包含 `identity_file`、`known_hosts`、`directory`，HTTP 请求不能改变目标主机。更新内网探针时将三个文件上传新的 releases 子目录、校验后切换 current，再用受限密钥实际执行 snapshot 校验 8 张卡。旧探针版本保留用于回退。
 

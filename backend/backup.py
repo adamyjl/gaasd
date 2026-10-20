@@ -13,8 +13,10 @@ def daily_backup(data=Path("/var/lib/gaasd-analytics")):
     for prefix, database in [
         ("analytics", data / "analytics.sqlite3"),
         ("gpu-usage", data / "status/intranet/gpu-usage.sqlite3"),
+        ("gpu-rtx4090", data / "status/rtx4090/gpu-usage.sqlite3"),
+        ("gpu-rtx5090", data / "status/rtx5090/gpu-usage.sqlite3"),
     ]:
-        if prefix == "gpu-usage" and not database.exists():
+        if prefix.startswith("gpu-") and not database.exists():
             continue
         destination = backups / f"{prefix}-{datetime.now(timezone.utc):%Y%m%d}.sqlite3"
         temporary = destination.with_suffix(".sqlite3.tmp")

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <title>六机运行总览 · GAASD</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/status/assets/dashboard.css" />
+    <link rel="stylesheet" href="/status/assets/status.css" />
+    <link rel="stylesheet" href="/status/assets/fleet.css" />
+    <script type="module" src="/status/assets/fleet.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="wordmark" href="/">GAASD <span>INFRASTRUCTURE</span></a>
+      <nav class="top-actions" aria-label="监控页面">
+        <span class="private-badge">管理员访问</span>
+        <a href="/status">腾讯云 / A100</a><a href="/status2/">3060 Ti</a>
+        <a href="/status3">Windows</a><a href="/status4">4090 / 5090</a
+        ><a href="/statistics">访问统计</a>
+      </nav>
+    </header>
+    <main class="dashboard status-dashboard">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">FLEET / LIVE</p>
+          <h1>六机运行总览</h1>
+          <p class="subtitle">
+            3 台 GPU 服务器 · 3 台开发与中转机 · 以腾讯云为连接中心
+          </p>
+        </div>
+        <div class="live-state">
+          <span id="live-state" class="state-pill">连接中</span>
+          <p id="updated" class="updated">等待采样</p>
+        </div>
+      </div>
+      <div class="status-toolbar">
+        <p>每 30 秒采样 · 过期主机不计入在线汇总 · 北京时间</p>
+        <div class="status-controls">
+          <label
+            >刷新间隔<select id="interval">
+              <option value="30">30 秒</option>
+              <option value="60">60 秒</option>
+              <option value="600">600 秒</option>
+            </select></label
+          ><button id="pause" aria-pressed="false">暂停刷新</button
+          ><button id="refresh">立即刷新 ↻</button>
+        </div>
+      </div>
+      <p id="error" class="status-notice" role="status" hidden></p>
+      <section
+        id="fleet-summary"
+        class="status-metrics"
+        aria-label="在线主机资源汇总"
+      ></section>
+      <section aria-label="GPU 服务器">
+        <div class="fleet-heading">
+          <h2>GPU 服务器</h2>
+          <p>分别查看计算利用率与显存占用；计算百分比不代表 FLOPS。</p>
+        </div>
+        <div id="gpu-hosts" class="fleet-grid"></div>
+      </section>
+      <section aria-label="开发与中转机">
+        <div class="fleet-heading">
+          <h2>开发与中转机</h2>
+          <p>
+            腾讯云统一采集；苏州两台 GPU 服务器的外部访问依赖 Windows 中转。
+          </p>
+        </div>
+        <div id="dev-hosts" class="fleet-grid"></div>
+      </section>
+      <section class="panel fleet-explanation">
+        <h2>延迟与使用量说明</h2>
+        <p>
+          A100 的 ping 从腾讯云经 OpenVPN 发出。其余内网主机通过反向 SSH
+          转发，腾讯云没有直达这些私网地址的 ICMP
+          路由，因此显示目标主机到腾讯云公网的
+          ping；并单独显示云端经隧道读取采样的耗时（包含 SSH
+          握手与采集）。未响应不显示成 0 ms，也不据此单独判定主机离线。
+        </p>
+        <p>
+          CPU 为整机占用率；内存为总量减可用；GPU
+          为驱动采样值；网络为非回环接口流量，虚拟接口可能重复计数。进程只显示名称和资源指标，不读取命令参数或环境变量。各卡型号不同，不将利用率换算成统一计算量或算力。
+        </p>
+        <p>
+          日／周 GPU 历史在 A100 与 4090 / 5090
+          详情页查看；新接入机器从首次成功采样开始积累，不补造历史。采样保存在腾讯云，关闭浏览器或维护电脑不影响采集。
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

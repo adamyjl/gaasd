@@ -165,41 +165,50 @@ def test_usage_storage_failure_keeps_successful_live_snapshot(monkeypatch, tmp_p
     assert json.loads((tmp_path / "connection.json").read_text())["ok"] is True
 
 
-def test_daily_backup_includes_wal_samples_and_retains_14_copies(tmp_path):
+@pytest.mark.parametrize(
+    "host,prefix",
+    [
+        ("intranet", "gpu-usage"),
+        ("rtx4090", "gpu-rtx4090"),
+        ("rtx5090", "gpu-rtx5090"),
+    ],
+)
+def test_daily_backup_includes_wal_samples_and_retains_14_copies(tmp_path, host, prefix):
     with closing(sqlite3.connect(tmp_path / "analytics.sqlite3")) as db:
         db.execute("CREATE TABLE visits(id)")
-    path = tmp_path / "status/intranet/gpu-usage.sqlite3"
+    path = tmp_path / "status" / host / "gpu-usage.sqlite3"
     UsageStore(path).record(sample(stamp("2026-10-09T12:00:00")))
     backups = tmp_path / "backups"
     backups.mkdir()
     for i in range(20, 0, -1):
         day = datetime.now() - timedelta(days=i)
-        for prefix in ["analytics", "gpu-usage"]:
-            (backups / f"{prefix}-{day:%Y%m%d}.sqlite3").touch()
+        for name in ["analytics", prefix]:
+            (backups / f"{name}-{day:%Y%m%d}.sqlite3").touch()
     with closing(sqlite3.connect(path)) as writer:
         writer.execute("INSERT INTO samples VALUES (1,1,0,0,100)")
         writer.commit()
         daily_backup(tmp_path)
-    copies = sorted(backups.glob("gpu-usage-*.sqlite3"))
+    copies = sorted(backups.glob(f"{prefix}-*.sqlite3"))
     assert len(copies) == 14
     assert len(list(backups.glob("analytics-*.sqlite3"))) == 14
     with closing(sqlite3.connect(copies[-1])) as db:
         assert db.execute("SELECT COUNT(*) FROM samples").fetchone()[0] == 2
 
 
-def test_full_backup_snapshots_gpu_db_without_copying_live_wal(monkeypatch, tmp_path):
+@pytest.mark.parametrize("host", ["intranet", "rtx4090", "rtx5090"])
+def test_full_backup_snapshots_gpu_db_without_copying_live_wal(monkeypatch, tmp_path, host):
     monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[2] / "scripts"))
     from backup_server import copy_status
 
     source = tmp_path / "source"
-    path = source / "intranet/gpu-usage.sqlite3"
+    path = source / host / "gpu-usage.sqlite3"
     UsageStore(path).record(sample(stamp("2026-10-09T12:00:00")))
     (source / "latest.json").write_text('{"cpu": 10}')
     with closing(sqlite3.connect(path)) as writer:
         writer.execute("INSERT INTO samples VALUES (1,1,0,0,100)")
         writer.commit()
         result = copy_status(source, tmp_path / "target")
-    assert result == dict(integrity="ok", samples=2)
+    assert result == {host: dict(integrity="ok", samples=2)}
     assert (tmp_path / "target/latest.json").read_text() == '{"cpu": 10}'
     assert list((tmp_path / "target").rglob("*-wal")) == []
     assert list((tmp_path / "target").rglob("*-shm")) == []

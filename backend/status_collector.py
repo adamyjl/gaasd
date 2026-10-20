@@ -217,6 +217,39 @@ def slow_details(profile="cloud"):
         certificate=certificate() if profile == "cloud" else None,
         backup=backup,
         temperatures=sensors,
+        hardware=hardware_inventory(),
+    )
+
+
+def hardware_inventory():
+    """Unprivileged inventory. No serial numbers or command-line information."""
+
+    def read(path):
+        try:
+            return Path(path).read_text().strip()
+        except OSError:
+            return None
+
+    cpu = read("/proc/cpuinfo") or ""
+    model = re.search(r"^model name\s*:\s*(.+)$", cpu, re.M)
+    disks = []
+    for disk in Path("/sys/block").glob("*"):
+        if disk.name.startswith(("loop", "ram", "dm-")):
+            continue
+        disks.append(
+            dict(
+                name=disk.name,
+                model=read(disk / "device/model"),
+                vendor=read(disk / "device/vendor"),
+            )
+        )
+    return dict(
+        cpu_model=model[1] if model else None,
+        manufacturer=read("/sys/class/dmi/id/sys_vendor"),
+        model=read("/sys/class/dmi/id/product_name"),
+        board=read("/sys/class/dmi/id/board_name"),
+        bios=read("/sys/class/dmi/id/bios_version"),
+        disks=disks,
     )
 
 

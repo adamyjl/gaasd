@@ -16,10 +16,16 @@ for (const name of [
   "gpu_metrics.py",
   "status_remote.py",
   "status_probe.py",
+  "fleet.py",
+  "fleet_probe.py",
+  "fleet_collector.py",
   "ui/status.html",
   "ui/status.css",
   "ui/status.js",
   "ui/status-gpu-usage.js",
+  "ui/fleet.html",
+  "ui/fleet.js",
+  "ui/fleet.css",
 ]) {
   const content = await readFile(path.join("backend", name));
   await mkdir(path.dirname(path.join(stage, name)), { recursive: true });
