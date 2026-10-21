@@ -190,6 +190,11 @@ function card(data) {
   return card;
 }
 function render(data) {
+  const hostCount = data.hosts.length;
+  const expectedGpus = data.hosts.reduce(
+    (sum, host) => sum + host.server.expected_gpus,
+    0,
+  );
   const online = data.hosts.filter((host) => !host.stale && !host.unavailable);
   const memory = online.map((host) => host.memory).filter(Boolean);
   const cores = online.reduce(
@@ -208,11 +213,19 @@ function render(data) {
   const memTotal = sum(memory, "total"),
     memUsed = sum(memory, "in_use");
   const summary = [
-    ["在线主机", `${online.length} / 6`, "超过 90 秒或连接失败标为过期"],
+    [
+      "在线主机",
+      `${online.length} / ${hostCount}`,
+      "超过 90 秒或连接失败标为过期",
+    ],
     ["逻辑 CPU", n(cores, 0), "仅合计在线主机"],
     ["CPU 整体占用", pct(cpu), "按在线逻辑核心数加权"],
     ["物理内存已用", bytes(memUsed), `在线容量 ${bytes(memTotal)}`],
-    ["检测到 GPU", `${devices.length} / 26`, "24 张服务器卡 + 2 张开发机卡"],
+    [
+      "检测到 GPU",
+      `${devices.length} / ${expectedGpus}`,
+      "按已登记主机配置核对",
+    ],
     [
       "GPU 显存已用",
       bytes(sum(devices, "memory_used")),
@@ -235,12 +248,12 @@ function render(data) {
   $("updated").textContent = `汇总于 ${date(data.generated_at)}`;
   $("live-state").textContent = paused
     ? "已暂停"
-    : online.length === 6
+    : online.length === hostCount
       ? "全部在线"
-      : `${6 - online.length} 台需关注`;
+      : `${hostCount - online.length} 台需关注`;
   $("live-state").dataset.state = paused
     ? "paused"
-    : online.length === 6
+    : online.length === hostCount
       ? "live"
       : "error";
 }

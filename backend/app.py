@@ -256,12 +256,25 @@ def create_app(overrides=None):
     @app.get("/status3/")
     @app.get("/status4")
     @app.get("/status4/")
+    @app.get("/status5")
+    @app.get("/status5/")
     def fleet_detail_page():
         windows = request.path.startswith("/status3")
         office = request.path.startswith("/status1")
-        names = ["windows"] if windows else ["office"] if office else ["rtx5090", "rtx4090"]
+        pro6000 = request.path.startswith("/status5")
+        names = (
+            ["pro6000"]
+            if pro6000
+            else ["windows"]
+            if windows
+            else ["office"]
+            if office
+            else ["rtx5090", "rtx4090"]
+        )
         title = (
-            "苏州 Windows 硬件监控"
+            "清华办公室 RTX PRO 6000 硬件监控"
+            if pro6000
+            else "苏州 Windows 硬件监控"
             if windows
             else "办公室 Ubuntu 硬件监控"
             if office
@@ -331,9 +344,13 @@ def create_app(overrides=None):
     @app.get("/status3/api/history")
     @app.get("/status4/api/snapshot")
     @app.get("/status4/api/history")
+    @app.get("/status5/api/snapshot")
+    @app.get("/status5/api/history")
     def status_data():
         default = (
-            "windows"
+            "pro6000"
+            if request.path.startswith("/status5/")
+            else "windows"
             if request.path.startswith("/status3/")
             else "rtx5090"
             if request.path.startswith("/status4/")

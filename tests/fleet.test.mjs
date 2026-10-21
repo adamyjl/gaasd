@@ -7,7 +7,7 @@ const credentials = process.env.GAASD_STATISTICS_CREDENTIALS
   : { username: "qa", password: "local-test-only" };
 test.use({ httpCredentials: { ...credentials, send: "always" } });
 
-test("six-host overview, Windows detail, separate GPU histories and shared login", async ({
+test("fleet overview, workstation details, separate GPU histories and shared login", async ({
   page,
   browser,
 }, info) => {
@@ -28,6 +28,9 @@ test("six-host overview, Windows detail, separate GPU histories and shared login
     "/status1",
     "/status3",
     "/status4",
+    "/status5",
+    "/status5/api/snapshot",
+    "/status5/api/history",
     "/status1/api/overview",
     "/status3/api/snapshot",
     "/status4/api/gpu-usage",
@@ -48,8 +51,24 @@ test("six-host overview, Windows detail, separate GPU histories and shared login
     ).toBe(false);
   await mkdir("work/fleet-screenshots", { recursive: true });
   await page.goto("/status1");
-  await expect(page.locator(".fleet-card")).toHaveCount(6);
-  await expect(page.locator("#fleet-summary")).toContainText("6 / 6");
+  await expect(page.locator(".fleet-card")).toHaveCount(7);
+  const overview = await (
+    await page.request.get(base + "/status1/api/overview")
+  ).json();
+  const offline = overview.hosts.filter(
+    (host) => host.stale || host.unavailable,
+  );
+  // Production Windows has a documented pre-existing SSH outage. The new
+  // workstation and every other host must still be fresh; fixtures must all pass.
+  expect(offline.every((host) => live && host.server.id === "windows")).toBe(
+    true,
+  );
+  await expect(page.locator("#fleet-summary")).toContainText(
+    `${7 - offline.length} / 7`,
+  );
+  await expect(page.locator("#fleet-summary")).toContainText(
+    `${27 - offline.length} / 27`,
+  );
   await overflow();
   await page.screenshot({
     path: `work/fleet-screenshots/${info.project.name}-overview.png`,
@@ -98,5 +117,19 @@ test("six-host overview, Windows detail, separate GPU histories and shared login
   await page.goto("/status?server=intranet");
   await expect(page.locator("#gpu-cards .gpu-card")).toHaveCount(8);
   await expect(page.locator("#gpu-usage-results")).toBeVisible();
+  if (live) await delay(5000);
+  await page.goto("/status5");
+  await expect(page.locator("#server-select")).toHaveValue("pro6000");
+  await expect(page.locator("#gpu-cards .gpu-card")).toHaveCount(1);
+  await expect(page.locator("#gpu-cards")).toContainText("RTX PRO 6000");
+  await expect(page.locator("#hardware-panel")).toBeVisible();
+  await expect(page.locator("#gpu-usage-panel")).toBeHidden();
+  await overflow();
+  await page.screenshot({
+    path: `work/fleet-screenshots/${info.project.name}-pro6000.png`,
+    fullPage: true,
+  });
+  await page.reload();
+  await expect(page.locator("#server-select")).toHaveValue("pro6000");
   expect(errors).toEqual([]);
 });

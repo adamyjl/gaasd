@@ -5,6 +5,7 @@ build-status-release archive to /tmp, then run: sudo python3 deploy-status.py ID
 The retained backend release and deployment record provide a rollback target.
 """
 
+import argparse
 import hashlib
 import json
 import os
@@ -32,7 +33,17 @@ def activate(link, target):
 
 
 def main():
-    release_id = sys.argv[1]
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("release_id")
+    parser.add_argument(
+        "--allow-unavailable",
+        action="append",
+        default=[],
+        choices=["office", "windows", "rtx4090", "rtx5090"],
+        help="Explicitly record an already unavailable old host; new PRO 6000 remains mandatory",
+    )
+    args = parser.parse_args()
+    release_id = args.release_id
     if os.geteuid() != 0 or not re.fullmatch(r"\d{8}T\d{6}", release_id):
         raise SystemExit("Root and YYYYMMDDTHHMMSS release identifier required")
     root = Path("/opt/gaasd-analytics")
@@ -43,7 +54,18 @@ def main():
     if not Path("/etc/gaasd-analytics/status-remote.json").is_file():
         raise SystemExit("Provision restricted internal SSH collection first")
     if not Path("/etc/gaasd-analytics/fleet.json").is_file():
-        raise SystemExit("Provision the four restricted fleet endpoints first")
+        raise SystemExit("Provision the restricted fleet endpoints first")
+    unavailable = set(args.allow_unavailable)
+    baseline = {}
+    for host in unavailable:
+        folder = Path("/var/lib/gaasd-analytics/status") / host
+        sample = json.loads((folder / "latest.json").read_text())
+        connection = json.loads((folder / "connection.json").read_text())
+        # An exception is only allowed when an existing collector already recorded
+        # a failed connection and the retained snapshot predates this deployment.
+        if connection.get("ok") is not False or time.time() - sample["generated_at"] < 90:
+            raise SystemExit(f"{host} is not a proven pre-existing outage")
+        baseline[host] = dict(sample_time=sample["generated_at"], connection=connection)
     frontend = Path("/var/www/gaasd-test/public").resolve(strict=True)
     expected = {
         "app.py",
@@ -103,6 +125,7 @@ def main():
         release=str(release),
         remote_service_previously_enabled=was_enabled,
         manifest=manifest,
+        preexisting_unavailable=baseline,
     )
     (backup / "deployment.json").write_text(json.dumps(record, indent=2))
     if previous_unit is not None:
@@ -146,7 +169,7 @@ WantedBy=multi-user.target
 """)
         service.chmod(0o644)
         fleet_service.write_text("""[Unit]
-Description=GAASD six-host monitoring and Suzhou GPU history
+Description=GAASD fleet monitoring and GPU history
 After=network-online.target
 Wants=network-online.target
 
@@ -210,13 +233,18 @@ WantedBy=multi-user.target
                     ("windows", 1),
                     ("rtx5090", 8),
                     ("rtx4090", 8),
+                    ("pro6000", 1),
                 ]:
                     folder = Path("/var/lib/gaasd-analytics/status") / host
                     sample = json.loads((folder / "latest.json").read_text())
+                    connection = json.loads((folder / "connection.json").read_text())
+                    if host in unavailable and not connection.get("ok"):
+                        assert connection["checked_at"] > started
+                        assert sample["generated_at"] == baseline[host]["sample_time"]
+                        continue
                     assert time.time() - sample["generated_at"] < 90
                     assert sample["cpu"]["percent"] is not None
                     assert len(sample["gpu"]["devices"]) == expected_gpus
-                    connection = json.loads((folder / "connection.json").read_text())
                     assert connection["ok"] and connection["checked_at"] > started
                     if expected_gpus == 8:
                         with sqlite3.connect(

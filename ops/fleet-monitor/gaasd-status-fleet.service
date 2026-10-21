@@ -1,5 +1,5 @@
 [Unit]
-Description=GAASD six-host monitoring and Suzhou GPU history
+Description=GAASD fleet monitoring and GPU history
 After=network-online.target
 Wants=network-online.target
 

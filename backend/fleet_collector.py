@@ -1,4 +1,4 @@
-"""Parallel bounded polling of four fixed SSH endpoints; no web-facing shell."""
+"""Parallel bounded polling of fixed SSH endpoints; no web-facing shell."""
 
 import argparse
 import json
@@ -128,7 +128,7 @@ def main():
     config = json.loads(Path(args.config).read_text())
     root = Path(config["directory"])
     samplers = {host: Sampler(root / host, profile="intranet") for host in TARGETS}
-    with ThreadPoolExecutor(max_workers=5) as pool:
+    with ThreadPoolExecutor(max_workers=len(TARGETS) + 1) as pool:
         while True:
             started = time.monotonic()
             futures = [

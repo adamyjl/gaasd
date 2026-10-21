@@ -67,7 +67,9 @@ def backup(path):
 
 
 def main():
+    global ACCOUNT, HOME_DIR, CONF, UNIT
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile", choices=["office", "pro6000"], default="office")
     parser.add_argument(
         "phase", choices=["office-prepare", "cloud-authorize", "office-start", "cloud-web"]
     )
@@ -75,6 +77,14 @@ def main():
     parser.add_argument("--public-key", type=Path)
     parser.add_argument("--host-key", type=Path)
     args = parser.parse_args()
+    if args.profile == "pro6000":
+        if args.phase == "cloud-web":
+            raise SystemExit("PRO 6000 uses the existing authenticated status backend")
+        ACCOUNT = "gaasd-pro6000-tunnel"
+        HOME_DIR = Path("/var/lib/gaasd-pro6000-tunnel")
+        CONF = Path("/etc/gaasd-pro6000-tunnel")
+        UNIT = "gaasd-pro6000-tunnel.service"
+    marker = "# BEGIN GAASD " + ("PRO6000" if args.profile == "pro6000" else "OFFICE") + " TUNNEL"
     if os.geteuid() != 0:
         raise SystemExit("Run as root")
     os.umask(0o077)
@@ -91,7 +101,7 @@ def main():
                 "-N",
                 "",
                 "-C",
-                "gaasd-office-tunnel",
+                ACCOUNT,
                 "-f",
                 str(private),
             )
@@ -112,11 +122,9 @@ def main():
         ssh_dir.mkdir(mode=0o700, exist_ok=True)
         os.chown(ssh_dir, user.pw_uid, user.pw_gid)
         authorized = ssh_dir / "authorized_keys"
-        line = (
-            'restrict,port-forwarding,permitlisten="127.0.0.1:2222",permitlisten="127.0.0.1:18765" '
-            + key
-            + "\n"
-        )
+        ports = [2226] if args.profile == "pro6000" else [2222, 18765]
+        options = ",".join(f'permitlisten="127.0.0.1:{port}"' for port in ports)
+        line = "restrict,port-forwarding," + options + " " + key + "\n"
         if authorized.exists() and authorized.read_text() != line:
             raise RuntimeError("Existing tunnel key differs; preserve it for review")
         save(authorized, line, 0o600)
@@ -124,7 +132,7 @@ def main():
         sshd = Path("/etc/ssh/sshd_config")
         original = sshd.read_text()
         block = (args.source / "cloud-sshd-match.conf").read_text()
-        if "# BEGIN GAASD OFFICE TUNNEL" not in original:
+        if marker not in original:
             old = backup(sshd)
             save(sshd, original.rstrip() + "\n\n" + block)
             try:
@@ -139,9 +147,7 @@ def main():
             if block.strip() not in original:
                 raise RuntimeError("Existing managed SSH block differs")
         print(fingerprint)
-        print(
-            run("/usr/sbin/sshd", "-T", "-C", "user=gaasd-office-tunnel,host=office,addr=127.0.0.1")
-        )
+        print(run("/usr/sbin/sshd", "-T", "-C", f"user={ACCOUNT},host=office,addr=127.0.0.1"))
 
     elif args.phase == "office-start":
         ensure_user()

@@ -48,12 +48,20 @@ HOSTS = {
         href="/status4?server=rtx4090",
         expected_gpus=8,
     ),
+    "pro6000": dict(
+        name="清华办公室 · RTX PRO 6000",
+        address="ThinkStation P3 Tower Gen 2",
+        group="开发机",
+        href="/status5",
+        expected_gpus=1,
+    ),
 }
 TARGETS = {
     "office": ("tsari", "127.0.0.1", 2222),
     "windows": ("tsari", "127.0.0.1", 2224),
     "rtx5090": ("user001", "127.0.0.1", 2223),
     "rtx4090": ("centos", "127.0.0.1", 2225),
+    "pro6000": ("lenovo", "127.0.0.1", 2226),
 }
 
 
@@ -99,7 +107,7 @@ def read_cached(root, host, history=False, now=None):
 def overview(root):
     now = time.time()
     hosts = []
-    for key in ("intranet", "rtx4090", "rtx5090", "cloud", "office", "windows"):
+    for key in ("intranet", "rtx4090", "rtx5090", "cloud", "office", "windows", "pro6000"):
         try:
             data = read_cached(root, key, now=now)
             # No process arguments, environment, log contents or credentials.

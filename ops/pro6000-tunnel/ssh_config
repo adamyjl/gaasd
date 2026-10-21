@@ -1,0 +1,21 @@
+Host gaasd-cloud-tunnel
+    HostName 49.232.60.144
+    Port 22
+    User gaasd-pro6000-tunnel
+    IdentityFile /var/lib/gaasd-pro6000-tunnel/id_ed25519
+    IdentitiesOnly yes
+    BatchMode yes
+    StrictHostKeyChecking yes
+    UserKnownHostsFile /etc/gaasd-pro6000-tunnel/known_hosts
+    GlobalKnownHostsFile /dev/null
+    UpdateHostKeys no
+    ExitOnForwardFailure yes
+    ConnectTimeout 10
+    ConnectionAttempts 1
+    ServerAliveInterval 20
+    ServerAliveCountMax 3
+    TCPKeepAlive yes
+    ForwardAgent no
+    ForwardX11 no
+    ControlMaster no
+    RemoteForward 127.0.0.1:2226 127.0.0.1:22
