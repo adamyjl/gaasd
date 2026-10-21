@@ -19,7 +19,7 @@ GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计
 | `https://gaasd.com/en/privacy.html` | 英文数据用途说明、共用当前浏览器统计偏好                       | 公开       |
 | `https://gaasd.com/statistics`      | 访问、IP 归属地、浏览器、视频播放报表与 CSV                    | 管理员     |
 | `https://gaasd.com/status`          | 腾讯云 / 内网切换；CPU、内存、Swap、磁盘、网络、服务、趋势及内网 8 GPU | 同一管理员 |
-| `https://gaasd.com/status1`         | 七机总览：3 台 GPU 服务器及 4 台开发/中转机，资源汇总与相对腾讯云延迟 | 同一管理员 |
+| `https://gaasd.com/status1`         | 七机总览：3 台 GPU 服务器、2 台开发机器、2 台中转机器，资源汇总与相对腾讯云延迟 | 同一管理员 |
 | `https://gaasd.com/status2/`        | 办公室 3060 Ti 开发机现有硬件监控，独立 SSH 隧道直连腾讯云 | 同一管理员 |
 | `https://gaasd.com/status3`         | 苏州 Windows 硬件、温度、每核 CPU、GPU、软件资源及网络/磁盘监控 | 同一管理员 |
 | `https://gaasd.com/status4`         | 苏州 8×RTX 4090 / 8×RTX 5090 切换、实时指标及独立日/周历史 | 同一管理员 |
@@ -33,7 +33,7 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分�
 | SSH          | `ssh ubuntu@49.232.60.144`，使用已有 SSH 密钥        |
 | 前端版本     | `/var/www/gaasd-test/releases/20261008T095600`       |
 | 前端活动链接 | `/var/www/gaasd-test/public`                         |
-| 后端版本     | `/opt/gaasd-analytics/releases/20261021T184000`      |
+| 后端版本     | `/opt/gaasd-analytics/releases/20261021T185500`      |
 | 后端活动链接 | `/opt/gaasd-analytics/current`                       |
 | Python 环境  | `/opt/gaasd-analytics/venv`，Python 3.12.3           |
 | 系统         | Ubuntu 24.04、Nginx、systemd                         |

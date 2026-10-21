@@ -239,12 +239,15 @@ function render(data) {
       return node;
     }),
   );
-  $("gpu-hosts").replaceChildren(
-    ...data.hosts.filter((host) => host.server.expected_gpus === 8).map(card),
-  );
-  $("dev-hosts").replaceChildren(
-    ...data.hosts.filter((host) => host.server.expected_gpus !== 8).map(card),
-  );
+  for (const [id, group] of [
+    ["gpu-hosts", "GPU 服务器"],
+    ["dev-hosts", "开发机器"],
+    ["relay-hosts", "中转机器"],
+  ]) {
+    $(id).replaceChildren(
+      ...data.hosts.filter((host) => host.server.group === group).map(card),
+    );
+  }
   $("updated").textContent = `汇总于 ${date(data.generated_at)}`;
   $("live-state").textContent = paused
     ? "已暂停"
