@@ -33,7 +33,7 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分�
 | SSH          | `ssh ubuntu@49.232.60.144`，使用已有 SSH 密钥        |
 | 前端版本     | `/var/www/gaasd-test/releases/20261008T095600`       |
 | 前端活动链接 | `/var/www/gaasd-test/public`                         |
-| 后端版本     | `/opt/gaasd-analytics/releases/20261021T185500`      |
+| 后端版本     | `/opt/gaasd-analytics/releases/20261021T193200`      |
 | 后端活动链接 | `/opt/gaasd-analytics/current`                       |
 | Python 环境  | `/opt/gaasd-analytics/venv`，Python 3.12.3           |
 | 系统         | Ubuntu 24.04、Nginx、systemd                         |

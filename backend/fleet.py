@@ -7,7 +7,7 @@ from pathlib import Path
 
 HOSTS = {
     "cloud": dict(
-        name="腾讯云服务器",
+        name="清华腾讯云服务器",
         address="49.232.60.144",
         group="中转机器",
         href="/status?server=cloud",
@@ -35,21 +35,21 @@ HOSTS = {
         expected_gpus=1,
     ),
     "rtx5090": dict(
-        name="苏州 · 8×RTX 5090",
+        name="研究院 · 8×RTX 5090",
         address="192.168.1.111",
         group="GPU 服务器",
         href="/status4?server=rtx5090",
         expected_gpus=8,
     ),
     "rtx4090": dict(
-        name="苏州 · 8×RTX 4090",
+        name="研究院 · 8×RTX 4090",
         address="192.168.1.19",
         group="GPU 服务器",
         href="/status4?server=rtx4090",
         expected_gpus=8,
     ),
     "pro6000": dict(
-        name="办公室 · RTX PRO 6000",
+        name="清华办公室 · RTX PRO 6000",
         address="ThinkStation P3 Tower Gen 2",
         group="开发机器",
         href="/status5",

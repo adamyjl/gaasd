@@ -53,9 +53,15 @@ test("fleet overview, workstation details, separate GPU histories and shared log
   await page.goto("/status1");
   await expect(page.locator(".fleet-card")).toHaveCount(7);
   for (const [group, names] of [
-    ["gpu-hosts", ["清华 · 8×A100", "苏州 · 8×RTX 4090", "苏州 · 8×RTX 5090"]],
-    ["dev-hosts", ["研究院办公室 · Ubuntu 3060 Ti", "办公室 · RTX PRO 6000"]],
-    ["relay-hosts", ["腾讯云服务器", "研究院 Windows 中转机"]],
+    [
+      "gpu-hosts",
+      ["清华 · 8×A100", "研究院 · 8×RTX 4090", "研究院 · 8×RTX 5090"],
+    ],
+    [
+      "dev-hosts",
+      ["研究院办公室 · Ubuntu 3060 Ti", "清华办公室 · RTX PRO 6000"],
+    ],
+    ["relay-hosts", ["清华腾讯云服务器", "研究院 Windows 中转机"]],
   ]) {
     await expect(page.locator(`#${group} .fleet-card h3`)).toHaveText(names);
   }
