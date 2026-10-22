@@ -28,7 +28,7 @@ export function initNavigation() {
     updateScrollLock();
   });
   window
-    .matchMedia("(min-width: 768px)")
+    .matchMedia("(min-width: 1000px)")
     .addEventListener("change", (event) => {
       if (event.matches && menu.open) menu.close();
     });

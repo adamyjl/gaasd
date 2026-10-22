@@ -58,10 +58,12 @@ def test_missing_corrupt_and_stale_snapshot_are_not_presented_as_live(status_cli
     assert client.get("/status/api/snapshot", auth=AUTH).status_code == 503
     (directory / "latest.json").write_text("broken")
     assert client.get("/status/api/snapshot", auth=AUTH).status_code == 503
-    atomic_json(directory / "latest.json", dict(generated_at=time.time() - 60, cpu={"percent": 17}))
+    atomic_json(
+        directory / "latest.json", dict(generated_at=time.time() - 120, cpu={"percent": 17})
+    )
     data = client.get("/status/api/snapshot", auth=AUTH).json
     assert data["stale"] is True
-    assert data["age_seconds"] >= 59
+    assert data["age_seconds"] >= 119
     assert data["cpu"]["percent"] == 17
     assert client.get("/status/assets/app.py", auth=AUTH).status_code == 404
 

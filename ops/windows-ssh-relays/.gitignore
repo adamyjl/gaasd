@@ -1,0 +1,24 @@
+# Secrets and machine-specific deployment state must stay outside this repository.
+*.local.json
+*.local.ps1
+*.key
+*.pem
+*.pfx
+id_*
+authorized_keys
+known_hosts*
+credentials/
+runtime/
+backups/
+logs/
+*.log
+*.log.*
+state.json
+*.lock
+disabled
+*.msi
+*.exe
+*.dll
+*.zip
+__pycache__/
+*.pyc

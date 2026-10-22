@@ -2,8 +2,8 @@ import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 
 const media = {
-  en: [207.04, 193.98, 296.34, 274.81],
-  cn: [207.04, 193.98, 282.64, 274.81],
+  en: [124.57, 239.3, 296.34, 274.77],
+  cn: [124.57, 239.3, 282.64, 274.77],
 };
 const ids = ["platform", "ai-assist", "nnide", "vla"];
 const titles = {
@@ -23,8 +23,8 @@ for (const language of ["en", "cn"]) {
     test.setTimeout(150000);
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
-    await page.goto(language === "cn" ? "/cn" : "/");
-    if (language === "cn") await expect(page).toHaveURL(/\/cn\/$/);
+    await page.goto(language === "cn" ? "/" : "/en");
+    if (language === "en") await expect(page).toHaveURL(/\/en\/$/);
     await expect(page.locator("html")).toHaveAttribute(
       "data-video-language",
       language,
@@ -36,7 +36,13 @@ for (const language of ["en", "cn"]) {
     );
     await expect(page.locator(".track-title")).toHaveText(titles[language]);
     if (language === "en") {
-      const text = (await page.locator("body").textContent())
+      const text = (
+        await page.locator("body").evaluate((body) => {
+          const content = body.cloneNode(true);
+          content.querySelector(".language-switch")?.remove();
+          return content.textContent;
+        })
+      )
         .replaceAll("京ICP备2026057773号", "")
         .replaceAll("京公网安备11010802050298号", "");
       expect(text).not.toMatch(/\p{Script=Han}/u);
@@ -62,7 +68,7 @@ for (const language of ["en", "cn"]) {
       "src",
       language === "cn"
         ? "/media/overview.mp4"
-        : "media/present2/en/overview-en-ja-20260914.mp4",
+        : "/media/present2/en/overview-en-ja-20260914.mp4",
     );
     await expect
       .poll(() => video.evaluate((v) => v.currentTime > 0.1 && !v.paused), {
@@ -76,15 +82,12 @@ for (const language of ["en", "cn"]) {
       );
       const filename =
         id === "platform"
-          ? "platform-20260915"
-          : id === "nnide" || id === "vla"
+          ? "platform-20260929"
+          : id === "nnide"
             ? `${id}-20260916`
-            : id;
+            : `${id}-20260928`;
       const src = `/media/present2/${language}/${filename}.mp4`;
-      await expect(video).toHaveAttribute(
-        "src",
-        language === "cn" ? src : src.slice(1),
-      );
+      await expect(video).toHaveAttribute("src", src);
       await expect
         .poll(
           () =>
@@ -147,7 +150,7 @@ for (const language of ["en", "cn"]) {
       await page.locator(".menu-toggle").click();
       await page.locator('#mobile-menu a[href="#tracks"]').click();
       await expect(page).toHaveURL(
-        language === "cn" ? /\/cn\/#tracks$/ : /\/#tracks$/,
+        language === "cn" ? /\/#tracks$/ : /\/en\/#tracks$/,
       );
     }
     await mkdir("work/bilingual-screenshots", { recursive: true });
@@ -165,7 +168,7 @@ test("both editions retain the same responsive grid and card widths", async ({
 }) => {
   for (const width of [320, 390, 768, 1024, 1200, 1440]) {
     const geometries = [];
-    for (const url of ["/", "/cn/"]) {
+    for (const url of ["/en/", "/"]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(url);
       await expect(page.locator(".track-card")).toHaveCount(4);
@@ -187,9 +190,9 @@ test("both editions retain the same responsive grid and card widths", async ({
 test("privacy pages keep localized copy and the same browser preference", async ({
   page,
 }) => {
-  await page.goto("/privacy.html");
+  await page.goto("/en/privacy.html");
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await expect(page.locator(".privacy-back")).toHaveAttribute("href", "/");
+  await expect(page.locator(".privacy-back")).toHaveAttribute("href", "/en/");
   await expect(page.locator("#privacy-toggle")).toHaveText(
     "Disable analytics in this browser",
   );
@@ -197,9 +200,9 @@ test("privacy pages keep localized copy and the same browser preference", async 
   await expect(page.locator("#privacy-status")).toHaveText(
     "Future analytics events are disabled in this browser.",
   );
-  await page.goto("/cn/privacy.html");
+  await page.goto("/privacy.html");
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
-  await expect(page.locator(".privacy-back")).toHaveAttribute("href", "/cn/");
+  await expect(page.locator(".privacy-back")).toHaveAttribute("href", "/");
   await expect(page.locator("#privacy-toggle")).toHaveText(
     "开启本浏览器的事件统计",
   );

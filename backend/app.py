@@ -9,6 +9,7 @@ import json
 import math
 import os
 import re
+import sqlite3
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -16,7 +17,9 @@ from urllib.parse import urlsplit
 
 from database import connect, initialize, insert_visit
 from flask import Flask, Response, abort, jsonify, request, send_from_directory
+from fleet import HOSTS, overview, read_cached
 from geo import GeoLookup, browser_info
+from gpu_usage import report as gpu_usage_report
 from werkzeug.security import check_password_hash
 
 SHANGHAI = timezone(timedelta(hours=8))
@@ -129,6 +132,9 @@ def create_app(overrides=None):
             "/cn",
             "/cn/",
             "/cn/index.html",
+            "/en",
+            "/en/",
+            "/en/index.html",
         }:
             abort(400)
         if body["kind"] == "video":
@@ -240,25 +246,132 @@ def create_app(overrides=None):
     def server_status():
         return send_from_directory(ui, "status.html")
 
+    @app.get("/status1")
+    @app.get("/status1/")
+    def fleet_overview_page():
+        return send_from_directory(ui, "fleet.html")
+
+    @app.get("/status1/host")
+    @app.get("/status3")
+    @app.get("/status3/")
+    @app.get("/status4")
+    @app.get("/status4/")
+    @app.get("/status5")
+    @app.get("/status5/")
+    def fleet_detail_page():
+        windows = request.path.startswith("/status3")
+        office = request.path.startswith("/status1")
+        pro6000 = request.path.startswith("/status5")
+        names = (
+            ["pro6000"]
+            if pro6000
+            else ["windows"]
+            if windows
+            else ["office"]
+            if office
+            else ["rtx5090", "rtx4090"]
+        )
+        title = (
+            "清华办公室 RTX PRO 6000 硬件监控"
+            if pro6000
+            else "苏州 Windows 硬件监控"
+            if windows
+            else "办公室 Ubuntu 硬件监控"
+            if office
+            else "苏州 GPU 服务器"
+        )
+        html = (ui / "status.html").read_text(encoding="utf-8")
+        html = re.sub(
+            r'(<select id="server-select">).*?(</select>)',
+            lambda m: (
+                m[1]
+                + "".join(f'<option value="{key}">{HOSTS[key]["name"]}</option>' for key in names)
+                + m[2]
+            ),
+            html,
+            count=1,
+            flags=re.S,
+        )
+        html = html.replace("服务器状态", title).replace("8 × A100 / USAGE", "8 × GPU / USAGE")
+        return Response(html, content_type="text/html; charset=utf-8")
+
+    @app.get("/status1/api/overview")
+    def fleet_overview_data():
+        return jsonify(overview(config.get("status_directory", "/var/lib/gaasd-analytics/status")))
+
     @app.get("/status/assets/<path:filename>")
     def status_asset(filename):
-        if filename not in {"status.js", "status.css", "dashboard.css"}:
+        if filename not in {
+            "status.js",
+            "status-gpu-usage.js",
+            "status.css",
+            "dashboard.css",
+            "fleet.js",
+            "fleet.css",
+        }:
             abort(404)
         return send_from_directory(ui, filename)
 
+    @app.get("/status/api/gpu-usage")
+    @app.get("/status4/api/gpu-usage")
+    def gpu_usage_data():
+        directory = Path(config.get("status_directory", "/var/lib/gaasd-analytics/status"))
+        group = request.args.get("group", "day")
+        selected = request.args.get(
+            "server", "rtx5090" if request.path.startswith("/status4") else "intranet"
+        )
+        if selected not in {"intranet", "rtx5090", "rtx4090"}:
+            abort(400)
+        try:
+            data = gpu_usage_report(
+                directory / selected / "gpu-usage.sqlite3",
+                group,
+                request.args.get("count", 14 if group == "day" else 12),
+                request.args.get("through"),
+            )
+        except (ValueError, TypeError, OverflowError):
+            abort(400)
+        except (OSError, sqlite3.Error):
+            return jsonify(error="GPU 使用统计暂时无法读取，请稍后重试。"), 503
+        data["server"] = dict(id=selected, **HOSTS[selected])
+        return jsonify(data)
+
     @app.get("/status/api/snapshot")
     @app.get("/status/api/history")
+    @app.get("/status1/api/snapshot")
+    @app.get("/status1/api/history")
+    @app.get("/status3/api/snapshot")
+    @app.get("/status3/api/history")
+    @app.get("/status4/api/snapshot")
+    @app.get("/status4/api/history")
+    @app.get("/status5/api/snapshot")
+    @app.get("/status5/api/history")
     def status_data():
-        directory = Path(config.get("status_directory", "/var/lib/gaasd-analytics/status"))
-        name = "history.json" if request.path.endswith("/history") else "latest.json"
-        try:
-            data = json.loads((directory / name).read_text(encoding="utf-8"))
-            age = max(0, time.time() - data["generated_at"])
-        except (OSError, ValueError, KeyError, TypeError):
-            return jsonify(error="状态采集尚未就绪，请稍后刷新。", stale=True), 503
-        return jsonify(
-            **data, age_seconds=round(age, 1), stale=age > (150 if name == "history.json" else 20)
+        default = (
+            "pro6000"
+            if request.path.startswith("/status5/")
+            else "windows"
+            if request.path.startswith("/status3/")
+            else "rtx5090"
+            if request.path.startswith("/status4/")
+            else "cloud"
         )
+        selected = request.args.get("server", default)
+        if selected not in HOSTS:
+            abort(400)
+        try:
+            data = read_cached(
+                config.get("status_directory", "/var/lib/gaasd-analytics/status"),
+                selected,
+                history=request.path.endswith("/history"),
+            )
+        except (OSError, ValueError, KeyError, TypeError):
+            return jsonify(
+                error="该服务器的状态采集尚未就绪，请稍后刷新。",
+                stale=True,
+                server=dict(id=selected, **HOSTS[selected]),
+            ), 503
+        return jsonify(data)
 
     def filters():
         today = datetime.now(SHANGHAI).date()
