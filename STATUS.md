@@ -2,6 +2,12 @@
 
 入口：[https://gaasd.com/status](https://gaasd.com/status)。与 `/statistics` 使用同一管理员账号、同一密码和同一 HTTP Basic 认证域，不新增账户。两页顶部可互相跳转，页面、静态脚本和状态接口均要求登录。
 
+2026-10-23：`/status1` 顶部加入硬盘总容量、已用空间、总使用率及可用空间。CPU、内存、GPU、磁盘汇总均采用各主机最近一次成功采样，包含离线缓存；页面列出离线机器及其采样时间。在线数量仍按连接状态和 90 秒过期规则计算，无有效采样的主机不计入资源汇总。硬盘按每台主机的设备去重，仅统计容量可读取的已挂载本地卷，排除网络挂载、内存盘、容器映射和 loop 设备；不代表未分配/未挂载的物理容量。使用率为合计已用 / 合计总量，可用空间不含文件系统预留空间，因此已用加可用可能小于总量。
+
+本次只发布 `backend/ui/fleet.html`、`fleet.css`、`fleet.js`，未重启服务或修改采集器、登录配置及历史库。发布脚本为 `scripts/deploy-fleet-ui.py`：读取 `build:status` 包，仅替换这三个 UI 文件，校验发布前基线和包内校验值，保留备份。腾讯云备份目录为 `/var/backups/gaasd-fleet-ui-20261023T193200/`，内有原文件和 `deployment.json`；回退时核对当前文件仍为该记录的 after 哈希，再恢复对应原文件，避免覆盖后续更新。正常完整后端发布仍使用原 `deploy-status.py`。
+
+验证：本地 fleet 浏览器 12 项（1440 / 1024 / 390 / 320px）及后端 fleet 35 项通过；lint、typecheck、`build:status` 通过。生产 Chrome 在以上四种宽度验证汇总和缓存标识，并复核未登录返回 401、页面无横向溢出/脚本异常。测试包括重复挂载、Windows 盘符大小写、离线缓存重新上线、不可读容量与缺失数据。截图和本地发布备份位于 Git 忽略的 `work/fleet-disk-live/`。
+
 2026-10-20 新增三个同认证入口：[六机总览 `/status1`](https://gaasd.com/status1)、[苏州 Windows `/status3`](https://gaasd.com/status3)、[苏州 4090 / 5090 `/status4`](https://gaasd.com/status4)。六机总览含腾讯云、A100、办公室 3060 Ti、Windows 及两台苏州 8 卡服务器，显示相对腾讯云的真实 ping 和资源摘要；GPU 日/周历史分库保存。详情见 [六机监控部署记录](docs/fleet-monitor-20261020.md)，包含指标限制、初始化、受限 SSH 探针和回退。下面涉及“双服务器”的历史说明仍专指原 `/status`。
 
 2026-10-17 新增办公室 3060 Ti 开发机入口：[https://gaasd.com/status2/](https://gaasd.com/status2/)。同样使用既有管理员账号密码，代理开发机已有硬件监控页面。开发机通过专用 SSH 密钥直接连接腾讯云，由 systemd 开机启动和断线重连，不依赖 Windows。该页面保持开发机自己的采样与展示逻辑；下面的双服务器指标和刷新说明仍针对 `/status`。SSH 跳转方式、部署文件和验证记录见 [办公室隧道说明](docs/office-tunnel-20261017.md)。

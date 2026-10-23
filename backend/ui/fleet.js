@@ -34,6 +34,56 @@ function sum(items, field) {
     ? items.reduce((s, item) => s + item[field], 0)
     : null;
 }
+// Count mounted local volumes once per host, not once per mount point.
+function diskSummary(hosts) {
+  const volumes = [];
+  let covered = 0,
+    missing = 0;
+  for (const host of hosts) {
+    const seen = new Set();
+    const before = volumes.length;
+    for (const disk of host.filesystems || []) {
+      if (
+        disk.kind !== "local" ||
+        /^(overlay|aufs|squashfs|tmpfs|devtmpfs|ramfs|fuse\.)/.test(
+          disk.filesystem || "",
+        ) ||
+        /^\/dev\/(loop|ram|zram)\d/.test(disk.device || "")
+      )
+        continue;
+      const device = disk.device || disk.mount;
+      const key = /^[a-z]:[\\/]?$/i.test(device || "")
+        ? device.slice(0, 2).toUpperCase()
+        : device;
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      if (
+        !Number.isFinite(disk.total) ||
+        disk.total <= 0 ||
+        ![disk.used, disk.free].every(
+          (value) =>
+            Number.isFinite(value) && value >= 0 && value <= disk.total,
+        )
+      ) {
+        missing++;
+        continue;
+      }
+      volumes.push(disk);
+    }
+    if (volumes.length > before) covered++;
+  }
+  const total = sum(volumes, "total"),
+    used = sum(volumes, "used");
+  return {
+    total,
+    used,
+    free: sum(volumes, "free"),
+    percent: total > 0 && used !== null ? (100 * used) / total : null,
+    count: volumes.length,
+    covered,
+    missing,
+  };
+}
 function meter(label, percent, note) {
   const box = el("div", undefined, "fleet-meter");
   const title = el("div", undefined, "resource-title");
@@ -196,12 +246,16 @@ function render(data) {
     0,
   );
   const online = data.hosts.filter((host) => !host.stale && !host.unavailable);
-  const memory = online.map((host) => host.memory).filter(Boolean);
-  const cores = online.reduce(
+  const available = data.hosts.filter((host) => !host.unavailable);
+  const cached = available.filter((host) => host.stale);
+  const memory = available.map((host) => host.memory).filter(Boolean);
+  const cores = available.reduce(
     (s, host) => s + (host.host?.logical_cpus || 0),
     0,
   );
-  const knownCpu = online.filter((host) => Number.isFinite(host.cpu?.percent));
+  const knownCpu = available.filter(
+    (host) => Number.isFinite(host.cpu?.percent) && host.host?.logical_cpus > 0,
+  );
   const coreCount = knownCpu.reduce((s, host) => s + host.host.logical_cpus, 0);
   const cpu = coreCount
     ? knownCpu.reduce(
@@ -209,7 +263,8 @@ function render(data) {
         0,
       ) / coreCount
     : null;
-  const devices = online.flatMap((host) => host.gpu?.devices || []);
+  const devices = available.flatMap((host) => host.gpu?.devices || []);
+  const disk = diskSummary(available);
   const memTotal = sum(memory, "total"),
     memUsed = sum(memory, "in_use");
   const summary = [
@@ -218,9 +273,9 @@ function render(data) {
       `${online.length} / ${hostCount}`,
       "超过 90 秒或连接失败标为过期",
     ],
-    ["逻辑 CPU", n(cores, 0), "仅合计在线主机"],
-    ["CPU 整体占用", pct(cpu), "按在线逻辑核心数加权"],
-    ["物理内存已用", bytes(memUsed), `在线容量 ${bytes(memTotal)}`],
+    ["逻辑 CPU", available.length ? n(cores, 0) : "—", "按最近成功采样合计"],
+    ["CPU 整体占用", pct(cpu), "按采样逻辑核心数加权"],
+    ["物理内存已用", bytes(memUsed), `采样容量 ${bytes(memTotal)}`],
     [
       "检测到 GPU",
       `${devices.length} / ${expectedGpus}`,
@@ -229,8 +284,15 @@ function render(data) {
     [
       "GPU 显存已用",
       bytes(sum(devices, "memory_used")),
-      `在线容量 ${bytes(sum(devices, "memory_total"))}`,
+      `采样容量 ${bytes(sum(devices, "memory_total"))}`,
     ],
+    [
+      "硬盘总容量",
+      bytes(disk.total),
+      `${disk.covered} / ${hostCount} 台 · ${disk.count} 个本地卷（去重）${disk.missing ? ` · ${disk.missing} 卷数据缺失` : ""}`,
+    ],
+    ["硬盘已用空间", bytes(disk.used), `总使用率 ${pct(disk.percent)}`],
+    ["硬盘可用空间", bytes(disk.free), "文件系统可用量，不含预留空间"],
   ];
   $("fleet-summary").replaceChildren(
     ...summary.map(([label, value, note]) => {
@@ -239,6 +301,16 @@ function render(data) {
       return node;
     }),
   );
+  $("summary-note").dataset.cached = String(cached.length > 0);
+  $("summary-note").textContent = [
+    `资源汇总采用 ${available.length} / ${hostCount} 台主机最近一次成功采样。`,
+    cached.length
+      ? `含 ${cached.length} 台离线 / 过期缓存：${cached.map((host) => `${host.server.name}（${date(host.generated_at)}）`).join("；")}。缓存使用量不代表当前实时状态。`
+      : "所有已采样主机当前在线。",
+    available.length < hostCount
+      ? `${hostCount - available.length} 台尚无采样，未计入资源汇总。`
+      : "",
+  ].join(" ");
   for (const [id, group] of [
     ["gpu-hosts", "GPU 服务器"],
     ["dev-hosts", "开发机器"],

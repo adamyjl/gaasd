@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="status-toolbar">
-        <p>每 30 秒采样 · 过期主机不计入在线汇总 · 北京时间</p>
+        <p>每 30 秒采样 · 离线主机沿用最近成功采样 · 北京时间</p>
         <div class="status-controls">
           <label
             >刷新间隔<select id="interval">
@@ -51,8 +51,9 @@
       <section
         id="fleet-summary"
         class="status-metrics"
-        aria-label="在线主机资源汇总"
+        aria-label="主机资源汇总"
       ></section>
+      <p id="summary-note" class="fleet-summary-note" role="status"></p>
       <section aria-label="GPU 服务器">
         <div class="fleet-heading">
           <h2>GPU 服务器</h2>
@@ -79,6 +80,11 @@
       </section>
       <section class="panel fleet-explanation">
         <h2>延迟与使用量说明</h2>
+        <p>
+          总体资源包含在线数据及离线主机最近一次成功采样；无有效采样的主机不计入。
+          硬盘仅汇总已挂载、容量可读取的本地文件系统，每台机器按设备去重，排除内存盘、网络挂载及容器映射，不包含未挂载或未分配的容量。
+          总使用率为已用空间合计除以容量合计；可用空间不含文件系统预留空间，因此已用加可用可能小于总容量。
+        </p>
         <p>
           A100 的 ping 从腾讯云经 OpenVPN 发出。其余内网主机通过反向 SSH
           转发，腾讯云没有直达这些私网地址的 ICMP

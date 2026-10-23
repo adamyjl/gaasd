@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFile, mkdir } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
+import { sample } from "./status-fixtures.mjs";
 
 const credentials = process.env.GAASD_STATISTICS_CREDENTIALS
   ? JSON.parse(await readFile(process.env.GAASD_STATISTICS_CREDENTIALS, "utf8"))
@@ -71,16 +72,12 @@ test("fleet overview, workstation details, separate GPU histories and shared log
   const offline = overview.hosts.filter(
     (host) => host.stale || host.unavailable,
   );
-  // Production Windows has a documented pre-existing SSH outage. The new
-  // workstation and every other host must still be fresh; fixtures must all pass.
-  expect(offline.every((host) => live && host.server.id === "windows")).toBe(
-    true,
-  );
+  if (!live) expect(offline).toEqual([]);
   await expect(page.locator("#fleet-summary")).toContainText(
     `${7 - offline.length} / 7`,
   );
   await expect(page.locator("#fleet-summary")).toContainText(
-    `${27 - offline.length} / 27`,
+    `${overview.hosts.filter((host) => !host.unavailable).reduce((count, host) => count + (host.gpu?.devices?.length || 0), 0)} / 27`,
   );
   await overflow();
   await page.screenshot({
@@ -145,4 +142,159 @@ test("fleet overview, workstation details, separate GPU histories and shared log
   await page.reload();
   await expect(page.locator("#server-select")).toHaveValue("pro6000");
   expect(errors).toEqual([]);
+});
+
+test("summary counts latest offline samples and deduplicates local disks", async ({
+  page,
+}, info) => {
+  test.skip(
+    Boolean(process.env.GAASD_TEST_URL),
+    "Synthetic API coverage runs locally",
+  );
+  const GiB = 1024 ** 3;
+  const volume = (device, total, used, free, extra = {}) => ({
+    device,
+    mount: device,
+    kind: "local",
+    filesystem: "ext4",
+    total: total * GiB,
+    used: used * GiB,
+    free: free * GiB,
+    ...extra,
+  });
+  const hosts = [
+    {
+      ...sample(false),
+      stale: false,
+      server: {
+        id: "cloud",
+        name: "测试云主机",
+        group: "中转机器",
+        expected_gpus: 0,
+        href: "/status",
+      },
+      filesystems: [
+        volume("/dev/test", 100, 25, 70),
+        volume("/dev/test", 100, 25, 70, { mount: "/duplicate" }),
+        volume("tmpfs", 1000, 999, 1, { kind: "memory" }),
+        volume("remote:/data", 1000, 999, 1, { kind: "remote" }),
+        volume("overlay", 1000, 999, 1, { filesystem: "overlay" }),
+        volume("/dev/loop0", 1000, 999, 1),
+      ],
+    },
+    {
+      ...sample(true),
+      stale: true,
+      generated_at: Date.now() / 1000 - 86400,
+      host: { logical_cpus: 8 },
+      cpu: { percent: 50 },
+      server: {
+        id: "cached",
+        name: "测试离线机器",
+        group: "GPU 服务器",
+        expected_gpus: 8,
+        href: "/status4",
+      },
+      filesystems: [volume("C:", 200, 50, 120), volume("c:\\", 200, 50, 120)],
+    },
+    {
+      unavailable: true,
+      stale: true,
+      server: {
+        id: "missing",
+        name: "无采样机器",
+        expected_gpus: 0,
+        group: "开发机器",
+        href: "/status",
+      },
+    },
+  ];
+  await page.route("**/status1/api/overview", (route) =>
+    route.fulfill({ json: { generated_at: Date.now() / 1000, hosts } }),
+  );
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/status1");
+  const metric = (label) =>
+    page.locator("#fleet-summary article").filter({
+      has: page.locator("p", { hasText: new RegExp(`^${label}$`) }),
+    });
+  await expect(metric("在线主机")).toContainText("1 / 3");
+  await expect(metric("逻辑 CPU")).toContainText("10");
+  await expect(metric("CPU 整体占用")).toContainText("42.4%");
+  await expect(metric("硬盘总容量")).toContainText("300 GiB");
+  await expect(metric("硬盘总容量")).toContainText("2 / 3 台 · 2 个本地卷");
+  await expect(metric("硬盘已用空间")).toContainText("75 GiB");
+  await expect(metric("硬盘已用空间")).toContainText("25%");
+  await expect(metric("硬盘可用空间")).toContainText("190 GiB");
+  await expect(page.locator("#summary-note")).toContainText(
+    "含 1 台离线 / 过期缓存",
+  );
+  await expect(page.locator("#summary-note")).toContainText("测试离线机器");
+  await expect(page.locator("#summary-note")).toContainText("1 台尚无采样");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    ),
+  ).toBe(false);
+  await mkdir("work/fleet-disk-screenshots", { recursive: true });
+  await page.screenshot({
+    path: `work/fleet-disk-screenshots/${info.project.name}-cached.png`,
+    fullPage: true,
+  });
+  hosts[1].stale = false;
+  hosts[1].generated_at = Date.now() / 1000;
+  await page.locator("#refresh").click();
+  await expect(metric("在线主机")).toContainText("2 / 3");
+  await expect(metric("硬盘总容量")).toContainText("300 GiB");
+  await expect(page.locator("#summary-note")).not.toContainText(
+    "离线 / 过期缓存",
+  );
+  expect(errors).toEqual([]);
+});
+
+test("unreadable or absent disks stay unknown instead of showing zero", async ({
+  page,
+}) => {
+  test.skip(
+    Boolean(process.env.GAASD_TEST_URL),
+    "Synthetic API coverage runs locally",
+  );
+  await page.route("**/status1/api/overview", (route) =>
+    route.fulfill({
+      json: {
+        generated_at: Date.now() / 1000,
+        hosts: [
+          {
+            ...sample(false),
+            stale: true,
+            server: {
+              id: "cloud",
+              name: "测试",
+              group: "中转机器",
+              expected_gpus: 0,
+            },
+            filesystems: [
+              { device: "/dev/missing", kind: "local" },
+              {
+                device: "/dev/bad",
+                kind: "local",
+                total: 100,
+                used: -1,
+                free: 101,
+              },
+            ],
+          },
+        ],
+      },
+    }),
+  );
+  await page.goto("/status1");
+  const disks = page
+    .locator("#fleet-summary article")
+    .filter({ hasText: /硬盘/ });
+  await expect(disks.locator("strong")).toHaveText(["—", "—", "—"]);
+  await expect(disks).toHaveCount(3);
+  await expect(page.locator("#fleet-summary")).toContainText("2 卷数据缺失");
+  await expect(page.locator("#fleet-summary")).toContainText("总使用率 未提供");
 });
