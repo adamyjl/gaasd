@@ -12,6 +12,7 @@
 - `ops/office-tunnel/` 中不含密钥的 SSH、systemd 和 Nginx 配置模板；专用密钥和实际授权文件留在对应服务器。
 - `ops/windows-ssh-relays/` 中苏州 Windows 三条中转（5090 / Windows / 4090）的 PowerShell / Python 源码、示例配置和说明；`docs/ssh-relays.md` 统一登记现有路线，`docs/rtx4090-relay-20261020.md` 记录新增 4090 的授权与部署验证。实际 ProgramData 运行目录、`.local.json`、专用密钥、日志及安装包不上传。
 - `ops/fleet-monitor/` 中六机监控的 Linux 探针安装器、Windows 采集任务、systemd 单元及说明；页面/API/采集器在 `backend/`，验证在 `tests/fleet.test.mjs` 和 `backend/tests/test_fleet.py`。`docs/fleet-monitor-20261020.md` 记录入口、部署及限制；GPU 历史库、截图、机器快照、凭据、实际 SSH 配置均不上传。
+- `ops/analysis/` 中 CPU/GPU 对比页的定时器和代理模板；前后端、受限任务探针、构建部署脚本和测试随源码保存。方案、费用与恢复见 [分析页说明](analysis-20261025.md)。AI 密钥、机器清单、基准实测数据、进程分析历史和用量账本仅保存在受限运行目录，不上传 GitHub。
 - [external-assets.json](external-assets.json)：未上传的运行媒体和地区库的相对路径、字节数及 SHA-256，仅记录元数据。
 
 视频、音频、位图封面、PDF 和原始设计素材不进入 Git。`node_modules/`、`.tools/`、`dist/`、`work/`、数据库、日志、测试报告、归档、生产账号配置和证书私钥也不进入 Git。`.gitignore` 已配置相应排除规则。`site/favicon.svg` 是文本源码，随代码保存。

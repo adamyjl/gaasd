@@ -9,6 +9,11 @@ from status_collector import Sampler
 
 
 def main():
+    if os.environ.get("SSH_ORIGINAL_COMMAND") == "workloads":
+        from workload_probe import sample
+
+        print(json.dumps(sample(), ensure_ascii=True, allow_nan=False))
+        return
     if os.environ.get("SSH_ORIGINAL_COMMAND") != "snapshot":
         raise SystemExit("Only the status snapshot command is permitted.")
     sampler = Sampler(None, profile="intranet")

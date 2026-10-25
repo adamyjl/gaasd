@@ -26,7 +26,7 @@ def main():
     if gpus not in (1, 8):
         raise ValueError("Invalid GPU count")
     stage = Path(__file__).resolve().parent
-    files = {"fleet_probe.py", "status_collector.py", "gpu_metrics.py"}
+    files = {"fleet_probe.py", "status_collector.py", "gpu_metrics.py", "workload_probe.py"}
     for name in files | {spec["wheel"]}:
         if "/" in name or "\\" in name:
             raise ValueError("Unexpected filename")

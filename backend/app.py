@@ -15,6 +15,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from analysis import page_data as analysis_data
 from database import connect, initialize, insert_visit
 from flask import Flask, Response, abort, jsonify, request, send_from_directory
 from fleet import HOSTS, overview, read_cached
@@ -62,7 +63,7 @@ def create_app(overrides=None):
     @app.before_request
     def protect_admin():
         nonlocal verified_credential
-        if not request.path.startswith(("/statistics", "/status")):
+        if not request.path.startswith(("/statistics", "/status", "/analysis")):
             return None
         auth = request.authorization
         if (
@@ -89,7 +90,7 @@ def create_app(overrides=None):
     def headers(response):
         response.headers["Cache-Control"] = "no-store"
         response.headers["X-Content-Type-Options"] = "nosniff"
-        if request.path.startswith(("/statistics", "/status")):
+        if request.path.startswith(("/statistics", "/status", "/analysis")):
             response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
             response.headers["Referrer-Policy"] = "same-origin"
             response.headers["Content-Security-Policy"] = (
@@ -298,6 +299,34 @@ def create_app(overrides=None):
     @app.get("/status1/api/overview")
     def fleet_overview_data():
         return jsonify(overview(config.get("status_directory", "/var/lib/gaasd-analytics/status")))
+
+    @app.get("/analysis")
+    @app.get("/analysis/")
+    @app.get("/analysis/cpu")
+    @app.get("/analysis/gpu")
+    def analysis_page():
+        return send_from_directory(ui, "analysis.html")
+
+    @app.get("/analysis/assets/<filename>")
+    def analysis_asset(filename):
+        if filename not in {"analysis.js", "analysis.css"}:
+            abort(404)
+        return send_from_directory(ui, filename)
+
+    @app.get("/analysis/api/report")
+    def analysis_report():
+        try:
+            return jsonify(
+                analysis_data(
+                    config.get("status_directory", "/var/lib/gaasd-analytics/status"),
+                    config.get("analysis_directory", "/var/lib/gaasd-analytics/analysis"),
+                    request.args.get("id"),
+                )
+            )
+        except ValueError:
+            abort(400)
+        except FileNotFoundError:
+            abort(404)
 
     @app.get("/status/assets/<path:filename>")
     def status_asset(filename):

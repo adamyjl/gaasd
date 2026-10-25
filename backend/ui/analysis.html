@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <title>算力对比与任务分析 · GAASD</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/analysis/assets/analysis.css" />
+    <script type="module" src="/analysis/assets/analysis.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">GAASD <span>COMPUTE INTELLIGENCE</span></a>
+      <nav aria-label="监控导航">
+        <a href="/status1">机器总览 ↗</a><a href="/status">实时监控 ↗</a
+        ><span class="private">管理员访问</span>
+      </nav>
+    </header>
+    <main>
+      <div class="heading">
+        <div>
+          <p class="eyebrow">INFRASTRUCTURE / ANALYSIS</p>
+          <h1>算力对比与任务分析</h1>
+          <p class="muted">
+            七台机器，多种能力。先看正在做什么，再选择适合的计算资源。
+          </p>
+        </div>
+        <a class="subtle-link" href="#method">查看比较口径 ↓</a>
+      </div>
+      <section class="workloads" aria-labelledby="tasks-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">01 / WORKLOAD INTELLIGENCE</p>
+            <h2 id="tasks-title">三组 GPU 正在运行什么</h2>
+          </div>
+          <div class="controls">
+            <label
+              >分析记录<select id="history">
+                <option value="">最新一轮</option>
+              </select></label
+            ><button id="refresh">刷新页面数据</button>
+          </div>
+        </div>
+        <p id="report-meta" class="muted" role="status">正在读取分析结果…</p>
+        <p id="notice" class="notice" hidden></p>
+        <div id="tasks" class="task-grid"></div>
+        <p class="fine">
+          腾讯云每半小时采集并调用一次
+          AI，三台合并分析。刷新页面只读取缓存，不触发付费调用。结论基于有限采样；历史/离线数据会注明时间。
+        </p>
+      </section>
+      <nav class="tabs" aria-label="性能分类">
+        <a href="/analysis" data-view="all">全部对比</a
+        ><a href="/analysis/cpu" data-view="cpu">CPU 性能与容量</a
+        ><a href="/analysis/gpu" data-view="gpu">GPU 算力与显存</a>
+      </nav>
+      <section id="cpu-section" class="performance" aria-labelledby="cpu-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">02 / CPU</p>
+            <h2 id="cpu-title">CPU：区分单线程速度与并行容量</h2>
+          </div>
+          <span class="tag">轻量实测 + 实际配置</span>
+        </div>
+        <div class="chart-grid">
+          <article class="panel">
+            <h3>单线程 SHA-256 吞吐</h3>
+            <p class="muted">MiB/s · 数值越大，本项运算越快</p>
+            <div id="cpu-speed" class="bars"></div>
+            <p class="fine">
+              相同 1 MiB 数据块，3 次 × 0.6 秒，取中位数。结果受 SHA
+              指令、OpenSSL 和运行负载影响，不是 CPU
+              综合跑分；未采到的数据不填零、不参与排序。
+            </p>
+          </article>
+          <article class="panel">
+            <h3>逻辑线程 / vCPU 容量</h3>
+            <p class="muted">线程数 · 仅比较分配容量，不代表性能倍数</p>
+            <div id="cpu-cores" class="bars"></div>
+            <p class="fine">
+              腾讯云仅统计虚拟机实际获配 vCPU，不把宿主机 EPYC 型号中的 64
+              核算作可用核心。混合架构 P/E 核、超线程与物理核也不能等价换算。
+            </p>
+          </article>
+        </div>
+      </section>
+      <section id="gpu-section" class="performance" aria-labelledby="gpu-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">03 / GPU</p>
+            <h2 id="gpu-title">GPU：算力和模型容量分别比较</h2>
+          </div>
+          <label class="scope"
+            >比较范围<select id="gpu-scope">
+              <option value="total">整机全部 GPU</option>
+              <option value="single">单张 GPU</option>
+            </select></label
+          >
+        </div>
+        <div class="chart-grid">
+          <article class="panel">
+            <h3 id="flops-title">整机 FP32 理论峰值合计</h3>
+            <p class="muted">TFLOPS · CUDA 普通单精度运算，非 Tensor / FP4</p>
+            <div id="gpu-flops" class="bars"></div>
+            <p class="fine">
+              多卡为单卡规格乘数量的算术合计，不是实测多卡加速。A100 的
+              HBM、NVLink
+              和混合精度优势不由此图反映，不能据此断言训练慢于消费卡。
+            </p>
+          </article>
+          <article class="panel">
+            <h3 id="vram-title">整机标称显存合计</h3>
+            <p class="muted">GB · 容量越大，可承载的模型和批次空间越多</p>
+            <div id="gpu-vram" class="bars"></div>
+            <p class="fine">
+              8
+              张卡的显存不会自动合并成一个地址空间；单卡可容纳模型仍受单卡显存限制。这里为厂商标称容量，监控中的可用容量可能因保留区而略低。
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="performance" aria-labelledby="inventory-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">04 / INVENTORY</p>
+            <h2 id="inventory-title">机器配置与采样状态</h2>
+          </div>
+        </div>
+        <div id="inventory" class="inventory"></div>
+      </section>
+      <section class="chart-grid bottom">
+        <article class="panel" id="billing">
+          <p class="eyebrow">COST / TRANSPARENT</p>
+          <h2>用量与费用</h2>
+          <div id="cost"></div>
+        </article>
+        <article class="panel" id="method">
+          <p class="eyebrow">METHODOLOGY</p>
+          <h2>如何读这些图</h2>
+          <p>
+            CPU 实测比较特定单线程运算；线程数量比较资源容量。GPU
+            理论峰值比较同一种 FP32 精度；不混用稀疏 FP4 TOPS、Tensor 或 FP64。
+          </p>
+          <p>
+            未运行长时间 CPU 或 GPU
+            压测，不打断现有任务。离线机器沿用最后硬件清单，并单独标注；未测的
+            CPU 性能保留为空。
+          </p>
+          <p>
+            AI 仅接收脱敏后的任务名、选定参数、GPU
+            指标和进度摘要，没有执行命令的能力。失败时保留上一轮分析并提示，不把旧结果冒充实时。
+          </p>
+          <details>
+            <summary>GPU 规格来源与计算说明</summary>
+            <div id="sources"></div>
+          </details>
+        </article>
+      </section>
+      <p class="footer">
+        GAASD · 私有运维分析 · 所有时间为北京时间 ·
+        <a href="/status1">返回机器总览</a>
+      </p>
+    </main>
+  </body>
+</html>

@@ -21,7 +21,9 @@
     "build:status": "node scripts/build-status-release.mjs",
     "preview": "node scripts/serve.mjs --dir dist --port 4173",
     "build:preview": "node scripts/build-preview.mjs",
-    "test:preview": "playwright test -c playwright.preview.config.mjs"
+    "test:preview": "playwright test -c playwright.preview.config.mjs",
+    "build:analysis": "node scripts/build-analysis-release.mjs",
+    "test:analysis": "playwright test -c playwright.analysis.config.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

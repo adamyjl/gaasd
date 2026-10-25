@@ -30,6 +30,11 @@ def cloud_ping():
 
 
 def main():
+    if os.environ.get("SSH_ORIGINAL_COMMAND") == "workloads":
+        from workload_probe import sample
+
+        print(json.dumps(sample(), ensure_ascii=True, allow_nan=False))
+        return
     parser = argparse.ArgumentParser()
     parser.add_argument("--gpus", type=int, choices=(1, 8), default=8)
     args = parser.parse_args()

@@ -10,6 +10,12 @@ await mkdir(stage);
 const manifest = {};
 for (const name of [
   "app.py",
+  "analysis.py",
+  "analysis_collector.py",
+  "workload_probe.py",
+  "ui/analysis.html",
+  "ui/analysis.css",
+  "ui/analysis.js",
   "backup.py",
   "gpu_usage.py",
   "status_collector.py",

@@ -10,13 +10,13 @@
 
 1. 在腾讯云为 `office`、`windows`、`rtx5090`、`rtx4090` 分别生成 Ed25519 采集密钥，保存在 `/etc/gaasd-analytics/fleet-ssh/`。私钥属于 `gaasd-analytics`，0600；目录 0700。私钥留在腾讯云。
 2. 通过已可信的管理 SSH 连接读取各目标主机的 **SSH 主机公钥**，生成各自 `[127.0.0.1]:端口` 的 known_hosts。不能使用未经核验的扫描结果，也不能关闭主机密钥检查。
-3. Linux：暂存 `install-linux-probe.py`、`backend/fleet_probe.py`、`backend/status_collector.py`、`backend/gpu_metrics.py` 和适配目标 Python / glibc 的 psutil **7.2.2** wheel。先从 PyPI 官方 JSON 核对 wheel SHA-256，再生成下方输入清单。以目标登录用户运行安装器。
+3. Linux：暂存 `install-linux-probe.py`、`backend/fleet_probe.py`、`backend/status_collector.py`、`backend/gpu_metrics.py`、`backend/workload_probe.py` 和适配目标 Python / glibc 的 psutil **7.2.2** wheel。先从 PyPI 官方 JSON 核对 wheel SHA-256，再生成下方输入清单。以目标登录用户运行安装器。
 4. Windows：将 `windows/` 三个脚本和对应的云端采集公钥暂存到 `D:\Server\gaasd-fleet-monitor`。在现有管理员 SSH 会话运行 `Install-Monitor.ps1 -PublicKeyFile <公钥路径>`。安装器固定检查现网自定义授权文件 `C:\ProgramData\ssh\gaasd_tsari_authorized_keys`；不适用于使用其他 AuthorizedKeysFile 的机器。
 5. 在腾讯云创建下方只包含路径的 `fleet.json`（0600，归 `gaasd-analytics`）。安装器只追加带强制命令的公钥，保留原有登录密钥和授权备份。
 6. `sudo python3 ops/fleet-monitor/enable-ping.py`：仅在当前策略为默认禁用 `1 0` 或已匹配监控组时，将 ICMP Echo socket 权限授予监控组。策略持久化至 `/etc/sysctl.d/60-gaasd-monitor-ping.conf`，保留服务的 `NoNewPrivileges` 和空 capability 集合。遇到其他既有策略会停止，供管理员检查，不覆盖。
 7. 云端先以 `gaasd-analytics` 执行 `fleet_collector.py --once`，核对四台主机、GPU 数量及新鲜时间；用相同受限密钥请求 `id` 必须失败。然后执行根目录 `npm run build:status -- ID` 和 `scripts/deploy-status.py ID`。
 
-Linux 安装器从标准输入读取 JSON，`hashes` 必须包含三个模块和 wheel 的 SHA-256：
+Linux 安装器从标准输入读取 JSON，`hashes` 必须包含四个模块和 wheel 的 SHA-256。2026-10-25 新增固定只读 `workloads` 命令供半小时 AI 分析使用，原 `snapshot` 不变；没有开放任意 shell 命令。
 
 ```json
 {
@@ -27,6 +27,7 @@ Linux 安装器从标准输入读取 JSON，`hashes` 必须包含三个模块和
     "fleet_probe.py": "64位SHA256",
     "status_collector.py": "64位SHA256",
     "gpu_metrics.py": "64位SHA256",
+    "workload_probe.py": "64位SHA256",
     "经核验且适配目标平台的-psutil-7.2.2.whl": "64位SHA256"
   }
 }

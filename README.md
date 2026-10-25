@@ -24,6 +24,7 @@ GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计
 | `https://gaasd.com/status3`         | 苏州 Windows 硬件、温度、每核 CPU、GPU、软件资源及网络/磁盘监控 | 同一管理员 |
 | `https://gaasd.com/status4`         | 苏州 8×RTX 4090 / 8×RTX 5090 切换、实时指标及独立日/周历史 | 同一管理员 |
 | `https://gaasd.com/status5`         | 清华办公室 RTX PRO 6000：硬件、实时资源、GPU 与 24 小时趋势 | 同一管理员 |
+| `https://gaasd.com/analysis`        | CPU/GPU 性能与容量图表、每半小时 AI 分析三台 GPU 的任务、历史与费用 | 同一管理员 |
 | `https://gaasd.com/healthz`         | Nginx 存活响应                                                 | 公开       |
 
 HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分别以 301 跳转至 `/cn/`、`/en/`。`http://49.232.60.144/gaasd-test/` 保留兼容预览，正式访问使用域名 HTTPS。主站默认中文，顶部 EN 可切换到 `/en/`；英文文案、封面和对应视频保留，备案号仍为中文。旧 `/cn/` 地址可继续访问，其 canonical 指向主站。
@@ -54,6 +55,8 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分�
 2026-10-20 新增 `/status1` 六机总览、`/status3` Windows 详情、`/status4` 苏州双 GPU 服务器详情。腾讯云独立服务每 30 秒通过现有 SSH 路线采集，Windows 另有 SYSTEM 开机采集任务；4090 / 5090 的独立日/周历史和每日备份从当天开始积累。原 `/status`、A100 历史及 `/status2/` 保留，三台苏州主机依赖 Windows 中转持续联网。指标边界、部署及回退见 [六机监控记录](docs/fleet-monitor-20261020.md)，安装说明见 [采集组件](ops/fleet-monitor/README.md)。
 
 ## 2. 整体架构
+
+2026-10-25 新增 `/analysis`、`/analysis/cpu`、`/analysis/gpu`。腾讯云 systemd 每半小时运行脱敏任务采集和百炼 `qwen3.7-plus` 分析；页面只读缓存，不因刷新触发付费调用。比较口径、模型与费用估算、密钥管理、部署回退见 [算力分析说明](docs/analysis-20261025.md)。
 
 2026-10-20 合并苏州汽车研究院 Windows 中转源码，并新增独立的 4090 路线：云端 `127.0.0.1:2223` → `192.168.1.111:22`（8×5090 / `user001`），`:2224` → Windows 自身 SSH（`tsari`），`:2225` → `192.168.1.19:22`（8×4090 / `centos`）。三条路线依赖该 Windows 的 SYSTEM 开机任务，源码位于 `ops/windows-ssh-relays/`，与原 Ubuntu / A100 路线分开。4090 已选择安装并通过登录、自动重连验证，原两条路线未重启。入口见 [中转总览](docs/ssh-relays.md)，授权、备份及检查见 [4090 部署记录](docs/rtx4090-relay-20261020.md)。
 

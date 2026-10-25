@@ -19,6 +19,9 @@ app = create_app(
         "status_directory": os.environ.get(
             "GAASD_STATUS_DIRECTORY", str(root / "work" / "status-preview")
         ),
+        "analysis_directory": os.environ.get(
+            "GAASD_ANALYSIS_DIRECTORY", str(root / "work" / "analysis-preview")
+        ),
     }
 )
 if __name__ == "__main__":
