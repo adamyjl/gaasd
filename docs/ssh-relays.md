@@ -26,6 +26,8 @@
 
 ## 登录命令
 
+2026-10-27 新增 [A100 ↔ 5090 数据交换 Demo](../ops/data-transfer-demo/README.md)：A100 的两枚独立受限密钥仅用于云端固定桥接到原 2223，以及 5090 独立目录内的 rsync。没有新增端口或修改下列登录方式；仍依赖 Windows 中转在线。该通道默认 128 KiB/s，较高速传输时曾观察到新 SSH 握手超时，详见 [带宽与稳定性报告](data-transfer-demo-20261027.md)。
+
 ```sh
 # 苏州 Windows 中转电脑
 ssh -J ubuntu@49.232.60.144 -p 2224 tsari@127.0.0.1

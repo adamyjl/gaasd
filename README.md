@@ -60,6 +60,8 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分�
 
 2026-10-27 PRO 6000 再次重装为 Ubuntu 24.04.5 / 6.17.0-1032-oem，已恢复原 SSH、监控并保护当前版本，最新入口和硬件复核见 [恢复记录](docs/pro6000-reinstall-20261027.md)。
 
+2026-10-27 新增 A100 ↔ RTX 5090 轻量数据交换 Demo，复用原 SSH 路线、独立目录及受限密钥，不改现有网卡/路由/代理。日常限速与命令见 [使用说明](ops/data-transfer-demo/README.md)，双向带宽、校验、续传和稳定性限制见 [实测报告](docs/data-transfer-demo-20261027.md)。
+
 2026-10-25 新增 `/analysis`、`/analysis/cpu`、`/analysis/gpu`。腾讯云 systemd 每半小时运行脱敏任务采集和百炼 `qwen3.7-plus` 分析；页面只读缓存，不因刷新触发付费调用。比较口径、模型与费用估算、密钥管理、部署回退见 [算力分析说明](docs/analysis-20261025.md)。
 
 2026-10-20 合并苏州汽车研究院 Windows 中转源码，并新增独立的 4090 路线：云端 `127.0.0.1:2223` → `192.168.1.111:22`（8×5090 / `user001`），`:2224` → Windows 自身 SSH（`tsari`），`:2225` → `192.168.1.19:22`（8×4090 / `centos`）。三条路线依赖该 Windows 的 SYSTEM 开机任务，源码位于 `ops/windows-ssh-relays/`，与原 Ubuntu / A100 路线分开。4090 已选择安装并通过登录、自动重连验证，原两条路线未重启。入口见 [中转总览](docs/ssh-relays.md)，授权、备份及检查见 [4090 部署记录](docs/rtx4090-relay-20261020.md)。
