@@ -15,6 +15,7 @@ import subprocess
 from pathlib import Path
 
 PATTERNS = (
+    "base-files",
     "linux-image*",
     "linux-headers*",
     "linux-modules*",
@@ -28,7 +29,7 @@ PATTERNS = (
     "linux-aws*",
     "linux-gcp*",
     "linux-tools-[0-9]*",
-    "linux-firmware",
+    "linux-firmware*",
     "nvidia-*",
     "libnvidia-*",
     "xserver-xorg-video-nvidia-*",
@@ -99,6 +100,7 @@ def main():
     exclusions = "\n".join(
         '    "' + p + '";'
         for p in (
+            "^base-files$",
             "^linux-image",
             "^linux-headers",
             "^linux-modules",
@@ -112,7 +114,7 @@ def main():
             "^linux-aws",
             "^linux-gcp",
             "^linux-tools-[0-9]",
-            "^linux-firmware$",
+            "^linux-firmware",
             "^nvidia-",
             "^libnvidia-",
             "^xserver-xorg-video-nvidia-",
