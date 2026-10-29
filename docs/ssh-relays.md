@@ -26,6 +26,8 @@
 
 ## 登录命令
 
+2026-10-29 已在 Windows 中转机增加独立 `GAASD-Wifi-Watchdog` 任务，开机及每 5 分钟检查 `tsari20F` 的实际连通性，连续失败才重连。SYSTEM 正常检查已验证，原三条 SSH 任务和配置保持一致；使用、日志与停用方法见 [Wi-Fi 自动恢复说明](../ops/windows-wifi-watchdog/README.md)。未主动断网演练。
+
 2026-10-27 新增 [A100 ↔ 5090 数据交换 Demo](../ops/data-transfer-demo/README.md)：A100 的两枚独立受限密钥仅用于云端固定桥接到原 2223，以及 5090 独立目录内的 rsync。没有新增端口或修改下列登录方式；仍依赖 Windows 中转在线。该通道默认 128 KiB/s，较高速传输时曾观察到新 SSH 握手超时，详见 [带宽与稳定性报告](data-transfer-demo-20261027.md)。
 
 ```sh
