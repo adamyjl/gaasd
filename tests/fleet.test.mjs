@@ -52,7 +52,10 @@ test("fleet overview, workstation details, separate GPU histories and shared log
     ).toBe(false);
   await mkdir("work/fleet-screenshots", { recursive: true });
   await page.goto("/status1");
-  await expect(page.locator(".fleet-card")).toHaveCount(7);
+  await expect(page.locator(".fleet-card")).toHaveCount(8);
+  await expect(page.locator("#fleet-counts")).toHaveText(
+    "3 台 GPU 服务器 · 3 台开发机器 · 2 台中转机器",
+  );
   for (const [group, names] of [
     [
       "gpu-hosts",
@@ -60,7 +63,11 @@ test("fleet overview, workstation details, separate GPU histories and shared log
     ],
     [
       "dev-hosts",
-      ["研究院办公室 · Ubuntu 3060 Ti", "清华办公室 · RTX PRO 6000"],
+      [
+        "研究院办公室 · Ubuntu 3060 Ti",
+        "清华办公室 · RTX PRO 6000 · 01",
+        "清华办公室 · RTX PRO 6000 · 02",
+      ],
     ],
     ["relay-hosts", ["清华腾讯云服务器", "研究院 Windows 中转机"]],
   ]) {
@@ -74,10 +81,10 @@ test("fleet overview, workstation details, separate GPU histories and shared log
   );
   if (!live) expect(offline).toEqual([]);
   await expect(page.locator("#fleet-summary")).toContainText(
-    `${7 - offline.length} / 7`,
+    `${8 - offline.length} / 8`,
   );
   await expect(page.locator("#fleet-summary")).toContainText(
-    `${overview.hosts.filter((host) => !host.unavailable).reduce((count, host) => count + (host.gpu?.devices?.length || 0), 0)} / 27`,
+    `${overview.hosts.filter((host) => !host.unavailable).reduce((count, host) => count + (host.gpu?.devices?.length || 0), 0)} / 28`,
   );
   await overflow();
   await page.screenshot({
@@ -130,6 +137,18 @@ test("fleet overview, workstation details, separate GPU histories and shared log
   if (live) await delay(5000);
   await page.goto("/status5");
   await expect(page.locator("#server-select")).toHaveValue("pro6000");
+  const secondResponse = page.waitForResponse((response) =>
+    response.url().includes("/status5/api/snapshot?server=pro6000-02"),
+  );
+  await page.locator("#server-select").selectOption("pro6000-02");
+  expect((await (await secondResponse).json()).server.id).toBe("pro6000-02");
+  await expect(page).toHaveURL(/server=pro6000-02/);
+  await expect(page.locator("#gpu-cards .gpu-card")).toHaveCount(1);
+  await expect(page.locator("#host-summary")).toContainText("第二台");
+  await overflow();
+  await page.reload();
+  await expect(page.locator("#server-select")).toHaveValue("pro6000-02");
+  await page.locator("#server-select").selectOption("pro6000");
   await expect(page.locator("#gpu-cards .gpu-card")).toHaveCount(1);
   await expect(page.locator("#gpu-cards")).toContainText("RTX PRO 6000");
   await expect(page.locator("#hardware-panel")).toBeVisible();

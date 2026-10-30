@@ -28,7 +28,7 @@
         <div>
           <p class="eyebrow">FLEET / LIVE</p>
           <h1>全部主机运行总览</h1>
-          <p class="subtitle">3 台 GPU 服务器 · 2 台开发机器 · 2 台中转机器</p>
+          <p id="fleet-counts" class="subtitle">正在读取已登记主机…</p>
         </div>
         <div class="live-state">
           <span id="live-state" class="state-pill">连接中</span>
@@ -65,9 +65,9 @@
       <section aria-label="开发机器">
         <div class="fleet-heading">
           <h2>开发机器</h2>
-          <p>研究院办公室 Ubuntu 3060 Ti 与清华办公室 RTX PRO 6000。</p>
+          <p>研究院办公室 Ubuntu 3060 Ti 与清华办公室 RTX PRO 6000 工作站。</p>
         </div>
-        <div id="dev-hosts" class="fleet-grid fleet-grid-pair"></div>
+        <div id="dev-hosts" class="fleet-grid"></div>
       </section>
       <section aria-label="中转机器">
         <div class="fleet-heading">

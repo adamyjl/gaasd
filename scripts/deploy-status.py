@@ -39,8 +39,8 @@ def main():
         "--allow-unavailable",
         action="append",
         default=[],
-        choices=["office", "windows", "rtx4090", "rtx5090"],
-        help="Explicitly record an already unavailable old host; new PRO 6000 remains mandatory",
+        choices=["office", "windows", "rtx4090", "rtx5090", "pro6000"],
+        help="Record a proven pre-existing outage; new PRO 6000 02 remains mandatory",
     )
     args = parser.parse_args()
     release_id = args.release_id
@@ -240,6 +240,7 @@ WantedBy=multi-user.target
                     ("rtx5090", 8),
                     ("rtx4090", 8),
                     ("pro6000", 1),
+                    ("pro6000-02", 1),
                 ]:
                     folder = Path("/var/lib/gaasd-analytics/status") / host
                     sample = json.loads((folder / "latest.json").read_text())

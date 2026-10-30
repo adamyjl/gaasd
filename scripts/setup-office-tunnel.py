@@ -69,7 +69,7 @@ def backup(path):
 def main():
     global ACCOUNT, HOME_DIR, CONF, UNIT
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", choices=["office", "pro6000"], default="office")
+    parser.add_argument("--profile", choices=["office", "pro6000", "pro6000-02"], default="office")
     parser.add_argument(
         "phase", choices=["office-prepare", "cloud-authorize", "office-start", "cloud-web"]
     )
@@ -77,14 +77,23 @@ def main():
     parser.add_argument("--public-key", type=Path)
     parser.add_argument("--host-key", type=Path)
     args = parser.parse_args()
-    if args.profile == "pro6000":
+    if args.profile.startswith("pro6000"):
         if args.phase == "cloud-web":
             raise SystemExit("PRO 6000 uses the existing authenticated status backend")
-        ACCOUNT = "gaasd-pro6000-tunnel"
-        HOME_DIR = Path("/var/lib/gaasd-pro6000-tunnel")
-        CONF = Path("/etc/gaasd-pro6000-tunnel")
-        UNIT = "gaasd-pro6000-tunnel.service"
-    marker = "# BEGIN GAASD " + ("PRO6000" if args.profile == "pro6000" else "OFFICE") + " TUNNEL"
+        ACCOUNT = f"gaasd-{args.profile}-tunnel"
+        HOME_DIR = Path("/var/lib") / ACCOUNT
+        CONF = Path("/etc") / ACCOUNT
+        UNIT = ACCOUNT + ".service"
+    marker = "# BEGIN GAASD " + args.profile.upper() + " TUNNEL"
+
+    def template(name):
+        text = (args.source / name).read_text()
+        if args.profile == "pro6000-02":
+            text = text.replace("gaasd-pro6000-tunnel", ACCOUNT)
+            text = text.replace("PRO6000 TUNNEL", "PRO6000-02 TUNNEL")
+            text = text.replace(":2226", ":2227")
+        return text
+
     if os.geteuid() != 0:
         raise SystemExit("Run as root")
     os.umask(0o077)
@@ -122,7 +131,7 @@ def main():
         ssh_dir.mkdir(mode=0o700, exist_ok=True)
         os.chown(ssh_dir, user.pw_uid, user.pw_gid)
         authorized = ssh_dir / "authorized_keys"
-        ports = [2226] if args.profile == "pro6000" else [2222, 18765]
+        ports = {"office": [2222, 18765], "pro6000": [2226], "pro6000-02": [2227]}[args.profile]
         options = ",".join(f'permitlisten="127.0.0.1:{port}"' for port in ports)
         line = "restrict,port-forwarding," + options + " " + key + "\n"
         if authorized.exists() and authorized.read_text() != line:
@@ -131,7 +140,7 @@ def main():
         os.chown(authorized, user.pw_uid, user.pw_gid)
         sshd = Path("/etc/ssh/sshd_config")
         original = sshd.read_text()
-        block = (args.source / "cloud-sshd-match.conf").read_text()
+        block = template("cloud-sshd-match.conf")
         if marker not in original:
             old = backup(sshd)
             save(sshd, original.rstrip() + "\n\n" + block)
@@ -159,11 +168,14 @@ def main():
         CONF.mkdir(mode=0o755, exist_ok=True)
         CONF.chmod(0o755)
         save(CONF / "known_hosts", "49.232.60.144 " + " ".join(host_key[:2]) + "\n")
-        save(CONF / "ssh_config", (args.source / "ssh_config").read_text())
+        save(CONF / "ssh_config", template("ssh_config"))
         unit = Path("/etc/systemd/system") / UNIT
         if unit.exists():
             backup(unit)
-        save(unit, (args.source / UNIT).read_text())
+        unit_template = (
+            "gaasd-pro6000-tunnel.service" if args.profile.startswith("pro6000") else UNIT
+        )
+        save(unit, template(unit_template))
         run("systemd-analyze", "verify", str(unit))
         run("systemctl", "daemon-reload")
         run("systemctl", "enable", "--now", UNIT)

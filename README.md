@@ -23,7 +23,7 @@ GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计
 | `https://gaasd.com/status2/`        | 办公室 3060 Ti 开发机现有硬件监控，独立 SSH 隧道直连腾讯云 | 同一管理员 |
 | `https://gaasd.com/status3`         | 苏州 Windows 硬件、温度、每核 CPU、GPU、软件资源及网络/磁盘监控 | 同一管理员 |
 | `https://gaasd.com/status4`         | 苏州 8×RTX 4090 / 8×RTX 5090 切换、实时指标及独立日/周历史 | 同一管理员 |
-| `https://gaasd.com/status5`         | 清华办公室 RTX PRO 6000：硬件、实时资源、GPU 与 24 小时趋势 | 同一管理员 |
+| `https://gaasd.com/status5`         | 清华办公室两台 RTX PRO 6000 切换：硬件、实时资源、GPU 与独立 24 小时趋势 | 同一管理员 |
 | `https://gaasd.com/analysis`        | CPU/GPU 性能与容量图表、每半小时 AI 分析三台 GPU 的任务、历史与费用 | 同一管理员 |
 | `https://gaasd.com/healthz`         | Nginx 存活响应                                                 | 公开       |
 
@@ -59,6 +59,8 @@ HTTP 和 `www.gaasd.com` 以 308 跳转至 HTTPS 主域名；`/cn`、`/en` 分�
 2026-10-26 PRO 6000 重装后的 SSH、监控和固定内核策略已恢复，当前硬件变化及验证见 [恢复记录](docs/pro6000-reinstall-20261026.md)。
 
 2026-10-27 PRO 6000 再次重装为 Ubuntu 24.04.5 / 6.17.0-1032-oem，已恢复原 SSH、监控并保护当前版本，最新入口和硬件复核见 [恢复记录](docs/pro6000-reinstall-20261027.md)。
+
+2026-10-30 新增第二台 PRO 6000（备用地址 `10.243.146.57`），独立云端端口 2227、主机 ID `pro6000-02`，`/status1` 现在为八机总览，`/status5` 可切换两台工作站。第二台保留 Ubuntu 24.04.2 / 6.11.0-17-generic 与当前驱动，接入、硬件差异及备份见 [第二台接入记录](docs/pro6000-02-20261030.md)。
 
 2026-10-27 新增 A100 ↔ RTX 5090 轻量数据交换 Demo，复用原 SSH 路线、独立目录及受限密钥，不改现有网卡/路由/代理。日常限速与命令见 [使用说明](ops/data-transfer-demo/README.md)，双向带宽、校验、续传和稳定性限制见 [实测报告](docs/data-transfer-demo-20261027.md)。
 

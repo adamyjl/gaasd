@@ -264,7 +264,7 @@ def create_app(overrides=None):
         office = request.path.startswith("/status1")
         pro6000 = request.path.startswith("/status5")
         names = (
-            ["pro6000"]
+            ["pro6000", "pro6000-02"]
             if pro6000
             else ["windows"]
             if windows

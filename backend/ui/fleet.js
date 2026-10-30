@@ -311,15 +311,19 @@ function render(data) {
       ? `${hostCount - available.length} 台尚无采样，未计入资源汇总。`
       : "",
   ].join(" ");
+  const groupCounts = [];
   for (const [id, group] of [
     ["gpu-hosts", "GPU 服务器"],
     ["dev-hosts", "开发机器"],
     ["relay-hosts", "中转机器"],
   ]) {
-    $(id).replaceChildren(
-      ...data.hosts.filter((host) => host.server.group === group).map(card),
+    const hosts = data.hosts.filter((host) => host.server.group === group);
+    groupCounts.push(
+      `${hosts.length} 台${group === "GPU 服务器" ? " " : ""}${group}`,
     );
+    $(id).replaceChildren(...hosts.map(card));
   }
+  $("fleet-counts").textContent = groupCounts.join(" · ");
   $("updated").textContent = `汇总于 ${date(data.generated_at)}`;
   $("live-state").textContent = paused
     ? "已暂停"

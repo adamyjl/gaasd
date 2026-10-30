@@ -67,6 +67,9 @@ def fleet(tmp_path):
         "/status5/",
         "/status5/api/snapshot",
         "/status5/api/history",
+        "/status5?server=pro6000-02",
+        "/status5/api/snapshot?server=pro6000-02",
+        "/status5/api/history?server=pro6000-02",
         "/status1/host?server=office",
         "/status1/api/overview",
         "/status3/api/snapshot",
@@ -98,6 +101,7 @@ def test_histories_gpu_databases_and_choices_are_isolated(fleet):
         ("rtx5090", "status4"),
         ("rtx4090", "status4"),
         ("pro6000", "status5"),
+        ("pro6000-02", "status5"),
     ]:
         data = client.get(f"/{prefix}/api/snapshot?server={name}", auth=AUTH).json
         assert data["host"]["name"] == name
@@ -112,6 +116,7 @@ def test_histories_gpu_databases_and_choices_are_isolated(fleet):
         ("/status3", 'value="windows"', 'value="rtx4090"'),
         ("/status4", 'value="rtx4090"', 'value="windows"'),
         ("/status5", 'value="pro6000"', 'value="windows"'),
+        ("/status5", 'value="pro6000-02"', 'value="windows"'),
     ]:
         html = client.get(page, auth=AUTH).text
         assert included in html and excluded not in html
@@ -158,6 +163,13 @@ def test_pro6000_default_and_offline_state(fleet):
     assert client.get("/status5/api/snapshot", auth=AUTH).status_code == 503
     hosts = client.get("/status1/api/overview", auth=AUTH).json["hosts"]
     assert next(host for host in hosts if host["server"]["id"] == "pro6000")["unavailable"]
+    second = client.get("/status5/api/snapshot?server=pro6000-02", auth=AUTH).json
+    assert second["server"]["id"] == "pro6000-02"
+    assert second["server"]["group"] == "开发机器"
+    assert not second["stale"]
+    assert TARGETS["pro6000"][-1] == 2226
+    assert TARGETS["pro6000-02"][-1] == 2227
+    assert len({host["server"]["href"] for host in hosts}) == len(hosts)
 
 
 @pytest.mark.parametrize("stamp", [float("nan"), float("inf"), True, 0, "now"])
