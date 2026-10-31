@@ -1,0 +1,36 @@
+{
+  "cloudHost": "49.232.60.144",
+  "cloudPort": 22,
+  "knownHostsSource": "C:\\Users\\YOUR_USER\\.ssh\\known_hosts",
+  "relays": [
+    {
+      "name": "linux",
+      "taskName": "GAASD-Tsari-SSH-Relay",
+      "cloudUser": "gaasd-tsari-relay",
+      "remotePort": 2223,
+      "targetHost": "192.168.1.111",
+      "targetPort": 22,
+      "privateKeySource": "C:\\Users\\YOUR_USER\\.ssh\\id_ed25519_tsari_relay",
+      "legacyDirectory": "D:\\Server\\tsari-relay"
+    },
+    {
+      "name": "windows",
+      "taskName": "GAASD-Windows-SSH-Relay",
+      "cloudUser": "gaasd-windows-relay",
+      "remotePort": 2224,
+      "targetHost": "127.0.0.1",
+      "targetPort": 22,
+      "privateKeySource": "C:\\Users\\YOUR_USER\\.ssh\\id_ed25519_windows_relay",
+      "legacyDirectory": "D:\\Server\\windows-relay"
+    },
+    {
+      "name": "rtx4090",
+      "taskName": "GAASD-RTX4090-SSH-Relay",
+      "cloudUser": "gaasd-4090-relay",
+      "remotePort": 2225,
+      "targetHost": "192.168.1.19",
+      "targetPort": 22,
+      "privateKeySource": "C:\\Users\\YOUR_USER\\.ssh\\id_ed25519_rtx4090_relay"
+    }
+  ]
+}

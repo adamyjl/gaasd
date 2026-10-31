@@ -1,0 +1,11 @@
+[Unit]
+Description=Check PRO6000 ZeroTier MTU every 30 seconds
+
+[Timer]
+OnBootSec=10s
+OnCalendar=*-*-* *:*:00,30
+AccuracySec=1s
+Unit=pro6000-zerotier-mtu.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,30 @@
+# Dedicated config: do not merge into or overwrite the user's normal SSH config.
+# Replace /ABS/HOME with the initiating A100 user's home during provisioning.
+Host gaasd-data-relay
+    HostName 49.232.60.144
+    User ubuntu
+    Port 22
+    IdentityFile /ABS/HOME/.ssh/gaasd-data-demo/id_ed25519_relay
+
+Host gaasd-data-5090
+    HostName 127.0.0.1
+    User user001
+    Port 2223
+    IdentityFile /ABS/HOME/.ssh/gaasd-data-demo/id_ed25519_peer
+    # Cloud key is forced to nc 127.0.0.1:2223. It cannot run a shell or forward other ports.
+    ProxyCommand /usr/bin/ssh -F /ABS/HOME/.ssh/gaasd-data-demo/config -T gaasd-data-relay
+
+Host *
+    IdentitiesOnly yes
+    BatchMode yes
+    StrictHostKeyChecking yes
+    UserKnownHostsFile /ABS/HOME/.ssh/gaasd-data-demo/known_hosts
+    ConnectTimeout 15
+    ServerAliveInterval 15
+    ServerAliveCountMax 3
+    Compression no
+    ForwardAgent no
+    ControlMaster no
+    ControlPath none
+    RequestTTY no
+    IPQoS none

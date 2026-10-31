@@ -26,6 +26,7 @@ const server = http.createServer(async (request, response) => {
     const endpoint = new URL(request.url, "http://localhost");
     if (
       endpoint.pathname.startsWith("/statistics") ||
+      endpoint.pathname.startsWith("/analysis") ||
       endpoint.pathname.startsWith("/status") ||
       endpoint.pathname === "/api/analytics/events"
     ) {

@@ -1,0 +1,30 @@
+[Unit]
+Description=GAASD office SSH and hardware monitor reverse tunnel
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=gaasd-office-tunnel
+Group=gaasd-office-tunnel
+ExecStart=/usr/bin/ssh -F /etc/gaasd-office-tunnel/ssh_config -N -T gaasd-cloud-tunnel
+Restart=always
+RestartSec=10
+TimeoutStopSec=10
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+RestrictSUIDSGID=true
+MemoryMax=128M
+TasksMax=32
+
+[Install]
+WantedBy=multi-user.target

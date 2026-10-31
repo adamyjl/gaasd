@@ -1,0 +1,26 @@
+[Unit]
+Description=GAASD fleet monitoring and GPU history
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=gaasd-analytics
+Group=gaasd-analytics
+WorkingDirectory=/opt/gaasd-analytics/current
+ExecStart=/opt/gaasd-analytics/venv/bin/python /opt/gaasd-analytics/current/fleet_collector.py
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/gaasd-analytics/status
+CapabilityBoundingSet=
+RestrictSUIDSGID=true
+MemoryMax=256M
+CPUQuota=40%
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,22 @@
+[Unit]
+Description=GAASD half-hour GPU task analysis
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=gaasd-analytics
+Group=gaasd-analytics
+WorkingDirectory=/opt/gaasd-analytics/current
+ExecStart=/opt/gaasd-analytics/venv/bin/python /opt/gaasd-analytics/current/analysis_collector.py
+TimeoutStartSec=240
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/gaasd-analytics/analysis
+CapabilityBoundingSet=
+RestrictSUIDSGID=true
+MemoryMax=256M
+CPUQuota=30%

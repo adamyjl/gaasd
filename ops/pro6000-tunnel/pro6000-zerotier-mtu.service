@@ -1,0 +1,15 @@
+[Unit]
+Description=Keep PRO6000 ZeroTier interface MTU at 1280
+After=zerotier-one.service
+ConditionPathExists=/sys/class/net/ztr2q7djxe/mtu
+
+[Service]
+Type=oneshot
+ExecCondition=/usr/bin/grep -qxv 1280 /sys/class/net/ztr2q7djxe/mtu
+ExecStart=/usr/sbin/ip link set dev ztr2q7djxe mtu 1280
+TimeoutStartSec=10s
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+CapabilityBoundingSet=CAP_NET_ADMIN
