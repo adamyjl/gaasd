@@ -14,6 +14,8 @@ import subprocess
 import time
 from pathlib import Path
 
+PORTS = {"pro6000": 2226, "pro6000-02": 2227, "pro6000-03": 2228, "pro6000-04": 2229}
+
 
 def main():
     if os.geteuid() != 0:
@@ -21,10 +23,10 @@ def main():
     os.umask(0o077)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("public_key", type=Path)
-    parser.add_argument("--host", choices=["pro6000", "pro6000-02"], default="pro6000")
+    parser.add_argument("--host", choices=PORTS, default="pro6000")
     args = parser.parse_args()
     host = args.host
-    port = {"pro6000": 2226, "pro6000-02": 2227}[host]
+    port = PORTS[host]
     public = args.public_key.read_text().strip().split()
     if len(public) < 2 or public[0] != "ssh-ed25519":
         raise ValueError("Expected trusted Ed25519 host public key")

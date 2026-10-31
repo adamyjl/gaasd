@@ -102,6 +102,8 @@ def test_histories_gpu_databases_and_choices_are_isolated(fleet):
         ("rtx4090", "status4"),
         ("pro6000", "status5"),
         ("pro6000-02", "status5"),
+        ("pro6000-03", "status5"),
+        ("pro6000-04", "status5"),
     ]:
         data = client.get(f"/{prefix}/api/snapshot?server={name}", auth=AUTH).json
         assert data["host"]["name"] == name

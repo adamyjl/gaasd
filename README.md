@@ -19,11 +19,11 @@ GAASD（Graphic AI-Augmented Software Developer）宣传网站及其访问统计
 | `https://gaasd.com/en/privacy.html` | 英文数据用途说明、共用当前浏览器统计偏好                       | 公开       |
 | `https://gaasd.com/statistics`      | 访问、IP 归属地、浏览器、视频播放报表与 CSV                    | 管理员     |
 | `https://gaasd.com/status`          | 腾讯云 / 内网切换；CPU、内存、Swap、磁盘、网络、服务、趋势及内网 8 GPU | 同一管理员 |
-| `https://gaasd.com/status1`         | 七机总览：3 台 GPU 服务器、2 台开发机器、2 台中转机器，资源汇总与相对腾讯云延迟 | 同一管理员 |
+| `https://gaasd.com/status1`         | 十机总览：3 台 GPU 服务器、5 台开发机器、2 台中转机器，资源汇总与相对腾讯云延迟 | 同一管理员 |
 | `https://gaasd.com/status2/`        | 办公室 3060 Ti 开发机现有硬件监控，独立 SSH 隧道直连腾讯云 | 同一管理员 |
 | `https://gaasd.com/status3`         | 苏州 Windows 硬件、温度、每核 CPU、GPU、软件资源及网络/磁盘监控 | 同一管理员 |
 | `https://gaasd.com/status4`         | 苏州 8×RTX 4090 / 8×RTX 5090 切换、实时指标及独立日/周历史 | 同一管理员 |
-| `https://gaasd.com/status5`         | 清华办公室两台 RTX PRO 6000 切换：硬件、实时资源、GPU 与独立 24 小时趋势 | 同一管理员 |
+| `https://gaasd.com/status5`         | [清华办公室四台 RTX PRO 6000 切换](docs/pro6000-four-20261031.md)：硬件、实时资源、GPU 与独立 24 小时趋势 | 同一管理员 |
 | `https://gaasd.com/analysis`        | CPU/GPU 性能与容量图表、每半小时 AI 分析三台 GPU 的任务、历史与费用 | 同一管理员 |
 | `https://gaasd.com/healthz`         | Nginx 存活响应                                                 | 公开       |
 

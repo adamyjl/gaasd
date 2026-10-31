@@ -52,9 +52,9 @@ test("fleet overview, workstation details, separate GPU histories and shared log
     ).toBe(false);
   await mkdir("work/fleet-screenshots", { recursive: true });
   await page.goto("/status1");
-  await expect(page.locator(".fleet-card")).toHaveCount(8);
+  await expect(page.locator(".fleet-card")).toHaveCount(10);
   await expect(page.locator("#fleet-counts")).toHaveText(
-    "3 台 GPU 服务器 · 3 台开发机器 · 2 台中转机器",
+    "3 台 GPU 服务器 · 5 台开发机器 · 2 台中转机器",
   );
   for (const [group, names] of [
     [
@@ -67,6 +67,8 @@ test("fleet overview, workstation details, separate GPU histories and shared log
         "研究院办公室 · Ubuntu 3060 Ti",
         "清华办公室 · RTX PRO 6000 · 01",
         "清华办公室 · RTX PRO 6000 · 02",
+        "清华办公室 · RTX PRO 6000 · 03",
+        "清华办公室 · RTX PRO 6000 · 04",
       ],
     ],
     ["relay-hosts", ["清华腾讯云服务器", "研究院 Windows 中转机"]],
@@ -81,10 +83,10 @@ test("fleet overview, workstation details, separate GPU histories and shared log
   );
   if (!live) expect(offline).toEqual([]);
   await expect(page.locator("#fleet-summary")).toContainText(
-    `${8 - offline.length} / 8`,
+    `${10 - offline.length} / 10`,
   );
   await expect(page.locator("#fleet-summary")).toContainText(
-    `${overview.hosts.filter((host) => !host.unavailable).reduce((count, host) => count + (host.gpu?.devices?.length || 0), 0)} / 28`,
+    `${overview.hosts.filter((host) => !host.unavailable).reduce((count, host) => count + (host.gpu?.devices?.length || 0), 0)} / 30`,
   );
   await overflow();
   await page.screenshot({
@@ -144,7 +146,7 @@ test("fleet overview, workstation details, separate GPU histories and shared log
   expect((await (await secondResponse).json()).server.id).toBe("pro6000-02");
   await expect(page).toHaveURL(/server=pro6000-02/);
   await expect(page.locator("#gpu-cards .gpu-card")).toHaveCount(1);
-  await expect(page.locator("#host-summary")).toContainText("第二台");
+  await expect(page.locator("#host-summary")).toContainText("GM1G9483");
   await overflow();
   await page.reload();
   await expect(page.locator("#server-select")).toHaveValue("pro6000-02");

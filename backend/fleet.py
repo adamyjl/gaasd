@@ -48,28 +48,29 @@ HOSTS = {
         href="/status4?server=rtx4090",
         expected_gpus=8,
     ),
-    "pro6000": dict(
-        name="清华办公室 · RTX PRO 6000 · 01",
-        address="ThinkStation P3 Tower Gen 2",
-        group="开发机器",
-        href="/status5?server=pro6000",
-        expected_gpus=1,
-    ),
-    "pro6000-02": dict(
-        name="清华办公室 · RTX PRO 6000 · 02",
-        address="ThinkStation P3 Tower Gen 2 · 第二台",
-        group="开发机器",
-        href="/status5?server=pro6000-02",
-        expected_gpus=1,
-    ),
 }
+
+# Keep the original ID for 01 so existing links and historical samples stay valid.
+WORKSTATIONS = {
+    "pro6000": ("01", "GM1F943D", 2226),
+    "pro6000-02": ("02", "GM1G9483", 2227),
+    "pro6000-03": ("03", "GM1F944T", 2228),
+    "pro6000-04": ("04", "GM1F942K", 2229),
+}
+for host_id, (number, serial, _) in WORKSTATIONS.items():
+    HOSTS[host_id] = dict(
+        name=f"清华办公室 · RTX PRO 6000 · {number}",
+        address=f"ThinkStation P3 Tower Gen 2 · {serial}",
+        group="开发机器",
+        href=f"/status5?server={host_id}",
+        expected_gpus=1,
+    )
 TARGETS = {
     "office": ("tsari", "127.0.0.1", 2222),
     "windows": ("tsari", "127.0.0.1", 2224),
     "rtx5090": ("user001", "127.0.0.1", 2223),
     "rtx4090": ("centos", "127.0.0.1", 2225),
-    "pro6000": ("lenovo", "127.0.0.1", 2226),
-    "pro6000-02": ("lenovo", "127.0.0.1", 2227),
+    **{key: ("lenovo", "127.0.0.1", port) for key, (_, _, port) in WORKSTATIONS.items()},
 }
 
 
@@ -122,8 +123,7 @@ def overview(root):
         "cloud",
         "office",
         "windows",
-        "pro6000",
-        "pro6000-02",
+        *WORKSTATIONS,
     ):
         try:
             data = read_cached(root, key, now=now)

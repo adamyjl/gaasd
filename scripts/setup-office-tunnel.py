@@ -15,6 +15,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+PRO_PORTS = {"pro6000": 2226, "pro6000-02": 2227, "pro6000-03": 2228, "pro6000-04": 2229}
+
 ACCOUNT = "gaasd-office-tunnel"
 HOME_DIR = Path("/var/lib/gaasd-office-tunnel")
 CONF = Path("/etc/gaasd-office-tunnel")
@@ -69,7 +71,7 @@ def backup(path):
 def main():
     global ACCOUNT, HOME_DIR, CONF, UNIT
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", choices=["office", "pro6000", "pro6000-02"], default="office")
+    parser.add_argument("--profile", choices=["office", *PRO_PORTS], default="office")
     parser.add_argument(
         "phase", choices=["office-prepare", "cloud-authorize", "office-start", "cloud-web"]
     )
@@ -88,10 +90,10 @@ def main():
 
     def template(name):
         text = (args.source / name).read_text()
-        if args.profile == "pro6000-02":
+        if args.profile in PRO_PORTS:
             text = text.replace("gaasd-pro6000-tunnel", ACCOUNT)
-            text = text.replace("PRO6000 TUNNEL", "PRO6000-02 TUNNEL")
-            text = text.replace(":2226", ":2227")
+            text = text.replace("PRO6000 TUNNEL", f"{args.profile.upper()} TUNNEL")
+            text = text.replace(":2226", f":{PRO_PORTS[args.profile]}")
         return text
 
     if os.geteuid() != 0:
@@ -131,7 +133,7 @@ def main():
         ssh_dir.mkdir(mode=0o700, exist_ok=True)
         os.chown(ssh_dir, user.pw_uid, user.pw_gid)
         authorized = ssh_dir / "authorized_keys"
-        ports = {"office": [2222, 18765], "pro6000": [2226], "pro6000-02": [2227]}[args.profile]
+        ports = [PRO_PORTS[args.profile]] if args.profile in PRO_PORTS else [2222, 18765]
         options = ",".join(f'permitlisten="127.0.0.1:{port}"' for port in ports)
         line = "restrict,port-forwarding," + options + " " + key + "\n"
         if authorized.exists() and authorized.read_text() != line:

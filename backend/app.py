@@ -18,7 +18,7 @@ from urllib.parse import urlsplit
 from analysis import page_data as analysis_data
 from database import connect, initialize, insert_visit
 from flask import Flask, Response, abort, jsonify, request, send_from_directory
-from fleet import HOSTS, overview, read_cached
+from fleet import HOSTS, WORKSTATIONS, overview, read_cached
 from geo import GeoLookup, browser_info
 from gpu_usage import report as gpu_usage_report
 from werkzeug.security import check_password_hash
@@ -264,7 +264,7 @@ def create_app(overrides=None):
         office = request.path.startswith("/status1")
         pro6000 = request.path.startswith("/status5")
         names = (
-            ["pro6000", "pro6000-02"]
+            list(WORKSTATIONS)
             if pro6000
             else ["windows"]
             if windows

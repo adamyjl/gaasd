@@ -13,9 +13,13 @@
 | 苏州内网 8 卡 RTX 4090 | `127.0.0.1:2225` → `192.168.1.19:22` | `centos` | 同一 Windows 独立连接 / `gaasd-4090-relay` | `ops/windows-ssh-relays/` |
 | 清华办公室 RTX PRO 6000 | `127.0.0.1:2226` → 开发机本地 `127.0.0.1:22` | `lenovo` | 开发机主动连接 / `gaasd-pro6000-tunnel` | `ops/pro6000-tunnel/` |
 | 清华办公室 RTX PRO 6000 · 02 | `127.0.0.1:2227` → 第二台本地 `127.0.0.1:22` | `lenovo` | 第二台主动连接 / `gaasd-pro6000-02-tunnel` | `ops/pro6000-tunnel/` |
+| 清华办公室 RTX PRO 6000 · 03 | 127.0.0.1:2228 → 工作站 22 | lenovo | 第三台主动连接 / gaasd-pro6000-03-tunnel | ops/pro6000-tunnel/ |
+| 清华办公室 RTX PRO 6000 · 04 | 127.0.0.1:2229 → 工作站 22 | lenovo | 第四台主动连接 / gaasd-pro6000-04-tunnel | ops/pro6000-tunnel/ |
 | 清华内网 8 卡 A100 | 云端 OpenVPN → `192.168.2.201:2202` | `aiusr` | 原 OpenVPN 路线，无新增云端回环端口 | 原部署及 `STATUS.md` |
 
-2222、2223、2224、2225、2226、18765 均只监听云端回环地址。`/status2/` 仍是原 3060 Ti 监控，`/status` 的内网选择仍是 A100。2026-10-20 另加 `/status1` 六机总览、`/status3` Windows 监控、`/status4` 苏州 GPU 监控；新采集复用这些路线及独立受限公钥，不修改中转任务或端口，见 [监控部署记录](fleet-monitor-20261020.md)。
+四台 PRO 6000 的当前地址、SSH 用法及硬件记录见[四机接入表](pro6000-four-20261031.md)。
+
+2222–2229、18765 均只监听云端回环地址。`/status2/` 仍是原 3060 Ti 监控，`/status` 的内网选择仍是 A100。2026-10-20 另加 `/status1` 六机总览、`/status3` Windows 监控、`/status4` 苏州 GPU 监控；新采集复用这些路线及独立受限公钥，不修改中转任务或端口，见 [监控部署记录](fleet-monitor-20261020.md)。
 
 **型号核对：** `192.168.1.111` / `tsari-server` 实测 8 张 **RTX 5090**，每张 32607 MiB。用户随后指定的 `192.168.1.19` / `localhost.localdomain` 是另一台机器，实测 8 张 **RTX 4090**，每张 24564 MiB。两台机器和入口分别保留，不把原 2223 改指向新机器。
 

@@ -241,6 +241,8 @@ WantedBy=multi-user.target
                     ("rtx4090", 8),
                     ("pro6000", 1),
                     ("pro6000-02", 1),
+                    ("pro6000-03", 1),
+                    ("pro6000-04", 1),
                 ]:
                     folder = Path("/var/lib/gaasd-analytics/status") / host
                     sample = json.loads((folder / "latest.json").read_text())

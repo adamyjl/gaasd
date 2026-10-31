@@ -16,12 +16,14 @@ async function update() {
     "rtx5090",
     "pro6000",
     "pro6000-02",
+    "pro6000-03",
+    "pro6000-04",
   ]) {
     const internal = host !== "cloud";
     const folder = host === "cloud" ? root : join(root, host);
     await mkdir(folder, { recursive: true });
     const data = sample(internal);
-    if (["office", "windows", "pro6000", "pro6000-02"].includes(host)) {
+    if (["office", "windows"].includes(host) || host.startsWith("pro6000")) {
       data.gpu.devices = data.gpu.devices.slice(0, 1);
       data.gpu.expected_count = 1;
       data.cpu.cores = data.cpu.cores.slice(0, 8);
